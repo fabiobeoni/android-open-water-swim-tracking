@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Open Water Swim Tracking</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="rss_activity_label">Open Water News</string>
+    <string name="menu_view_swim_view">Show Swim List</string>
+</resources>
