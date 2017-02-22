@@ -1,75 +1,71 @@
 package com.beoni.openwaterswimtracking;
-
-import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
+import android.widget.ListView;
 
+import com.beoni.openwaterswimtracking.bll.RssManager;
+import com.beoni.openwaterswimtracking.utils.LLog;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link RssFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link RssFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.ViewById;
+
+import java.util.ArrayList;
+
+@EFragment(R.layout.fragment_rss)
+@OptionsMenu(R.menu.rss_menu)
 public class RssFragment extends Fragment {
+
+    ArrayList<RssItemSimplified> mRssItems = new ArrayList<>();
+
+    @Bean
+    RssManager mRssManager;
+
+    RssListAdapter rssListAdapter;
+
+    @ViewById(R.id.rss_list)
+    ListView mRssList;
+
 
     public RssFragment() {
         // Required empty public constructor
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
 
-        setHasOptionsMenu(true);
-
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_rss, container, false);
+    @OptionsItem(R.id.menu_show_swim_list)
+    void startSwimActivity(){
+        LLog.i("Navigating to swim activity");
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.rss_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
+    @AfterViews
+    void viewCreated() {
+        loadRssItems();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        //TODO: find a better way to handle those cases
-        //when the settings button Filter gets clicked
-        //sets the filter for the movie list to display
-        /*
-        switch (id){
-            case R.id.menu_filter_popular:
-                onMenuPopularClick();
-                break;
-            case R.id.menu_reload:
-                onMenuPopularClick();
-                break;
-            case R.id.menu_filter_rated:
-                onMenuTopRatedClick();
-                break;
-            case R.id.menu_filter_favorites:
-                onMenuOrderByFavoritesClick();
-                break;
-            case R.id.menu_clear_favorites:
-                onMenuClearFavoritesClick();
-                break;
-        }
-        */
-
-        return super.onOptionsItemSelected(item);
+    @Background
+    void loadRssItems() {
+        mRssItems = mRssManager.getRssItems();
+        updateAdapter();
     }
 
+    @UiThread
+    void updateAdapter() {
+        rssListAdapter = new RssListAdapter(getContext(), R.layout.rss_item, mRssItems);
+        mRssList.setAdapter(rssListAdapter);
+    }
+
+    @ItemClick(R.id.rss_list)
+    void viewRssOnBrowser(int position){
+        String link = mRssItems.get(position).getLink();
+        Uri uri = Uri.parse(link);
+        Intent intent = new Intent(Intent.ACTION_VIEW).setData(uri);
+        startActivity(intent);
+    }
 }

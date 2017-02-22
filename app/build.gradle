@@ -1,4 +1,22 @@
 apply plugin: 'com.android.application'
+apply plugin: 'android-apt'
+def AAVersion = '3.2'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
+    }
+}
+
+apt {
+    arguments {
+        androidManifestFile variant.outputs[0].processResources.manifestFile
+        resourcePackageName 'com.beoni.openwaterswimtracking'
+    }
+}
 
 android {
     compileSdkVersion 25
@@ -28,8 +46,12 @@ dependencies {
     compile 'com.android.support:support-v4:25.1.1'
     compile 'com.android.support:recyclerview-v7:25.1.1'
     compile 'com.google.firebase:firebase-auth:10.0.1'
+    compile files('libs/gson-2.2.2.jar')
     testCompile 'junit:junit:4.12'
     compile project(path: ':sAXRSSReader')
+
+    apt "org.androidannotations:androidannotations:$AAVersion"
+    compile "org.androidannotations:androidannotations-api:$AAVersion"
 }
 
 apply plugin: 'com.google.gms.google-services'

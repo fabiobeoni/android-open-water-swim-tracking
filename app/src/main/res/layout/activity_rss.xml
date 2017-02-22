@@ -41,7 +41,7 @@
         tools:context="com.beoni.openwaterswimtracking.RssActivity">
 
         <fragment
-            android:name="com.beoni.openwaterswimtracking.RssFragment"
+            android:name="com.beoni.openwaterswimtracking.RssFragment_"
             android:id="@+id/rss_fragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
