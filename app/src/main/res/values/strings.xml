@@ -11,7 +11,8 @@
     <string name="action_settings">Settings</string>
     <string name="rss_no_connection">Looks like you are not connected</string>
     <string name="btn_show_swim_list">Don\'t care, show Swim Track</string>
-    <string name="menu_add_swim">New Swim</string>
+    <string name="menu_add_swim">Add New Swim</string>
     <string name="btn_know_more">Read More</string>
-    <string name="menu_backup">Backup Swim On Google Cloud</string>
+    <string name="menu_backup">Backup/Restore swim tracks with Google Cloud</string>
+    <string name="no_swim">Looks like you don\'t have any swim yet</string>
 </resources>

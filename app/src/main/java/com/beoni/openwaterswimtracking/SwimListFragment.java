@@ -7,8 +7,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
-import com.beoni.openwaterswimtracking.bll.RssManager;
-import com.beoni.openwaterswimtracking.model.RssItemSimplified;
+import com.beoni.openwaterswimtracking.bll.SwimTrackManager;
+import com.beoni.openwaterswimtracking.model.SwimTrack;
 import com.beoni.openwaterswimtracking.utils.LLog;
 
 import org.androidannotations.annotations.AfterViews;
@@ -17,34 +17,35 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
 
 /**
- * The fragment presents RSS data in a list view,
- * performs RSS download and local cache by the
- * RssManager, handles the navigation to the swim
- * list activity.
+ * The fragment presents swim tracking data in a list view,
+ * performs swim reading from the storage by the
+ * SwimManager.
  */
-@EFragment(R.layout.fragment_rss)
-public class RssFragment extends Fragment {
+@EFragment(R.layout.fragment_swim_list)
+@OptionsMenu(R.menu.menu_swim)
+public class SwimListFragment extends Fragment {
 
-    //list of Rss items presented on view
+    //list of swim track items presented on view
     @InstanceState
-    ArrayList<RssItemSimplified> mRssItems = null;
+    ArrayList<SwimTrack> mSwimTracksList = null;
 
-    //class that actually performs the Rss download and cache
+    //class that actually performs the swim CRUD actions
     @Bean
-    RssManager mRssManager;
+    SwimTrackManager mSwimTrackManager;
 
     //adapt class for this view
-    RssListAdapter rssListAdapter;
+    SwimTracksAdapter mSwimTracksAdapter;
 
-    //list view presenting the Rss data
-    @ViewById(R.id.rss_list)
-    ListView mRssList;
+    //list view presenting the swim tracks data
+    @ViewById(R.id.swim_list)
+    ListView mSwimListView;
 
     @ViewById(R.id.progress_bar)
     ProgressBar mProgressBar;
@@ -52,11 +53,18 @@ public class RssFragment extends Fragment {
     //group of ui elements to display
     //a message to the user when
     //device is offline
-    @ViewById(R.id.rss_message_panel)
+    @ViewById(R.id.swim_message_panel)
     LinearLayout mMessagePanel;
 
     // Required empty public constructor
-    public RssFragment() {}
+    public SwimListFragment() {}
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        saveDataOnLocalFile();
+    }
 
     /**
      * Requests data when not saved
@@ -66,7 +74,7 @@ public class RssFragment extends Fragment {
     void viewCreated() {
         //mSwimTracksList is saved in instance state
         //so can be reused
-        if(mRssItems==null){
+        if(mSwimTracksList ==null){
             //updates the UI showing progress bar
             //for background tasks
             setUIState(UIStates.GETTING_DATA);
@@ -78,28 +86,19 @@ public class RssFragment extends Fragment {
             onDataLoadCompleted();
     }
 
-    /**
-     * Async load rss data from cache or from the web
-     * when cache is not valid anymore and network
-     * is available, then request list view update
-     */
+
     @Background
     void loadData() {
-        mRssItems = mRssManager.getRssItems();
+        mSwimTracksList = mSwimTrackManager.getSwimTracks();
         onDataLoadCompleted();
     }
 
-    /**
-     Performs list view adapter refresh
-     with loaded rss data (if any), otherwise
-     displays the swim list activity
-     */
     @UiThread
     void onDataLoadCompleted() {
         //updates the list adapter to display the data
-        if(mRssItems!=null && mRssItems.size()>0){
-            rssListAdapter = new RssListAdapter(getContext(), R.layout.rss_item, mRssItems);
-            mRssList.setAdapter(rssListAdapter);
+        if(mSwimTracksList !=null && mSwimTracksList.size()>0){
+            mSwimTracksAdapter = new SwimTracksAdapter(getContext(), R.layout.swim_track_item, mSwimTracksList);
+            mSwimListView.setAdapter(mSwimTracksAdapter);
 
             //hides the progress bar since the
             //background process is completed
@@ -113,6 +112,11 @@ public class RssFragment extends Fragment {
             setUIState(UIStates.OFFLINE);
     }
 
+    @Background
+    void saveDataOnLocalFile(){
+        mSwimTrackManager.save();
+    }
+
 
     //============== UI STATES ==============/
 
@@ -124,17 +128,17 @@ public class RssFragment extends Fragment {
             case GETTING_DATA:
                 mProgressBar.setVisibility(View.VISIBLE);
                 mMessagePanel.setVisibility(View.GONE);
-                mRssList.setVisibility(View.GONE);
+                mSwimListView.setVisibility(View.GONE);
                 break;
             case OFFLINE:
                 mProgressBar.setVisibility(View.GONE);
                 mMessagePanel.setVisibility(View.VISIBLE);
-                mRssList.setVisibility(View.GONE);
+                mSwimListView.setVisibility(View.GONE);
                 break;
             case VIEW_DATA:
                 mProgressBar.setVisibility(View.GONE);
                 mMessagePanel.setVisibility(View.GONE);
-                mRssList.setVisibility(View.VISIBLE);
+                mSwimListView.setVisibility(View.VISIBLE);
                 break;
             default:
                 LLog.e(new Exception("Missing UI state definition"));

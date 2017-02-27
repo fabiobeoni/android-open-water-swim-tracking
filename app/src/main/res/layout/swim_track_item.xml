@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/swim_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Title"/>
+
+    <TextView
+        android:id="@+id/swim_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="10/12/2010"/>
+
+    <!--//TODO: small chronometer gray icon close to the text  -->
+    <TextView
+        android:id="@+id/swim_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1.3h"/>
+
+    <!--//TODO: small distance gray icon close to the text  -->
+    <TextView
+        android:id="@+id/swim_length"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="5km"/>
+
+    <!--//TODO: small temperature gray icon close to the text  -->
+    <TextView
+        android:id="@+id/swim_temperature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="cold"/>
+
+    <ImageView
+        android:id="@+id/swim_waves"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <ImageView
+        android:id="@+id/swim_flow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

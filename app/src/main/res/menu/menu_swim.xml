@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="com.beoni.openwaterswimtracking.MainActivity">
+    <item
+        android:id="@+id/menu_add_swim"
+        android:title="@string/menu_add_swim"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_add_box_white"/>
+
+    <item
+        android:id="@+id/menu_backup"
+        android:title="@string/menu_backup"
+        app:showAsAction="never"
+        android:icon="@drawable/ic_backup_white"/>
+</menu>

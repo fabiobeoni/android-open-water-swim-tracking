@@ -9,14 +9,12 @@ import android.support.v4.view.ViewPager;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @EActivity(R.layout.activity_main)
-@OptionsMenu(R.menu.menu_main)
 public class MainActivity extends AppCompatActivity
 {
 
@@ -60,11 +58,13 @@ public class MainActivity extends AppCompatActivity
         //populates the list of titles. See SectionsPagerAdapter
         mTabsTitles = new HashMap<Integer, String>(){{
             put(0,getString(R.string.rss_activity_label));
+            put(1,getString(R.string.swim_activity_label));
         }};
 
         //populates the list of fragments. See SectionsPagerAdapter
         mTabsFragments = new HashMap<Integer, Class>(){{
             put(0,RssFragment_.class);
+            put(1,SwimListFragment_.class);
         }};
 
         // Create the adapter that will return a fragment for each of the three
