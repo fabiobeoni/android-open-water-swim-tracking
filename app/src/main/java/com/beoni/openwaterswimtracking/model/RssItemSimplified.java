@@ -1,12 +1,13 @@
-package com.beoni.openwaterswimtracking;
+package com.beoni.openwaterswimtracking.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
 import nl.matshofman.saxrssreader.RssItem;
 
 
-public class RssItemSimplified
+public class RssItemSimplified implements Serializable
 {
     public static RssItemSimplified factory(RssItem rssItem){
         RssItemSimplified item = new RssItemSimplified();
