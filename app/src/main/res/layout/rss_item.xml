@@ -23,10 +23,12 @@
         android:layout_height="wrap_content"
         android:text="Date"/>
 
-    <TextView
-        android:id="@+id/rss_link"
+    <Button
+        android:id="@+id/btn_know_more"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Link"/>
+        android:text="@string/btn_know_more"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_marginTop="4dp"/>
 
 </LinearLayout>

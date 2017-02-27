@@ -114,20 +114,6 @@ public class RssFragment extends Fragment {
     }
 
 
-    //========== USER INTERACTION ===========/
-
-    //handler for Rss list view item
-    //click event that starts the browsers
-    //and displays the RSS web page
-    @ItemClick(R.id.rss_list)
-    void viewRssOnBrowser(int position){
-        String link = mRssItems.get(position).getLink();
-        Uri uri = Uri.parse(link);
-        Intent intent = new Intent(Intent.ACTION_VIEW).setData(uri);
-        startActivity(intent);
-    }
-
-
     //============== UI STATES ==============/
 
     private enum UIStates { GETTING_DATA, OFFLINE, VIEW_DATA}
