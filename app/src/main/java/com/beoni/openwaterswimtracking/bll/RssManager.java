@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.beoni.openwaterswimtracking.R;
-import com.beoni.openwaterswimtracking.RssItemSimplified;
+import com.beoni.openwaterswimtracking.model.RssItemSimplified;
 import com.beoni.openwaterswimtracking.data.LocalFileStorage;
 import com.beoni.openwaterswimtracking.utils.ConnectivityUtils;
 import com.beoni.openwaterswimtracking.utils.DateUtils;
@@ -34,7 +34,6 @@ public class RssManager
 {
     private static final String RSS_FILE_NAME = "OWSTRss.txt";
     private static final String LAST_DOWNLOAD_DATE = "LAST_DOWNLOAD_DATE";
-    private static final String PREFERENCE_FILE = "com.beoni.openwaterswimtracking.mPreferences";
 
     private Context mContext;
     private LocalFileStorage mStorage;
@@ -43,7 +42,7 @@ public class RssManager
     public RssManager(Context ctx){
         mContext = ctx;
         mStorage = LocalFileStorage.get(ctx);
-        mPreferences = mContext.getSharedPreferences(PREFERENCE_FILE, android.content.Context.MODE_PRIVATE);
+        mPreferences = mContext.getSharedPreferences(ctx.getString(R.string.preferences_file), android.content.Context.MODE_PRIVATE);
     }
 
     /**
