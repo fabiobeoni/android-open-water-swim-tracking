@@ -2,13 +2,13 @@ package com.beoni.openwaterswimtracking;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
-import android.text.Layout;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.beoni.openwaterswimtracking.bll.RssManager;
+import com.beoni.openwaterswimtracking.model.RssItemSimplified;
 import com.beoni.openwaterswimtracking.utils.LLog;
 
 import org.androidannotations.annotations.AfterViews;
@@ -64,7 +64,7 @@ public class RssFragment extends Fragment {
      */
     @AfterViews
     void viewCreated() {
-        //mRssItems is saved in instance state
+        //mSwimTracksList is saved in instance state
         //so can be reused
         if(mRssItems==null){
             //updates the UI showing progress bar
@@ -72,10 +72,10 @@ public class RssFragment extends Fragment {
             setUIState(UIStates.GETTING_DATA);
 
             //gets data from the web or from cached
-            loadRssItems();
+            loadData();
         }
         else //just proceed with UI update
-            onLoadRssItemsCompleted();
+            onDataLoadCompleted();
     }
 
     /**
@@ -84,9 +84,9 @@ public class RssFragment extends Fragment {
      * is available, then request list view update
      */
     @Background
-    void loadRssItems() {
+    void loadData() {
         mRssItems = mRssManager.getRssItems();
-        onLoadRssItemsCompleted();
+        onDataLoadCompleted();
     }
 
     /**
@@ -95,7 +95,7 @@ public class RssFragment extends Fragment {
      displays the swim list activity
      */
     @UiThread
-    void onLoadRssItemsCompleted() {
+    void onDataLoadCompleted() {
         //updates the list adapter to display the data
         if(mRssItems!=null && mRssItems.size()>0){
             rssListAdapter = new RssListAdapter(getContext(), R.layout.rss_item, mRssItems);
