@@ -49,12 +49,19 @@ public class RssFragment extends Fragment {
     @ViewById(R.id.progress_bar)
     ProgressBar mProgressBar;
 
+    //group of ui elements to display
+    //a message to the user when
+    //device is offline
     @ViewById(R.id.rss_message_panel)
     LinearLayout mMessagePanel;
 
     // Required empty public constructor
     public RssFragment() {}
 
+    /**
+     * Requests data when not saved
+     * on instance state
+     */
     @AfterViews
     void viewCreated() {
         //mRssItems is saved in instance state
@@ -71,18 +78,22 @@ public class RssFragment extends Fragment {
             onLoadRssItemsCompleted();
     }
 
-    //async load rss data from cache or from the web
-    //when cache is not valid anymore and network
-    //is available, then request list view update
+    /**
+     * Async load rss data from cache or from the web
+     * when cache is not valid anymore and network
+     * is available, then request list view update
+     */
     @Background
     void loadRssItems() {
         mRssItems = mRssManager.getRssItems();
         onLoadRssItemsCompleted();
     }
 
-    //performs list view adapter refresh
-    //with loaded rss data (if any), otherwise
-    //displays the swim list activity
+    /**
+     Performs list view adapter refresh
+     with loaded rss data (if any), otherwise
+     displays the swim list activity
+     */
     @UiThread
     void onLoadRssItemsCompleted() {
         //updates the list adapter to display the data
