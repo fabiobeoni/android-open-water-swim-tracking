@@ -1,8 +1,13 @@
 <resources>
+    <string name="rss_url" translatable="false">http://feeds.feedburner.com/TheDailyNewsOfOpenWaterSwimming</string>
+
     <string name="app_name">Open Water Swim Tracking</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="rss_activity_label">Open Water News</string>
-    <string name="menu_view_swim_view">Show Swim List</string>
-    <string name="rss_url">http://feeds.feedburner.com/TheDailyNewsOfOpenWaterSwimming</string>
+    <string name="swim_activity_label">Swim Track</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="rss_no_connection">Looks like you are not connected</string>
+    <string name="btn_show_swim_list">Don\'t care, show Swim Track</string>
 </resources>

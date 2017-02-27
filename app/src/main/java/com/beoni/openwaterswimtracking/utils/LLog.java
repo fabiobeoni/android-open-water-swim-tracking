@@ -14,11 +14,13 @@ public class LLog
     private static final String INFO_TAG = "OWST.info";
 
     public static Exception e(Exception ex){
+        ex.printStackTrace();
         Log.e(ERROR_TAG, Arrays.toString(ex.getStackTrace()));
         return ex;
     }
 
     public static Exception w(Exception ex){
+        ex.printStackTrace();
         Log.e(WARN_TAG, Arrays.toString(ex.getStackTrace()));
         return ex;
     }

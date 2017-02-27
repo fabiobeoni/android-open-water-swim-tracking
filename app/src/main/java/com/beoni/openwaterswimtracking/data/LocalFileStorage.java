@@ -1,15 +1,7 @@
 package com.beoni.openwaterswimtracking.data;
 
 import android.content.Context;
-import android.os.AsyncTask;
-import android.support.annotation.Nullable;
-
-import com.beoni.openwaterswimtracking.utils.ICallback;
-import com.beoni.openwaterswimtracking.utils.LLog;
-
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
