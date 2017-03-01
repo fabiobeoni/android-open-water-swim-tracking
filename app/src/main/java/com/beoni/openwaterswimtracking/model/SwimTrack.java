@@ -119,10 +119,10 @@ public class SwimTrack implements Serializable
     private String location;
     private Date date;
     //in minutes
-    private int duration;
+    private int duration = 0;
     //measure type agnostic number
-    private int length;
-    private int perceivedTemperature;
-    private int waves;
-    private int flow;
+    private int length = 0;
+    private int perceivedTemperature = 0;
+    private int waves = 0;
+    private int flow = 0;
 }

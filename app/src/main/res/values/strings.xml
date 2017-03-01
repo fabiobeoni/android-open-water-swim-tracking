@@ -15,4 +15,57 @@
     <string name="btn_know_more">Read More</string>
     <string name="menu_backup">Backup/Restore swim tracks with Google Cloud</string>
     <string name="no_swim">Looks like you don\'t have any swim yet</string>
+    <string name="title_activity_login">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="edit_swim_activity_label">Swim Data</string>
+    <string name="menu_save_swim">Save Swim</string>
+    <string name="menu_delete_swim">Delete Swim</string>
+    <string name="swim_title_hint">Title (*)</string>
+    <string name="swim_notes_hint">Notes</string>
+    <string name="swim_date_hint">When (*)</string>
+    <string name="swim_location_hint">Spot</string>
+    <string name="swim_duration">Duration</string>
+    <string name="swim_duration_label_hours">&#160;h&#160;&#160;</string>
+    <string name="swim_duration_label_minutes">&#160;m</string>
+    <string name="swim_length">Distance</string>
+    <string name="swim_length_label">&#160;meters</string>
+    <string name="swim_temperature">Perceived Temperature</string>
+    <string-array name="temperature_values">
+        <item>Really cold</item>
+        <item>Cold</item>
+        <item>Quite cold</item>
+        <item>Regular</item>
+        <item>Quite warm</item>
+        <item>Warm</item>
+        <item>Too warm</item>
+    </string-array>
+    <string name="swim_waves">Waves</string>
+    <string-array name="waves_values">
+        <item>Flat water</item>
+        <item>Choppy</item>
+        <item>High chopp</item>
+        <item>Small waves</item>
+        <item>Waves</item>
+    </string-array>
+    <string name="swim_flow">Flow</string>
+    <string name="swim_title_validate">Title is required</string>
+    <string name="swim_date_validate">When is required</string>
+    <string-array name="flow_values">
+        <item>None</item>
+        <item>Light</item>
+        <item>Medium</item>
+        <item>Strong</item>
+    </string-array>
 </resources>

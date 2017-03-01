@@ -1,7 +1,9 @@
 package com.beoni.openwaterswimtracking;
 import android.content.Intent;
-import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -9,16 +11,15 @@ import android.widget.ProgressBar;
 
 import com.beoni.openwaterswimtracking.bll.SwimTrackManager;
 import com.beoni.openwaterswimtracking.model.SwimTrack;
+import com.beoni.openwaterswimtracking.rubricrequired.AAsyncTaskLoader;
 import com.beoni.openwaterswimtracking.utils.LLog;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
-import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
-import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
@@ -29,8 +30,14 @@ import java.util.ArrayList;
  * SwimManager.
  */
 @EFragment(R.layout.fragment_swim_list)
-@OptionsMenu(R.menu.menu_swim)
-public class SwimListFragment extends Fragment {
+@OptionsMenu(R.menu.menu_swim_list)
+public class SwimListFragment extends Fragment implements LoaderManager.LoaderCallbacks
+{
+    //============ AVAILABLE UI STATES ===============/
+
+    private static final int UISTATE_GETTING_DATA = 0;
+    private static final int UISTATE_VIEW_DATA = 1;
+
 
     //list of swim track items presented on view
     @InstanceState
@@ -56,86 +63,88 @@ public class SwimListFragment extends Fragment {
     @ViewById(R.id.swim_message_panel)
     LinearLayout mMessagePanel;
 
-    // Required empty public constructor
+
+    //Required empty public constructor
     public SwimListFragment() {}
 
-    @Override
-    public void onPause()
-    {
-        super.onPause();
-        saveDataOnLocalFile();
+    //when the menu item Add Swim is clicked
+    //display the SwimEditActivity to add new
+    //a new swim track
+    @OptionsItem(R.id.menu_add_swim)
+    void displayEditSwimActivity(){
+        Intent displayIntent = new Intent(getActivity(), SwimEditActivity_.class);
+        startActivity(displayIntent);
     }
 
-    /**
-     * Requests data when not saved
-     * on instance state
-     */
+    //initialization
     @AfterViews
     void viewCreated() {
+        //TODO: for project approval using here AsyncTaskLoader instead of annotation. Restore commented code after.
         //mSwimTracksList is saved in instance state
         //so can be reused
         if(mSwimTracksList ==null){
             //updates the UI showing progress bar
             //for background tasks
-            setUIState(UIStates.GETTING_DATA);
+            setUIState(UISTATE_GETTING_DATA);
 
             //gets data from the web or from cached
-            loadData();
+            ////loadData();
+            getActivity().getSupportLoaderManager().initLoader(1, null, this).forceLoad();
         }
         else //just proceed with UI update
             onDataLoadCompleted();
     }
 
+    //creates a loader to load list of swim track
+    @Override
+    public Loader onCreateLoader(int id, Bundle args)
+    {
+        return new AAsyncTaskLoader(getActivity());
+    }
 
-    @Background
-    void loadData() {
-        mSwimTracksList = mSwimTrackManager.getSwimTracks();
+    //populate the list of swim tracks and updates the ui
+    @Override
+    public void onLoadFinished(Loader loader, Object data)
+    {
+        mSwimTracksList = (ArrayList<SwimTrack>) data;
         onDataLoadCompleted();
     }
 
-    @UiThread
+    @Override
+    public void onLoaderReset(Loader loader)
+    {
+        //do nothing, list is empty already
+    }
+
+    //TODO: for project approval using here AsyncTaskLoader instead of annotation. Restore commented code after.
+    ////@Background
+    ////void loadData() {
+        ////mSwimTracksList = mSwimTrackManager.getSwimTracks();
+        ////onDataLoadCompleted();
+    ////}
+    //Updates the UI to display loaded swim tracks
+    //@UiThread
     void onDataLoadCompleted() {
         //updates the list adapter to display the data
         if(mSwimTracksList !=null && mSwimTracksList.size()>0){
             mSwimTracksAdapter = new SwimTracksAdapter(getContext(), R.layout.swim_track_item, mSwimTracksList);
             mSwimListView.setAdapter(mSwimTracksAdapter);
-
-            //hides the progress bar since the
-            //background process is completed
-            //and displays the data
-            setUIState(UIStates.VIEW_DATA);
         }
-        else
-            //hides the progress bar since the
-            //background process is completed
-            //and shows a message
-            setUIState(UIStates.OFFLINE);
+
+        //hides the progress bar since the
+        //background process is completed
+        //and displays the data
+        setUIState(UISTATE_VIEW_DATA);
     }
 
-    @Background
-    void saveDataOnLocalFile(){
-        mSwimTrackManager.save();
-    }
-
-
-    //============== UI STATES ==============/
-
-    //TODO: avoid enums!!!!
-    private enum UIStates { GETTING_DATA, OFFLINE, VIEW_DATA}
-
-    private void setUIState(UIStates state){
+    private void setUIState(int state){
         switch (state){
-            case GETTING_DATA:
+            case UISTATE_GETTING_DATA:
                 mProgressBar.setVisibility(View.VISIBLE);
                 mMessagePanel.setVisibility(View.GONE);
                 mSwimListView.setVisibility(View.GONE);
                 break;
-            case OFFLINE:
-                mProgressBar.setVisibility(View.GONE);
-                mMessagePanel.setVisibility(View.VISIBLE);
-                mSwimListView.setVisibility(View.GONE);
-                break;
-            case VIEW_DATA:
+            case UISTATE_VIEW_DATA:
                 mProgressBar.setVisibility(View.GONE);
                 mMessagePanel.setVisibility(View.GONE);
                 mSwimListView.setVisibility(View.VISIBLE);

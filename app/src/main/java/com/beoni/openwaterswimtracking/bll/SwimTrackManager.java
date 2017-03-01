@@ -33,9 +33,10 @@ public class SwimTrackManager
         mPreferences = mContext.getSharedPreferences(ctx.getString(R.string.preferences_file), Context.MODE_PRIVATE);
     }
 
-    public ArrayList<SwimTrack> getSwimTracks()
+    public ArrayList<SwimTrack> getSwimTracks(boolean forceReload)
     {
-        mSwimTracks = readFile();
+        if(mSwimTracks==null || forceReload)
+            mSwimTracks = readFile();
 
         //TESTING!!! TODO:REMOVE
         if(mSwimTracks.size()==0){
@@ -48,15 +49,18 @@ public class SwimTrackManager
     }
 
     public void addNewSwimTrack(SwimTrack swim){
+        getSwimTracks(false);
         mSwimTracks.add(swim);
     }
 
-    public void editSwimTrack(int index, SwimTrack currentSwim){
+    public void updateSwimTrack(int index, SwimTrack currentSwim){
+        getSwimTracks(false);
         mSwimTracks.remove(index);
         mSwimTracks.add(index,currentSwim);
     }
 
     public void deleteSwimTrack(int index){
+        getSwimTracks(false);
         mSwimTracks.remove(index);
     }
 

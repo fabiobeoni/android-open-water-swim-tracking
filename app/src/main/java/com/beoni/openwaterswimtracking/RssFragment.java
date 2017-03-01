@@ -1,6 +1,4 @@
 package com.beoni.openwaterswimtracking;
-import android.content.Intent;
-import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -9,14 +7,13 @@ import android.widget.ProgressBar;
 
 import com.beoni.openwaterswimtracking.bll.RssManager;
 import com.beoni.openwaterswimtracking.model.RssItemSimplified;
+import com.beoni.openwaterswimtracking.rubricrequired.SwimListFileTask;
 import com.beoni.openwaterswimtracking.utils.LLog;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
-import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -30,6 +27,13 @@ import java.util.ArrayList;
  */
 @EFragment(R.layout.fragment_rss)
 public class RssFragment extends Fragment {
+
+    //============== UI STATES ==============/
+
+    private static final int UISTATE_GETTING_DATA = 0;
+    private static final int UISTATE_OFFLINE = 1;
+    private static final int UISTATE_VIEW_DATA = 2;
+
 
     //list of Rss items presented on view
     @InstanceState
@@ -69,7 +73,7 @@ public class RssFragment extends Fragment {
         if(mRssItems==null){
             //updates the UI showing progress bar
             //for background tasks
-            setUIState(UIStates.GETTING_DATA);
+            setUIState(UISTATE_GETTING_DATA);
 
             //gets data from the web or from cached
             loadData();
@@ -83,10 +87,19 @@ public class RssFragment extends Fragment {
      * when cache is not valid anymore and network
      * is available, then request list view update
      */
-    @Background
+    //TODO: for project approval using here AsyncTask instead of annotation. Restore commented code after.
+    //@Background
     void loadData() {
-        mRssItems = mRssManager.getRssItems();
-        onDataLoadCompleted();
+        new SwimListFileTask(){
+            @Override
+            protected void onPostExecute(Object o)
+            {
+                mRssItems = (ArrayList<RssItemSimplified>)o;
+                onDataLoadCompleted();
+            }
+        }.execute(getContext());
+        //mRssItems = mRssManager.getRssItems();
+        //onDataLoadCompleted();
     }
 
     /**
@@ -94,7 +107,8 @@ public class RssFragment extends Fragment {
      with loaded rss data (if any), otherwise
      displays the swim list activity
      */
-    @UiThread
+    //TODO: for project approval. Restore commented code after.
+    //@UiThread
     void onDataLoadCompleted() {
         //updates the list adapter to display the data
         if(mRssItems!=null && mRssItems.size()>0){
@@ -104,34 +118,29 @@ public class RssFragment extends Fragment {
             //hides the progress bar since the
             //background process is completed
             //and displays the data
-            setUIState(UIStates.VIEW_DATA);
+            setUIState(UISTATE_VIEW_DATA);
         }
         else
             //hides the progress bar since the
             //background process is completed
             //and shows a message
-            setUIState(UIStates.OFFLINE);
+            setUIState(UISTATE_OFFLINE);
     }
 
 
-    //============== UI STATES ==============/
-
-    //TODO: avoid enums!!!!
-    private enum UIStates { GETTING_DATA, OFFLINE, VIEW_DATA}
-
-    private void setUIState(UIStates state){
+    private void setUIState(int state){
         switch (state){
-            case GETTING_DATA:
+            case UISTATE_GETTING_DATA:
                 mProgressBar.setVisibility(View.VISIBLE);
                 mMessagePanel.setVisibility(View.GONE);
                 mRssList.setVisibility(View.GONE);
                 break;
-            case OFFLINE:
+            case UISTATE_OFFLINE:
                 mProgressBar.setVisibility(View.GONE);
                 mMessagePanel.setVisibility(View.VISIBLE);
                 mRssList.setVisibility(View.GONE);
                 break;
-            case VIEW_DATA:
+            case UISTATE_VIEW_DATA:
                 mProgressBar.setVisibility(View.GONE);
                 mMessagePanel.setVisibility(View.GONE);
                 mRssList.setVisibility(View.VISIBLE);

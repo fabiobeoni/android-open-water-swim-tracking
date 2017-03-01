@@ -10,27 +10,32 @@
         android:layout_height="wrap_content"
         android:text="Title"/>
 
+    <!--//TODO: small chronometer gray icon close to the text  -->
+    <!--//TODO: small distance gray icon close to the text  -->
+    <!--//TODO: small temperature gray icon close to the text  -->
+
+    <!--
     <TextView
         android:id="@+id/swim_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="10/12/2010"/>
 
-    <!--//TODO: small chronometer gray icon close to the text  -->
+
     <TextView
         android:id="@+id/swim_duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="1.3h"/>
 
-    <!--//TODO: small distance gray icon close to the text  -->
+
     <TextView
         android:id="@+id/swim_length"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="5km"/>
 
-    <!--//TODO: small temperature gray icon close to the text  -->
+
     <TextView
         android:id="@+id/swim_temperature"
         android:layout_width="wrap_content"
@@ -46,5 +51,7 @@
         android:id="@+id/swim_flow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+
+        -->
 
 </LinearLayout>

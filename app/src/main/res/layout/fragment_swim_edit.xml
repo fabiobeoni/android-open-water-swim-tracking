@@ -1,0 +1,242 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.beoni.openwaterswimtracking.SwimEditFragment_">
+
+    <ScrollView
+        android:id="@+id/swim_form"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/activity_horizontal_margin">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/swim_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/swim_title_hint"
+                    android:inputType="textCapSentences"
+                    android:maxLines="1"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/swim_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/swim_location_hint"
+                    android:inputType="textCapSentences"
+                    android:maxLines="1"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/swim_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/swim_date_hint"
+                    android:inputType="date"
+                    android:maxLines="1"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/swim_notes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/swim_notes_hint"
+                    android:inputType="textMultiLine"
+                    android:maxLines="100"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?android:attr/textColorHint"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:text="@string/swim_duration"
+                android:paddingBottom="12dp"
+                android:paddingEnd="4dp"
+                android:paddingStart="4dp"
+                android:paddingTop="16dp"/>
+
+
+            <SeekBar
+                android:id="@+id/swim_duration"
+                    style="@style/Widget.AppCompat.SeekBar.Discrete"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:max="600"
+                    android:progress="1"
+                    android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/swim_duration_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:text="[value]"
+                android:textColor="@android:color/black"
+                android:layout_marginTop="4dp"
+                android:paddingStart="8dp"/>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?android:attr/textColorHint"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:text="@string/swim_length"
+                android:paddingBottom="12dp"
+                android:paddingEnd="4dp"
+                android:paddingStart="4dp"
+                android:paddingTop="16dp"/>
+
+            <SeekBar
+                android:id="@+id/swim_length"
+                style="@style/Widget.AppCompat.SeekBar.Discrete"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:max="600"
+                android:progress="1"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/swim_length_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:text="[value]"
+                android:textColor="@android:color/black"
+                android:layout_marginTop="4dp"
+                android:paddingStart="8dp"/>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?android:attr/textColorHint"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:text="@string/swim_temperature"
+                android:paddingBottom="12dp"
+                android:paddingEnd="4dp"
+                android:paddingStart="4dp"
+                android:paddingTop="16dp"/>
+
+            <SeekBar
+                android:id="@+id/swim_temperature"
+                style="@style/Widget.AppCompat.SeekBar.Discrete"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:max="6"
+                android:progress="0"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/swim_temperature_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:text="[value]"
+                android:textColor="@android:color/black"
+                android:layout_marginTop="4dp"
+                android:paddingStart="8dp"/>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?android:attr/textColorHint"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:text="@string/swim_waves"
+                android:paddingBottom="12dp"
+                android:paddingEnd="4dp"
+                android:paddingStart="4dp"
+                android:paddingTop="16dp"/>
+
+            <SeekBar
+                android:id="@+id/swim_waves"
+                style="@style/Widget.AppCompat.SeekBar.Discrete"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:max="4"
+                android:progress="0"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/swim_waves_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:text="[value]"
+                android:textColor="@android:color/black"
+                android:layout_marginTop="4dp"
+                android:paddingStart="8dp"/>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?android:attr/textColorHint"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:text="@string/swim_flow"
+                android:paddingBottom="12dp"
+                android:paddingEnd="4dp"
+                android:paddingStart="4dp"
+                android:paddingTop="16dp"/>
+
+            <SeekBar
+                android:id="@+id/swim_flow"
+                style="@style/Widget.AppCompat.SeekBar.Discrete"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:max="3"
+                android:progress="0"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/swim_flow_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:text="[value]"
+                android:textColor="@android:color/black"
+                android:layout_marginTop="4dp"
+                android:paddingStart="8dp"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- this file is only needed to fix a bug in the  android.support.design.widget.TextInputLayout used in ui -->
+    <item name="visible" type="id"/>
+    <item name="masked" type="id"/>
+</resources>
