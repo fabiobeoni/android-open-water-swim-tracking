@@ -6,13 +6,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-/**
- * Created by fabio on 22/02/17.
- */
 
 public class DateUtils
 {
-    private final static String FORMAT = "MM/dd/yyyy HH:mm:ss";
+    public final static String FORMAT = "dd/mm/yyyy hh:mm:ss";
+    public final static String SHORT_FORMAT = "dd/mm/yyyy";
 
     public static String dateToString(Date date){
         DateFormat df = new SimpleDateFormat(FORMAT);
@@ -24,8 +22,8 @@ public class DateUtils
      * @param dateStr
      * @return
      */
-    public static Date stringToDate(String dateStr){
-        DateFormat formatter = new SimpleDateFormat(FORMAT);
+    public static Date stringToDate(String dateStr, String format){
+        DateFormat formatter = new SimpleDateFormat(format);
         try
         {
             return formatter.parse(dateStr);

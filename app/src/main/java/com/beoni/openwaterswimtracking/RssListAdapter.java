@@ -4,14 +4,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.beoni.openwaterswimtracking.model.RssItemSimplified;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -42,6 +45,8 @@ public class RssListAdapter extends ArrayAdapter
             holder.btnKnowMore = (Button) viewItem.findViewById(R.id.btn_know_more);
             holder.titleView = (TextView) viewItem.findViewById(R.id.rss_title);
             holder.dateView = (TextView) viewItem.findViewById(R.id.rss_date);
+            holder.descriptionView = (TextView) viewItem.findViewById(R.id.rss_text);
+            holder.imageView = (ImageView) viewItem.findViewById(R.id.rss_image);
             viewItem.setTag(holder);
         }
         else
@@ -49,8 +54,16 @@ public class RssListAdapter extends ArrayAdapter
 
         final RssItemSimplified item = (RssItemSimplified) this.getItem(position);
 
+        if(item.getImageUrl()!=null)
+            Picasso.with(getContext()).load(item.getImageUrl())
+                    .placeholder(R.drawable.placeholder)
+                    .error(R.drawable.placeholder)
+                    .into(holder.imageView);
+
         holder.titleView.setText(item.getTitle());
         holder.dateView.setText(item.getDate().toString());
+        holder.descriptionView.setText(item.getDescription());
+
         holder.btnKnowMore.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -71,5 +84,7 @@ public class RssListAdapter extends ArrayAdapter
         Button btnKnowMore;
         TextView titleView;
         TextView dateView;
+        TextView descriptionView;
+        ImageView imageView;
     }
 }

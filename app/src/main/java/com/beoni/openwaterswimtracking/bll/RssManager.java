@@ -135,11 +135,11 @@ public class RssManager
 
         //gets the last data download date
         if(!lastDownloadDateStr.equals("")){
-            Date lastDownloadDate = DateUtils.stringToDate(lastDownloadDateStr);
+            Date lastDownloadDate = DateUtils.stringToDate(lastDownloadDateStr,DateUtils.FORMAT);
             diff = DateUtils.dateDiff(lastDownloadDate,today);
         }
 
-        return true; //(diff>=1); //TODO:testing
+        return true; //(diff>1); //TODO: development, remove
     }
 
 }

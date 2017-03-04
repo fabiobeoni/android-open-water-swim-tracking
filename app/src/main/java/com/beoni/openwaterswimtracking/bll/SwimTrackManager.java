@@ -39,11 +39,12 @@ public class SwimTrackManager
             mSwimTracks = readFile();
 
         //TESTING!!! TODO:REMOVE
+        /*
         if(mSwimTracks.size()==0){
             mSwimTracks.add(new SwimTrack("Swim 1","My notes", "Notes about swim 1", new Date(),0,0,0,0,0));
             mSwimTracks.add(new SwimTrack("Swim 2","My notes", "Notes about swim 2", new Date(),0,0,0,0,0));
             mSwimTracks.add(new SwimTrack("Swim 3","My notes", "Notes about swim 3", new Date(),0,0,0,0,0));
-        }
+        }*/
 
         return mSwimTracks;
     }
@@ -59,9 +60,9 @@ public class SwimTrackManager
         mSwimTracks.add(index,currentSwim);
     }
 
-    public void deleteSwimTrack(int index){
+    public void deleteSwimTrack(SwimTrack swim){
         getSwimTracks(false);
-        mSwimTracks.remove(index);
+        mSwimTracks.remove(swim);
     }
 
     public void save(){

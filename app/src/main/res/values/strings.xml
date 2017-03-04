@@ -1,6 +1,7 @@
 <resources>
     <string name="rss_url" translatable="false">http://feeds.feedburner.com/TheDailyNewsOfOpenWaterSwimming</string>
     <string name="preferences_file" translatable="false">com.beoni.openwaterswimtracking.preferences</string>
+    <string name="date_format_default" translatable="false">dd/mm/yyyy</string>
 
     <string name="app_name">Open Water Swim Tracking</string>
 
@@ -35,7 +36,7 @@
     <string name="swim_title_hint">Title (*)</string>
     <string name="swim_notes_hint">Notes</string>
     <string name="swim_date_hint">When (*)</string>
-    <string name="swim_location_hint">Spot</string>
+    <string name="swim_location_hint">Spot (*)</string>
     <string name="swim_duration">Duration</string>
     <string name="swim_duration_label_hours">&#160;h&#160;&#160;</string>
     <string name="swim_duration_label_minutes">&#160;m</string>
@@ -62,6 +63,9 @@
     <string name="swim_flow">Flow</string>
     <string name="swim_title_validate">Title is required</string>
     <string name="swim_date_validate">When is required</string>
+    <string name="swim_location_validate">Spot is required</string>
+    <string name="cannot_delete_new_swim">Swim cannot be deleted since it\'s not save yet</string>
+    <string name="swim_invalid">Please fill all required swim data</string>
     <string-array name="flow_values">
         <item>None</item>
         <item>Light</item>

@@ -9,6 +9,7 @@ import android.support.v4.view.ViewPager;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.HashMap;
@@ -17,28 +18,25 @@ import java.util.Map;
 @EActivity(R.layout.activity_main)
 public class MainActivity extends AppCompatActivity
 {
+    public static final String REQUEST_SELECTED_TAB_KEY = "REQUEST_SELECTED_TAB_KEY";
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
     private TabsPagerAdapter mTabsPagerAdapter;
 
     @ViewById(R.id.toolbar)
     Toolbar mToolbar;
 
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
     @ViewById(R.id.tab_container)
     ViewPager mViewPager;
 
     @ViewById(R.id.tabs)
     TabLayout mTabLayout;
+
+    //set by the SwimEditActivity before
+    //sending the user back to this activity
+    //to display the swim tab instead of
+    //the news one (default)
+    @Extra(REQUEST_SELECTED_TAB_KEY)
+    int mSelectedTab;
 
     //list of all available tabs titles
     //that will be presented when a tab
@@ -79,6 +77,9 @@ public class MainActivity extends AppCompatActivity
         mViewPager.setAdapter(mTabsPagerAdapter);
 
         mTabLayout.setupWithViewPager(mViewPager);
+
+        //default 0
+        mTabLayout.getTabAt(mSelectedTab).select();
     }
 
 }

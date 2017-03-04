@@ -2,8 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+    android:paddingBottom="16dp">
 
+    <ImageView
+        android:id="@+id/rss_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:src="@drawable/placeholder"
+        />
 
     <TextView
         android:id="@+id/rss_title"
@@ -15,6 +24,8 @@
         android:id="@+id/rss_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:maxLines="10"
+        android:ellipsize="end"
         android:text="Text"/>
 
     <TextView

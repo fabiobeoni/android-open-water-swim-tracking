@@ -1,19 +1,40 @@
 package com.beoni.openwaterswimtracking.model;
 
+import android.os.Build;
+import android.text.Html;
+
+import com.beoni.openwaterswimtracking.utils.RssUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
 import nl.matshofman.saxrssreader.RssItem;
 
-
 public class RssItemSimplified implements Serializable
 {
+    public RssItemSimplified()
+    {
+    }
+
     public static RssItemSimplified factory(RssItem rssItem){
         RssItemSimplified item = new RssItemSimplified();
         item.setDate(rssItem.getPubDate());
         item.setTitle(rssItem.getTitle());
         item.setLink(rssItem.getLink());
+
+        ArrayList<String> imagesUrls = RssUtils.getImagesURL(rssItem.getDescription());
+        if(imagesUrls.size()>0)
+            item.setImageUrl(imagesUrls.get(0));
+
+        String description;
+        if(Build.VERSION.SDK_INT<24)
+            description = Html.fromHtml(rssItem.getDescription()).toString();
+        else
+            description = Html.fromHtml(rssItem.getDescription(), Html.FROM_HTML_MODE_LEGACY).toString();
+
+        item.setDescription(description);
+
         return item;
     }
 
@@ -28,6 +49,32 @@ public class RssItemSimplified implements Serializable
     private String title;
     private String link;
     private Date date;
+    private String imageUrl;
+    private String description;
+
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
+    }
+
+
+
+    public String getImageUrl()
+    {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl)
+    {
+        this.imageUrl = imageUrl;
+    }
+
+
 
     public Date getDate()
     {

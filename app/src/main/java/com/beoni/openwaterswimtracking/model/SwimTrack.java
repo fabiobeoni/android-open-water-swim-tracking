@@ -4,23 +4,15 @@ package com.beoni.openwaterswimtracking.model;
 import java.io.Serializable;
 import java.util.Date;
 
+//TODO: replace validation with annotation based one if you can find one specifically designed for android that works on model classes instead of forms
 public class SwimTrack implements Serializable
 {
     public SwimTrack()
     {
     }
 
-    public SwimTrack(String title, String notes, String location, Date date, int duration, int length, int perceivedTemperature, int waves, int flow)
-    {
-        this.title = title;
-        this.notes = notes;
-        this.location = location;
-        this.date = date;
-        this.duration = duration;
-        this.length = length;
-        this.perceivedTemperature = perceivedTemperature;
-        this.waves = waves;
-        this.flow = flow;
+    public boolean isValid(){
+        return (isDateValid() && isLocationValid() && isTitleValid());
     }
 
     public String getTitle()
@@ -31,6 +23,10 @@ public class SwimTrack implements Serializable
     public void setTitle(String title)
     {
         this.title = title;
+    }
+
+    public boolean isTitleValid(){
+        return (this.title!=null && this.title.trim().length()>0);
     }
 
     private String title;
@@ -55,6 +51,10 @@ public class SwimTrack implements Serializable
         this.location = location;
     }
 
+    public boolean isLocationValid(){
+        return (this.location!=null && this.location.trim().length()>0);
+    }
+
     public Date getDate()
     {
         return date;
@@ -63,6 +63,10 @@ public class SwimTrack implements Serializable
     public void setDate(Date date)
     {
         this.date = date;
+    }
+
+    public boolean isDateValid(){
+        return (this.date!=null);
     }
 
     public int getDuration()
@@ -125,4 +129,6 @@ public class SwimTrack implements Serializable
     private int perceivedTemperature = 0;
     private int waves = 0;
     private int flow = 0;
+
+
 }
