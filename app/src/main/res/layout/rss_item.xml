@@ -9,37 +9,46 @@
         android:id="@+id/rss_image"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scaleType="fitCenter"
         android:adjustViewBounds="true"
-        android:src="@drawable/placeholder"
-        />
+        android:paddingBottom="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/placeholder"/>
 
     <TextView
         android:id="@+id/rss_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingBottom="8dp"
         android:text="Title"/>
 
     <TextView
         android:id="@+id/rss_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxLines="10"
         android:ellipsize="end"
+        android:maxLines="10"
+        android:paddingBottom="8dp"
         android:text="Text"/>
 
     <TextView
         android:id="@+id/rss_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingBottom="8dp"
         android:text="Date"/>
 
     <Button
         android:id="@+id/btn_know_more"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="end|right"
         android:text="@string/btn_know_more"
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_marginTop="4dp"/>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"/>
 
 </LinearLayout>

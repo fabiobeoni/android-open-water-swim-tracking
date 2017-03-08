@@ -66,10 +66,56 @@
     <string name="swim_location_validate">Spot is required</string>
     <string name="cannot_delete_new_swim">Swim cannot be deleted since it\'s not save yet</string>
     <string name="swim_invalid">Please fill all required swim data</string>
+    <string name="loading">Loading...</string>
+    <string name="google_title_text">Login with Google</string>
+    <string name="signed_out">Signed Out</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="google_status_fmt">Google User: %s</string>
+    <string name="firebase_status_fmt">Firebase User: %s</string>
+    <string name="label_google_sign_in">Sign In with Google</string>
     <string-array name="flow_values">
         <item>None</item>
         <item>Light</item>
         <item>Medium</item>
         <item>Strong</item>
     </string-array>
+
+    <!-- FIREBASE -->
+    <string name="camera_button_text">Upload</string>
+    <string name="sign_in_prompt">Sign In to begin</string>
+    <string name="take_photo_prompt">Upload a Photo</string>
+    <string name="download">Download</string>
+    <string name="sign_in_anonymously">Sign In</string>
+    <string name="rationale_storage">This sample reads images from your camera to demonstrate uploading.</string>
+    <string name="label_link">Link to Uploaded File</string>
+    <string name="label_download">Download File</string>
+    <string name="log_out">Log out</string>
+    <string name="success">Success</string>
+
+    <string name="progress_downloading">Downloading…</string>
+    <string name="progress_uploading">Uploading…</string>
+    <string name="progress_auth">Signing In…</string>
+
+    <string name="upload_success">Upload finished</string>
+    <string name="upload_failure">Upload failed</string>\
+
+    <string name="download_success">Download finished</string>
+    <string name="download_failure">Download failure</string>
+    <string name="backup">Backup</string>
+    <string name="restore">Restore</string>
+    <string name="google_api_error">An error occurred with Google services</string>
+    <string name="authentication_fail">Authentication failed</string>
+    <string name="backup_activity_label"><![CDATA[Backup & Restore]]></string>
+    <string name="please_login">Please login with your Google account to backup swim data</string>
+    <string name="logged_in_message">You are logged in</string>
+    <string name="performing_backup">In progress...</string>
+    <string name="backup_restore_info">Use the Google Cloud to perform backup or restore of your data</string>
+    <string name="task_completed">Task completed.</string>
+    <string name="error_backup">Error performing backup. Backup file size limit is 5MB. Please try again later.</string>
+    <string name="please_confirm">Please confirm</string>
+    <string name="restore_confirm_message">Restoring the file from a backup will override any swim data now available on your device. Do you want to restore the backup?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="error_restore">Error restoring the backup. This can happen if you didn\'t save any backup before. Please try later.</string>
 </resources>

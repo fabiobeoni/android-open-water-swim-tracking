@@ -38,14 +38,6 @@ public class SwimTrackManager
         if(mSwimTracks==null || forceReload)
             mSwimTracks = readFile();
 
-        //TESTING!!! TODO:REMOVE
-        /*
-        if(mSwimTracks.size()==0){
-            mSwimTracks.add(new SwimTrack("Swim 1","My notes", "Notes about swim 1", new Date(),0,0,0,0,0));
-            mSwimTracks.add(new SwimTrack("Swim 2","My notes", "Notes about swim 2", new Date(),0,0,0,0,0));
-            mSwimTracks.add(new SwimTrack("Swim 3","My notes", "Notes about swim 3", new Date(),0,0,0,0,0));
-        }*/
-
         return mSwimTracks;
     }
 
@@ -69,9 +61,13 @@ public class SwimTrackManager
         writeFile(mSwimTracks);
     }
 
-    public void backup(){}
+    public String getFileForBackup(){
+        return mStorage.readTextFile(FILE_NAME);
+    }
 
-    public void restore(){}
+    public void restoreFileFromBackup(String content){
+        mStorage.writeTextFile(FILE_NAME, content);
+    }
 
     private ArrayList<SwimTrack> readFile(){
         Type listType = new TypeToken<ArrayList<SwimTrack>>(){}.getType();

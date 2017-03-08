@@ -33,6 +33,23 @@
             android:label="@string/edit_swim_activity_label"
             android:theme="@style/AppThemeNoBar">
         </activity>
+        <activity
+            android:name=".BackupActivity_"
+            android:label="@string/backup_activity_label"
+            android:theme="@style/AppThemeNoBar"/>
+
+        <activity
+            android:name=".FBMainActivity"
+            android:launchMode="singleTask">
+        </activity>
+
+        <service
+            android:name=".net.FBDownloadService"
+            android:exported="false"/>
+
+        <service
+            android:name=".net.FBUploadService"
+            android:exported="false" />
     </application>
 
 </manifest>

@@ -158,4 +158,10 @@ public class SwimListFragment extends Fragment implements LoaderManager.LoaderCa
         startActivity(displayIntent);
     }
 
+    @OptionsItem(R.id.menu_backup)
+    void displayGoogleLoginActivity(){
+        Intent displayIntent = new Intent(getActivity(), BackupActivity_.class);
+        startActivity(displayIntent);
+    }
+
 }
