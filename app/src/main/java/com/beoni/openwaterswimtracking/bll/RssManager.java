@@ -58,7 +58,7 @@ public class RssManager
     {
         ArrayList<RssItemSimplified> rssItems = new ArrayList<>();
 
-        if(ConnectivityUtils.isConnected(mContext) && isDownloadedRssObsolete()){
+        if(ConnectivityUtils.isDeviceConnected(mContext) && isDownloadedRssObsolete()){
             rssItems = downloadRss();
             writeRssFile(rssItems);
         }

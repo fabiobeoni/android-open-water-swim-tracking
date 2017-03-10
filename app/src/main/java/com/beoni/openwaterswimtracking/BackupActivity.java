@@ -4,7 +4,6 @@ package com.beoni.openwaterswimtracking;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.beoni.openwaterswimtracking.bll.FirebaseStorageManager;
+import com.beoni.openwaterswimtracking.bll.FirebaseManager;
 import com.beoni.openwaterswimtracking.bll.SwimTrackManager;
 import com.beoni.openwaterswimtracking.utils.LLog;
 import com.google.android.gms.auth.api.Auth;
@@ -27,7 +26,6 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -43,7 +41,6 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 
 @EActivity(R.layout.activity_backup)
 public class BackupActivity extends AppCompatActivity
@@ -57,18 +54,16 @@ public class BackupActivity extends AppCompatActivity
     private static final int UISTATE_LOGGED_IN = 1;
     private static final int UISTATE_PERFORMS_BACKUP_RESTORE = 2;
 
-    private FirebaseAuth mFirebaseAuth;
-    private FirebaseAuth.AuthStateListener mFirebaseAuthListener;
-    private GoogleApiClient mGoogleApiClient;
-    private FirebaseUser mFirebaseUser;
-
     private ProgressDialog mProgressDialog;
 
-    @Bean
-    FirebaseStorageManager mFireStorageMgn;
+    private GoogleApiClient mGoogleApiClient;
 
     @Bean
-    SwimTrackManager mSwimTrackManager;
+    FirebaseManager mFirebaseMng;
+    private FirebaseUser mFirebaseUser;
+
+    @Bean
+    SwimTrackManager mSwimTrackMng;
 
 
     @ViewById(R.id.btn_signin)
@@ -110,18 +105,6 @@ public class BackupActivity extends AppCompatActivity
                 })
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                mFirebaseUser = firebaseAuth.getCurrentUser();
-                if (mFirebaseUser != null)
-                    setUIState(UISTATE_LOGGED_IN);
-                else
-                    setUIState(UISTATE_LOGGED_OUT);
-            }
-        };
     }
 
     @Click(R.id.btn_signin)
@@ -133,7 +116,7 @@ public class BackupActivity extends AppCompatActivity
     @Click(R.id.btn_sign_out)
     void signOut() {
         // Firebase sign out
-        mFirebaseAuth.signOut();
+        mFirebaseMng.signOut();
         // Google sign out
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
@@ -154,13 +137,13 @@ public class BackupActivity extends AppCompatActivity
 
     @Background
     void performBackup(){
-        String fileContent = mSwimTrackManager.getFileForBackup();
+        String fileContent = mSwimTrackMng.getFileForBackup();
         String referenceName = getReferenceNameByUser();
         byte[] data;
 
         try{
             data = fileContent.getBytes("UTF-8");
-            mFireStorageMgn.upload(referenceName, data, new FirebaseStorageManager.IAsyncTaskCallback()
+            mFirebaseMng.upload(referenceName, data, new FirebaseManager.IStorageCallback()
             {
                 @Override
                 public void onSuccess(Object fileUri)
@@ -222,7 +205,7 @@ public class BackupActivity extends AppCompatActivity
     @Background
     void performRestore(){
         String referenceName = getReferenceNameByUser();
-        mFireStorageMgn.download(referenceName, new FirebaseStorageManager.IAsyncTaskCallback()
+        mFirebaseMng.download(referenceName, new FirebaseManager.IStorageCallback()
         {
             @Override
             public void onSuccess(Object content)
@@ -230,7 +213,7 @@ public class BackupActivity extends AppCompatActivity
                 String data;
                 try{
                     data = new String((byte[])content, "UTF-8");
-                    mSwimTrackManager.restoreFileFromBackup(data);
+                    mSwimTrackMng.restoreFileFromBackup(data);
                     mProgress.setProgress(100);
                     setUIState(UISTATE_LOGGED_IN);
                     mTxtMessage.setText(R.string.task_completed);
@@ -262,15 +245,29 @@ public class BackupActivity extends AppCompatActivity
     @Override
     public void onStart() {
         super.onStart();
-        mFirebaseAuth.addAuthStateListener(mFirebaseAuthListener);
+        mFirebaseMng.listenForAuthChanges(new FirebaseManager.IAuthChangeCallback()
+        {
+            @Override
+            public void onLoggeIn(FirebaseUser user)
+            {
+                mFirebaseUser = user;
+                setUIState(UISTATE_LOGGED_IN);
+            }
+
+            @Override
+            public void onLoggedOut()
+            {
+                setUIState(UISTATE_LOGGED_OUT);
+            }
+        });
     }
 
     @Override
     public void onStop() {
         super.onStop();
         hideProgressDialog();
-        if (mFirebaseAuthListener != null)
-            mFirebaseAuth.removeAuthStateListener(mFirebaseAuthListener);
+        if (mFirebaseMng != null)
+            mFirebaseMng.stopListeningForAuthChanges();
     }
 
     @Override
@@ -293,29 +290,28 @@ public class BackupActivity extends AppCompatActivity
     }
 
     private void performFirebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
 
         showProgressDialog();
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mFirebaseAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
 
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithCredential", task.getException());
-                            Toast.makeText(getBaseContext(), R.string.authentication_fail,
-                                    Toast.LENGTH_SHORT).show();
-                        }
+        mFirebaseMng.signInWithCredentials(credential, new FirebaseManager.IAuthSignInCallback()
+        {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task)
+            {
+                // If sign in fails, display a message to the user. If sign in succeeds
+                // the auth state listener will be notified and logic to handle the
+                // signed in user can be handled in the listener.
+                if (!task.isSuccessful()) {
+                    Log.w(TAG, "signInWithCredential", task.getException());
+                    Toast.makeText(getBaseContext(), R.string.authentication_fail,
+                            Toast.LENGTH_SHORT).show();
+                }
 
-                        hideProgressDialog();
-                    }
-                });
+                hideProgressDialog();
+            }
+        });
     }
 
     private void setUIState(int state) {
@@ -371,8 +367,7 @@ public class BackupActivity extends AppCompatActivity
         }
     }
 
-    private String getReferenceNameByUser()
-    {
+    private String getReferenceNameByUser() {
         return BACKUP_FILE.replace("{0}", mFirebaseUser.getUid());
     }
 

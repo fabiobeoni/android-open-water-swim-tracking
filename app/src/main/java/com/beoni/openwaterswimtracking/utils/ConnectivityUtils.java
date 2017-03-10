@@ -9,7 +9,7 @@ import org.androidannotations.annotations.RootContext;
 
 public class ConnectivityUtils
 {
-    public static boolean isConnected(Context _ctx) {
+    public static boolean isDeviceConnected(Context _ctx) {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) _ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();

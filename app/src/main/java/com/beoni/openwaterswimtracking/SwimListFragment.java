@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -12,6 +13,7 @@ import android.widget.ProgressBar;
 import com.beoni.openwaterswimtracking.bll.SwimTrackManager;
 import com.beoni.openwaterswimtracking.model.SwimTrack;
 import com.beoni.openwaterswimtracking.rubricrequired.AAsyncTaskLoader;
+import com.beoni.openwaterswimtracking.utils.ConnectivityUtils;
 import com.beoni.openwaterswimtracking.utils.LLog;
 
 import org.androidannotations.annotations.AfterViews;
@@ -20,6 +22,7 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.OptionsMenuItem;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
@@ -63,6 +66,9 @@ public class SwimListFragment extends Fragment implements LoaderManager.LoaderCa
     @ViewById(R.id.swim_message_panel)
     LinearLayout mMessagePanel;
 
+    @OptionsMenuItem(R.id.menu_backup)
+    MenuItem menuItemBackup;
+
 
     //Required empty public constructor
     public SwimListFragment() {}
@@ -84,6 +90,13 @@ public class SwimListFragment extends Fragment implements LoaderManager.LoaderCa
         }
         else //just proceed with UI update
             onDataLoadCompleted();
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        //menuItemBackup.setEnabled(ConnectivityUtils.isDeviceConnected(getContext()));
     }
 
     //creates a loader to load list of swim track
@@ -110,7 +123,7 @@ public class SwimListFragment extends Fragment implements LoaderManager.LoaderCa
     //TODO: for project approval using here AsyncTaskLoader instead of annotation. Restore commented code after.
     ////@Background
     ////void loadData() {
-        ////mSwimTracksList = mSwimTrackManager.getSwimTracks();
+        ////mSwimTracksList = mSwimTrackMng.getSwimTracks();
         ////onDataLoadCompleted();
     ////}
     //Updates the UI to display loaded swim tracks
