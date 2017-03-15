@@ -118,4 +118,11 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="error_restore">Error restoring the backup. This can happen if you didn\'t save any backup before. Please try later.</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="distance_km">KM</string>
+    <string name="duration_houres">HOURS</string>
 </resources>

@@ -1,30 +1,29 @@
 package com.beoni.openwaterswimtracking.bll;
 
 
-import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.androidannotations.annotations.EBean;
 
 @EBean
 public class FirebaseManager
 {
-    public interface IStorageCallback
+    public interface ICallback
     {
         void onSuccess(Object data);
-        void onProgress(long progress);
         void onFail(Exception ex);
     }
 
@@ -40,59 +39,40 @@ public class FirebaseManager
     }
 
 
-    private Context mContext;
+    private static final String BACKUP_FILE = "/{0}/backup";
+
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mFirebaseAuthListener;
-    private FirebaseStorage mFirebaseStorage;
+    private FirebaseUser mFirebaseUser;
+    private FirebaseDatabase mFirebaseDatabase;
 
 
-    public FirebaseManager(Context mContext)
+    public FirebaseManager()
     {
-        this.mContext = mContext;
-        mFirebaseStorage = FirebaseStorage.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
     }
 
-    public void upload(String referenceName, byte[] bytes, final IStorageCallback callback){
-        StorageReference fileRef = mFirebaseStorage.getReference().child(referenceName);
-        fileRef.putBytes(bytes).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                callback.onFail(exception);
-            }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                callback.onSuccess(taskSnapshot.getDownloadUrl());
-            }
-        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>()
-        {
-            @Override
-            public void onProgress(UploadTask.TaskSnapshot taskSnapshot)
-            {
-                callback.onProgress(taskSnapshot.getBytesTransferred()/taskSnapshot.getTotalByteCount());
-            }
-        });
+    public void backupOnFireDatabase(String data, final ICallback callback){
+        DatabaseReference databaseReference = mFirebaseDatabase.getReference(getReferenceNameByUser());
+        databaseReference.setValue(data);
+        callback.onSuccess(null);
     }
 
-    public void download(String referenceName, final IStorageCallback callback){
-        StorageReference fileRef = mFirebaseStorage.getReference().child(referenceName);
-        long data = 5 * 1024 * 1024; //max download 5MB
-
-        fileRef.getBytes(data).addOnFailureListener(new OnFailureListener()
+    public void restoreFromFireDatabase(final ICallback callback){
+        DatabaseReference databaseReference = mFirebaseDatabase.getReference(getReferenceNameByUser());
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener()
         {
             @Override
-            public void onFailure(@NonNull Exception e)
+            public void onDataChange(DataSnapshot dataSnapshot)
             {
-                callback.onFail(e);
+                callback.onSuccess(dataSnapshot.getValue());
             }
-        }).addOnSuccessListener(new OnSuccessListener<byte[]>()
-        {
+
             @Override
-            public void onSuccess(byte[] bytes)
+            public void onCancelled(DatabaseError databaseError)
             {
-                callback.onSuccess(bytes);
+                callback.onFail(databaseError.toException());
             }
         });
     }
@@ -101,9 +81,9 @@ public class FirebaseManager
         mFirebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null)
-                    callback.onLoggeIn(user);
+                mFirebaseUser = firebaseAuth.getCurrentUser();
+                if (mFirebaseUser != null)
+                    callback.onLoggeIn(mFirebaseUser);
                 else
                     callback.onLoggedOut();
             }
@@ -120,6 +100,9 @@ public class FirebaseManager
             @Override
             public void onComplete(@NonNull Task<AuthResult> task)
             {
+                //TODO: check with forum why I need to explicitly invoke it
+                mFirebaseAuthListener.onAuthStateChanged(mFirebaseAuth);
+
                 callback.onComplete(task);
             }
         });
@@ -127,5 +110,9 @@ public class FirebaseManager
 
     public void signOut(){
         mFirebaseAuth.signOut();
+    }
+
+    private String getReferenceNameByUser() {
+        return BACKUP_FILE.replace("{0}", mFirebaseUser.getUid());
     }
 }

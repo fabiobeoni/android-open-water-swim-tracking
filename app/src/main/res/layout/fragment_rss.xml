@@ -28,7 +28,6 @@
         android:layout_gravity="center"
         android:gravity="center">
 
-        <!-- //TODO change icons on res folders and use different icon sizes according to device resolution. \For testing only 48dp icons are available in all folders -->
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,6 +45,7 @@
             android:layout_marginTop="4dp"/>
 
         <Button
+            android:id="@+id/btn_show_swim"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"

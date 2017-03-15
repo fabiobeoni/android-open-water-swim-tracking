@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @EActivity(R.layout.activity_main)
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity implements RssFragment.ITabSelectionRequest
 {
     public static final String REQUEST_SELECTED_TAB_KEY = "REQUEST_SELECTED_TAB_KEY";
 
@@ -82,4 +82,9 @@ public class MainActivity extends AppCompatActivity
         mTabLayout.getTabAt(mSelectedTab).select();
     }
 
+    @Override
+    public void onSelectTab(int index)
+    {
+        mTabLayout.getTabAt(index).select();
+    }
 }

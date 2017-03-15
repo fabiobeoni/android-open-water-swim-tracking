@@ -3,6 +3,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,7 +13,6 @@ import android.widget.ProgressBar;
 
 import com.beoni.openwaterswimtracking.bll.SwimTrackManager;
 import com.beoni.openwaterswimtracking.model.SwimTrack;
-import com.beoni.openwaterswimtracking.rubricrequired.AAsyncTaskLoader;
 import com.beoni.openwaterswimtracking.utils.ConnectivityUtils;
 import com.beoni.openwaterswimtracking.utils.LLog;
 
@@ -66,20 +66,18 @@ public class SwimListFragment extends Fragment implements LoaderManager.LoaderCa
     @ViewById(R.id.swim_message_panel)
     LinearLayout mMessagePanel;
 
-    @OptionsMenuItem(R.id.menu_backup)
-    MenuItem menuItemBackup;
-
-
     //Required empty public constructor
     public SwimListFragment() {}
 
     //initialization
     @AfterViews
-    void viewCreated() {
+    void viewCreated()
+    {
         //TODO: for project approval using here AsyncTaskLoader instead of annotation. Restore commented code after.
         //mSwimTracksList is saved in instance state
         //so can be reused
-        if(mSwimTracksList ==null){
+        if (mSwimTracksList == null)
+        {
             //updates the UI showing progress bar
             //for background tasks
             setUIState(UISTATE_GETTING_DATA);
@@ -87,23 +85,22 @@ public class SwimListFragment extends Fragment implements LoaderManager.LoaderCa
             //gets data from the web or from cached
             ////loadData();
             getActivity().getSupportLoaderManager().initLoader(1, null, this).forceLoad();
-        }
-        else //just proceed with UI update
+        } else //just proceed with UI update
             onDataLoadCompleted();
-    }
-
-    @Override
-    public void onStart()
-    {
-        super.onStart();
-        //menuItemBackup.setEnabled(ConnectivityUtils.isDeviceConnected(getContext()));
     }
 
     //creates a loader to load list of swim track
     @Override
     public Loader onCreateLoader(int id, Bundle args)
     {
-        return new AAsyncTaskLoader(getActivity());
+        return new AsyncTaskLoader(getActivity()){
+            @Override
+            public Object loadInBackground()
+            {
+                SwimTrackManager mng = new SwimTrackManager(getContext());
+                return mng.getSwimTracks(true);
+            }
+        };
     }
 
     //populate the list of swim tracks and updates the ui

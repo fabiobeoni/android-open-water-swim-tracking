@@ -29,7 +29,6 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
@@ -38,16 +37,15 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
-
-import java.io.UnsupportedEncodingException;
 
 @EActivity(R.layout.activity_backup)
 public class BackupActivity extends AppCompatActivity
 {
 
     private static final String TAG = "BackupActivity";
-    private static final String BACKUP_FILE = "/{0}/backup.txt";
+
     private static final int RC_SIGN_IN = 9001;
 
     private static final int UISTATE_LOGGED_OUT = 0;
@@ -55,12 +53,11 @@ public class BackupActivity extends AppCompatActivity
     private static final int UISTATE_PERFORMS_BACKUP_RESTORE = 2;
 
     private ProgressDialog mProgressDialog;
-
     private GoogleApiClient mGoogleApiClient;
+
 
     @Bean
     FirebaseManager mFirebaseMng;
-    private FirebaseUser mFirebaseUser;
 
     @Bean
     SwimTrackManager mSwimTrackMng;
@@ -122,7 +119,6 @@ public class BackupActivity extends AppCompatActivity
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(@NonNull Status status) {
-                        mFirebaseUser =null;
                         setUIState(UISTATE_LOGGED_OUT);
                     }
                 });
@@ -130,49 +126,8 @@ public class BackupActivity extends AppCompatActivity
 
     @Click(R.id.btn_backup)
     void onBtnBackupClick(){
-        //mProgress.setProgress(50);
         setUIState(UISTATE_PERFORMS_BACKUP_RESTORE);
         performBackup();
-    }
-
-    @Background
-    void performBackup(){
-        String fileContent = mSwimTrackMng.getFileForBackup();
-        String referenceName = getReferenceNameByUser();
-        byte[] data;
-
-        try{
-            data = fileContent.getBytes("UTF-8");
-            mFirebaseMng.upload(referenceName, data, new FirebaseManager.IStorageCallback()
-            {
-                @Override
-                public void onSuccess(Object fileUri)
-                {
-                    mProgress.setProgress(100);
-                    setUIState(UISTATE_LOGGED_IN);
-                    mTxtMessage.setText(R.string.task_completed);
-                }
-
-                @Override
-                public void onProgress(long progress)
-                {
-                    mProgress.setProgress((int)(long)progress);
-                }
-
-                @Override
-                public void onFail(Exception ex)
-                {
-                    LLog.e(ex);
-                    setUIState(UISTATE_LOGGED_IN);
-                    mTxtMessage.setText(R.string.error_backup);
-                }
-            });
-        }
-        catch (UnsupportedEncodingException ex){
-            LLog.e(ex);
-            setUIState(UISTATE_LOGGED_IN);
-            mTxtMessage.setText(R.string.error_backup);
-        }
     }
 
     @Click(R.id.btn_restore)
@@ -203,43 +158,69 @@ public class BackupActivity extends AppCompatActivity
     }
 
     @Background
-    void performRestore(){
-        String referenceName = getReferenceNameByUser();
-        mFirebaseMng.download(referenceName, new FirebaseManager.IStorageCallback()
+    void performBackup(){
+        String fileContent = mSwimTrackMng.getLocalDataForBackup();
+        mFirebaseMng.backupOnFireDatabase(fileContent, new FirebaseManager.ICallback()
         {
             @Override
-            public void onSuccess(Object content)
+            public void onSuccess(Object _null)
             {
-                String data;
-                try{
-                    data = new String((byte[])content, "UTF-8");
-                    mSwimTrackMng.restoreFileFromBackup(data);
-                    mProgress.setProgress(100);
-                    setUIState(UISTATE_LOGGED_IN);
-                    mTxtMessage.setText(R.string.task_completed);
-                }
-                catch (UnsupportedEncodingException ex)
-                {
-                    LLog.e(ex);
-                    setUIState(UISTATE_LOGGED_IN);
-                    mTxtMessage.setText(R.string.error_restore);
-                }
-            }
-
-            @Override
-            public void onProgress(long progress)
-            {
-                mProgress.setProgress((int)(long)progress);
+                updateUIAfterBackup(true);
             }
 
             @Override
             public void onFail(Exception ex)
             {
                 LLog.e(ex);
-                setUIState(UISTATE_LOGGED_IN);
-                mTxtMessage.setText(R.string.error_restore);
+                updateUIAfterBackup(false);
             }
         });
+    }
+
+    @UiThread
+    void updateUIAfterBackup(boolean completed){
+        if(completed){
+            mProgress.setProgress(100);
+            setUIState(UISTATE_LOGGED_IN);
+            mTxtMessage.setText(R.string.task_completed);
+        }
+        else{
+            setUIState(UISTATE_LOGGED_IN);
+            mTxtMessage.setText(R.string.error_backup);
+        }
+    }
+
+    @Background
+    void performRestore(){
+        mFirebaseMng.restoreFromFireDatabase(new FirebaseManager.ICallback()
+        {
+            @Override
+            public void onSuccess(Object data)
+            {
+                mSwimTrackMng.restoreLocalDataFromBackup((String)data);
+                updateUIAfterRestore(true);
+            }
+
+            @Override
+            public void onFail(Exception ex)
+            {
+                LLog.e(ex);
+                updateUIAfterRestore(false);
+            }
+        });
+    }
+
+    @UiThread
+    void updateUIAfterRestore(boolean completed){
+        if(completed){
+            mProgress.setProgress(100);
+            setUIState(UISTATE_LOGGED_IN);
+            mTxtMessage.setText(R.string.task_completed);
+        }
+        else{
+            setUIState(UISTATE_LOGGED_IN);
+            mTxtMessage.setText(R.string.error_restore);
+        }
     }
 
     @Override
@@ -250,7 +231,6 @@ public class BackupActivity extends AppCompatActivity
             @Override
             public void onLoggeIn(FirebaseUser user)
             {
-                mFirebaseUser = user;
                 setUIState(UISTATE_LOGGED_IN);
             }
 
@@ -309,6 +289,7 @@ public class BackupActivity extends AppCompatActivity
                             Toast.LENGTH_SHORT).show();
                 }
 
+
                 hideProgressDialog();
             }
         });
@@ -365,10 +346,6 @@ public class BackupActivity extends AppCompatActivity
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();
         }
-    }
-
-    private String getReferenceNameByUser() {
-        return BACKUP_FILE.replace("{0}", mFirebaseUser.getUid());
     }
 
 }

@@ -38,18 +38,15 @@
             android:label="@string/backup_activity_label"
             android:theme="@style/AppThemeNoBar"/>
 
-        <activity
-            android:name=".FBMainActivity"
-            android:launchMode="singleTask">
-        </activity>
+        <receiver android:name=".SwimminhGraphWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
 
-        <service
-            android:name=".net.FBDownloadService"
-            android:exported="false"/>
-
-        <service
-            android:name=".net.FBUploadService"
-            android:exported="false" />
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/swimminh_graph_widget_info"/>
+        </receiver>
     </application>
 
 </manifest>

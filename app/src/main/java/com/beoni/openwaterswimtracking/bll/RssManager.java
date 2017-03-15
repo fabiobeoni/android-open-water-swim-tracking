@@ -26,7 +26,7 @@ import nl.matshofman.saxrssreader.RssItem;
 import nl.matshofman.saxrssreader.RssReader;
 
 /**
- * Class performs rss download, manages the local
+ * Class performs rss restoreFromFireDatabase, manages the local
  * cached version and provides rss data to the client.
  */
 @EBean
@@ -69,7 +69,7 @@ public class RssManager
     }
 
     /**
-     * Performs the download from the web of the rss file
+     * Performs the restoreFromFireDatabase from the web of the rss file
      * configured in app resources.
      * @return list of RssItemSimplified items. Empty list when exception occurs.
      */
@@ -116,7 +116,7 @@ public class RssManager
         String rssAsString = new Gson().toJson(rssItemsSimp);
         mStorage.writeTextFile(RSS_FILE_NAME, rssAsString);
 
-        //stores the date about the current download
+        //stores the date about the current restoreFromFireDatabase
         Date today = new Date();
         mPreferences.edit().putString(LAST_DOWNLOAD_DATE, DateUtils.dateToString(today)).commit();
     }
@@ -124,7 +124,7 @@ public class RssManager
     /**
      * This method host the logic to invalidate rss cached data.
      * When the rss file is older than 1 day, cache is invalid.
-     * The last download date of the cached data is stored in
+     * The last restoreFromFireDatabase date of the cached data is stored in
      * a shared preference of easy retrying.
      * @return true|false according to cache valid status.
      */
@@ -133,7 +133,7 @@ public class RssManager
         Date today = new Date();
         String lastDownloadDateStr = mPreferences.getString(LAST_DOWNLOAD_DATE,"");
 
-        //gets the last data download date
+        //gets the last data restoreFromFireDatabase date
         if(!lastDownloadDateStr.equals("")){
             Date lastDownloadDate = DateUtils.stringToDate(lastDownloadDateStr,DateUtils.FORMAT);
             diff = DateUtils.dateDiff(lastDownloadDate,today);

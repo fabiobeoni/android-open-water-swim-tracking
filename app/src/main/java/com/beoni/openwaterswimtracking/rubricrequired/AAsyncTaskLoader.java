@@ -9,19 +9,15 @@ import com.beoni.openwaterswimtracking.model.SwimTrack;
 
 import java.util.ArrayList;
 
-public class AAsyncTaskLoader extends AsyncTaskLoader<ArrayList<SwimTrack>>
+public class AAsyncTaskLoader extends AsyncTaskLoader<Object>
 {
-    private Context mCtx;
-
     public AAsyncTaskLoader(Context ctx){
         super(ctx);
-        this.mCtx = ctx;
     }
 
     @Override
-    public ArrayList<SwimTrack> loadInBackground()
+    public Object loadInBackground()
     {
-        SwimTrackManager mng = new SwimTrackManager(mCtx);
-        return mng.getSwimTracks(true);
+        return null;
     }
 }

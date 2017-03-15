@@ -1,4 +1,5 @@
 package com.beoni.openwaterswimtracking;
+import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -7,26 +8,31 @@ import android.widget.ProgressBar;
 
 import com.beoni.openwaterswimtracking.bll.RssManager;
 import com.beoni.openwaterswimtracking.model.RssItemSimplified;
-import com.beoni.openwaterswimtracking.rubricrequired.SwimListFileTask;
 import com.beoni.openwaterswimtracking.utils.LLog;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
-import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
 
 /**
  * The fragment presents RSS data in a list view,
- * performs RSS download and local cache by the
+ * performs RSS restoreFromFireDatabase and local cache by the
  * RssManager, handles the navigation to the swim
  * list activity.
  */
 @EFragment(R.layout.fragment_rss)
 public class RssFragment extends Fragment {
+
+    //interface to communicate with the hosting
+    //activity and request a tab change, if any.
+    public interface ITabSelectionRequest{
+        void onSelectTab(int index);
+    }
 
     //============== UI STATES ==============/
 
@@ -39,7 +45,7 @@ public class RssFragment extends Fragment {
     @InstanceState
     ArrayList<RssItemSimplified> mRssItems = null;
 
-    //class that actually performs the Rss download and cache
+    //class that actually performs the Rss restoreFromFireDatabase and cache
     @Bean
     RssManager mRssManager;
 
@@ -82,15 +88,30 @@ public class RssFragment extends Fragment {
             onDataLoadCompleted();
     }
 
+    @Click(R.id.btn_show_swim)
+    void onBtnShowSwimClick(){
+        ((ITabSelectionRequest)getActivity()).onSelectTab(1);
+    }
+
     /**
      * Async load rss data from cache or from the web
      * when cache is not valid anymore and network
      * is available, then request list view update
      */
-    //TODO: for project approval using here AsyncTask instead of annotation. Restore commented code after.
+    //TODO: as requested by the rubric: using here AsyncTask instead of annotation.
     //@Background
     void loadData() {
-        new SwimListFileTask(){
+        //Performs data load at once, when starting the app
+        //and your local data are obsolete (see RssManager).
+        //Otherwise loads from local cache.
+        new AsyncTask(){
+            @Override
+            protected Object doInBackground(Object[] objects)
+            {
+                RssManager mng = new RssManager(getContext());
+                return mng.getRssItems();
+            }
+
             @Override
             protected void onPostExecute(Object o)
             {
@@ -98,6 +119,7 @@ public class RssFragment extends Fragment {
                 onDataLoadCompleted();
             }
         }.execute(getContext());
+
         //mRssItems = mRssManager.getRssItems();
         //onDataLoadCompleted();
     }
