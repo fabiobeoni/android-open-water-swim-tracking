@@ -10,16 +10,20 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.beoni.openwaterswimtracking.bll.SwimTrackManager;
 import com.beoni.openwaterswimtracking.model.SwimTrack;
 import com.beoni.openwaterswimtracking.utils.ConnectivityUtils;
 import com.beoni.openwaterswimtracking.utils.LLog;
+import com.google.gson.Gson;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
+import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.OptionsMenuItem;
@@ -36,10 +40,13 @@ import java.util.ArrayList;
 @OptionsMenu(R.menu.menu_swim_list)
 public class SwimListFragment extends Fragment implements LoaderManager.LoaderCallbacks
 {
+    public static final String UPDATE_LIST_KEY = "UPDATE_LIST";
+
     //============ AVAILABLE UI STATES ===============/
 
     private static final int UISTATE_GETTING_DATA = 0;
     private static final int UISTATE_VIEW_DATA = 1;
+    private static final int UISTATE_NO_DATA = 2;
 
 
     //list of swim track items presented on view
@@ -73,10 +80,12 @@ public class SwimListFragment extends Fragment implements LoaderManager.LoaderCa
     @AfterViews
     void viewCreated()
     {
+        boolean forceListReload = getActivity().getIntent().getBooleanExtra(UPDATE_LIST_KEY,false);
+
         //TODO: for project approval using here AsyncTaskLoader instead of annotation. Restore commented code after.
         //mSwimTracksList is saved in instance state
         //so can be reused
-        if (mSwimTracksList == null)
+        if (mSwimTracksList == null || forceListReload)
         {
             //updates the UI showing progress bar
             //for background tasks
@@ -130,12 +139,13 @@ public class SwimListFragment extends Fragment implements LoaderManager.LoaderCa
         if(mSwimTracksList !=null && mSwimTracksList.size()>0){
             mSwimTracksAdapter = new SwimTracksAdapter(getContext(), R.layout.swim_track_item, mSwimTracksList);
             mSwimListView.setAdapter(mSwimTracksAdapter);
+            //hides the progress bar since the
+            //background process is completed
+            //and displays the data
+            setUIState(UISTATE_VIEW_DATA);
         }
-
-        //hides the progress bar since the
-        //background process is completed
-        //and displays the data
-        setUIState(UISTATE_VIEW_DATA);
+        else
+            setUIState(UISTATE_NO_DATA);
     }
 
     private void setUIState(int state){
@@ -150,6 +160,11 @@ public class SwimListFragment extends Fragment implements LoaderManager.LoaderCa
                 mMessagePanel.setVisibility(View.GONE);
                 mSwimListView.setVisibility(View.VISIBLE);
                 break;
+            case UISTATE_NO_DATA:
+                mProgressBar.setVisibility(View.GONE);
+                mMessagePanel.setVisibility(View.VISIBLE);
+                mSwimListView.setVisibility(View.GONE);
+                break;
             default:
                 LLog.e(new Exception("Missing UI state definition"));
                 break;
@@ -163,6 +178,7 @@ public class SwimListFragment extends Fragment implements LoaderManager.LoaderCa
     //display the SwimEditActivity to add new
     //a new swim track
     @OptionsItem(R.id.menu_add_swim)
+    @Click(R.id.btn_add_swim)
     void displayEditSwimActivity(){
         Intent displayIntent = new Intent(getActivity(), SwimEditActivity_.class);
         startActivity(displayIntent);
@@ -170,8 +186,29 @@ public class SwimListFragment extends Fragment implements LoaderManager.LoaderCa
 
     @OptionsItem(R.id.menu_backup)
     void displayGoogleLoginActivity(){
+        if(!ConnectivityUtils.isDeviceConnected(getContext()))
+        {
+            Toast.makeText(getContext(), R.string.rss_no_connection, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if(mSwimTracksList.size()==0)
+        {
+            Toast.makeText(getContext(), R.string.no_swim, Toast.LENGTH_LONG).show();
+            return;
+        }
+
         Intent displayIntent = new Intent(getActivity(), BackupActivity_.class);
-        startActivity(displayIntent);
+            startActivity(displayIntent);
+    }
+
+    @ItemClick(R.id.swim_list)
+    void onSwimListItemClick(SwimTrack swimTrack){
+        String swimJson = new Gson().toJson(swimTrack);
+        Intent intent = new Intent(getContext(), SwimEditActivity_.class);
+        intent.putExtra(SwimEditFragment.SWIM_ITEM_KEY, swimJson);
+        intent.putExtra(SwimEditFragment.SWIM_ITEM_INDEX, mSwimTracksList.indexOf(swimTrack));
+        startActivity(intent);
     }
 
 }

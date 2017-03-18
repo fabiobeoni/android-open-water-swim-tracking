@@ -52,15 +52,38 @@
         <item>Warm</item>
         <item>Too warm</item>
     </string-array>
+    <string-array name="temperature_colors">
+        <item>#01579B</item>
+        <item>#03A9F4</item>
+        <item>#B3E5FC</item>
+        <item>#00C853</item>
+        <item>#FFE082</item>
+        <item>#FFC107</item>
+        <item>#FF6F00</item>
+    </string-array>
     <string name="swim_waves">Waves</string>
     <string-array name="waves_values">
         <item>Flat water</item>
         <item>Choppy</item>
-        <item>High chopp</item>
         <item>Small waves</item>
-        <item>Waves</item>
+    </string-array>
+    <string-array name="waves_icons">
+        <item>waves</item>
+        <item>waves</item>
+        <item>waves</item>
     </string-array>
     <string name="swim_flow">Flow</string>
+    <string-array name="flow_values">
+        <item>None</item>
+        <item>Light</item>
+        <item>Medium</item>
+        <item>Strong</item>
+    </string-array>
+    <string-array name="flow_icons">
+        <item>waves</item>
+        <item>waves</item>
+        <item>waves</item>
+    </string-array>
     <string name="swim_title_validate">Title is required</string>
     <string name="swim_date_validate">When is required</string>
     <string name="swim_location_validate">Spot is required</string>
@@ -74,12 +97,6 @@
     <string name="google_status_fmt">Google User: %s</string>
     <string name="firebase_status_fmt">Firebase User: %s</string>
     <string name="label_google_sign_in">Sign In with Google</string>
-    <string-array name="flow_values">
-        <item>None</item>
-        <item>Light</item>
-        <item>Medium</item>
-        <item>Strong</item>
-    </string-array>
 
     <!-- FIREBASE -->
     <string name="camera_button_text">Upload</string>
@@ -125,4 +142,5 @@
     <string name="add_widget">Add widget</string>
     <string name="distance_km">KM</string>
     <string name="duration_houres">HOURS</string>
+    <string name="btn_add_swim">Add a New Swimming</string>
 </resources>

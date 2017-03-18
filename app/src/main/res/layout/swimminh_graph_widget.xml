@@ -7,6 +7,15 @@
     <ImageView
         android:id="@+id/img_graph"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        />
+
+    <TextView
+        android:id="@+id/txt_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:textAlignment="center"
+        android:text="@string/no_swim"/>
 
 </RelativeLayout>

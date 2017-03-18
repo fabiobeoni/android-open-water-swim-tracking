@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.beoni.openwaterswimtracking.bll.SwimTrackManager;
 import com.beoni.openwaterswimtracking.model.SwimTrack;
 import com.beoni.openwaterswimtracking.utils.DateUtils;
+import com.beoni.openwaterswimtracking.utils.FormattingUtils;
 import com.beoni.openwaterswimtracking.utils.LLog;
 import com.google.gson.Gson;
 
@@ -28,6 +29,7 @@ import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.StringRes;
 import org.androidannotations.annotations.res.StringArrayRes;
 
+import java.sql.Date;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -53,12 +55,6 @@ public class SwimEditFragment extends Fragment {
     //class that actually performs the swim CRUD actions
     @Bean
     SwimTrackManager mSwimTrackManager;
-
-    @StringRes(R.string.swim_duration_label_hours)
-    String mDurationLabelHours;
-
-    @StringRes(R.string.swim_duration_label_minutes)
-    String mDurationLabelMinutes;
 
     @StringArrayRes
     String[] wavesValues;
@@ -136,16 +132,38 @@ public class SwimEditFragment extends Fragment {
         isNewSwim = (mSwimTrackSerialized ==null);
 
         if(isNewSwim)
-            mSwimTrack = new SwimTrack();
+            mSwimTrack = SwimTrack.createNewEmptySwim();
         else
             mSwimTrack = new Gson().fromJson(mSwimTrackSerialized,SwimTrack.class);
 
-        //default values or selected swim values
-        mDurationLabelTvw.setText(String.valueOf(mSwimTrack.getDuration())+ mDurationLabelHours);
-        mLengthLabelTvw.setText(String.valueOf(mSwimTrack.getLength())+ mLengthLabel);
+
+        mTitleTxt.setText(mSwimTrack.getTitle());
+        mLocationTxt.setText(mSwimTrack.getLocation());
+        mDateTxt.setText(DateUtils.dateToString(mSwimTrack.getDate(),DateUtils.SHORT_FORMAT));
+        mNotesTxt.setText(mSwimTrack.getNotes());
+        mDurationSkb.setProgress(mSwimTrack.getDuration());
+        mLengthSkb.setProgress(mSwimTrack.getLength()/100);
+        mTemperatureSkb.setProgress(mSwimTrack.getPerceivedTemperature());
         mTemperatureTvw.setText(temperatureValues[mSwimTrack.getPerceivedTemperature()]);
+        mWavesSkb.setProgress(mSwimTrack.getWaves());
         mWavesTvw.setText(wavesValues[mSwimTrack.getWaves()]);
+        mFlowSkb.setProgress(mSwimTrack.getFlow());
         mFlowTvw.setText(flowValues[mSwimTrack.getFlow()]);
+    }
+
+    @Background
+    void performAsyncSaving(){
+        mSwimTrackManager.save();
+        displaySwimList();
+    }
+
+    @UiThread
+    void displaySwimList(){
+        Intent displayIntent = new Intent(getActivity(), MainActivity_.class);
+        //requests to display the swim tab instead of the default one
+        displayIntent.putExtra(MainActivity.REQUEST_SELECTED_TAB_KEY, 1);
+        displayIntent.putExtra(SwimListFragment.UPDATE_LIST_KEY, true);
+        startActivity(displayIntent);
     }
 
 
@@ -183,18 +201,7 @@ public class SwimEditFragment extends Fragment {
 
     @SeekBarProgressChange(R.id.swim_duration)
     void onDurationChange(SeekBar seekBar, int i, boolean b){
-        //"i" are minutes
-        double h = ((double)i/60.00);
-        NumberFormat format = new DecimalFormat("#.##");
-        String full = format.format(h);
-        String hours = "0";
-        String minutes = "0";
-        if(full.contains("."))
-        {
-            hours = full.split("[.]")[0];
-            minutes = full.split("[.]")[1];
-        }
-        mDurationLabelTvw.setText(hours+ mDurationLabelHours +minutes+ mDurationLabelMinutes);
+        mDurationLabelTvw.setText(FormattingUtils.formatDuration(getContext(),i));
         mSwimTrack.setDuration(i);
     }
 
@@ -219,7 +226,7 @@ public class SwimEditFragment extends Fragment {
         mSwimTrack.setPerceivedTemperature(i);
     }
 
-    @SeekBarProgressChange(R.id.swim_temperature)
+    @SeekBarProgressChange(R.id.swim_waves)
     void onWavesChange(SeekBar seekBar, int i, boolean b){
         mWavesTvw.setText(wavesValues[i]);
         mSwimTrack.setWaves(i);
@@ -245,26 +252,10 @@ public class SwimEditFragment extends Fragment {
     @OptionsItem(R.id.menu_delete_swim)
     void deleteSwim(){
         if(!isNewSwim)
-            mSwimTrackManager.deleteSwimTrack(mSwimTrack);
+            mSwimTrackManager.deleteSwimTrack(mSwimIndex);
         else
             Toast.makeText(getContext(),R.string.cannot_delete_new_swim, Toast.LENGTH_SHORT).show();
 
         performAsyncSaving();
-    }
-
-
-
-    @Background
-    void performAsyncSaving(){
-        mSwimTrackManager.save();
-        displaySwimList();
-    }
-
-    @UiThread
-    void displaySwimList(){
-        Intent displayIntent = new Intent(getActivity(), MainActivity_.class);
-        //requests to display the swim tab instead of the default one
-        displayIntent.putExtra(MainActivity.REQUEST_SELECTED_TAB_KEY, 1);
-        startActivity(displayIntent);
     }
 }

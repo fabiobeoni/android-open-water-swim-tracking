@@ -34,6 +34,11 @@ public class DateUtils
         }
     }
 
+    public static String dateToString(Date date, String format){
+        DateFormat formatter = new SimpleDateFormat(format);
+        return formatter.format(date).toString();
+    }
+
     public static long dateDiff(Date startdate, Date endDate){
 
         long diff = endDate.getTime() - startdate.getTime();

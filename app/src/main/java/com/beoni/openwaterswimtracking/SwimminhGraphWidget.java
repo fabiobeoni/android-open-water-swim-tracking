@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import com.beoni.openwaterswimtracking.bll.SwimTrackManager;
@@ -14,18 +15,32 @@ import com.beoni.openwaterswimtracking.bll.SwimTrackManager;
  */
 public class SwimminhGraphWidget extends AppWidgetProvider
 {
+    private static SwimTrackManager swimTrackManager;
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId)
     {
-        int h = appWidgetManager.getAppWidgetInfo(appWidgetId).minHeight;
-        int w = appWidgetManager.getAppWidgetInfo(appWidgetId).minWidth;
-
-        Bitmap bitmap = SwimTrackManager.createSwimmingGraph(context,w,h);
-
+        Bitmap graphBitmap;
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.swimminh_graph_widget);
-        views.setImageViewBitmap(R.id.img_graph,bitmap);
+
+        if(swimTrackManager==null)
+            swimTrackManager = new SwimTrackManager(context);
+
+        if(swimTrackManager.getSwimTracks(false).size()>0)
+        {
+            int h = appWidgetManager.getAppWidgetInfo(appWidgetId).minHeight;
+            int w = appWidgetManager.getAppWidgetInfo(appWidgetId).minWidth;
+            graphBitmap = swimTrackManager.createSwimmingGraph(w, h);
+            views.setImageViewBitmap(R.id.img_graph,graphBitmap);
+            views.setViewVisibility(R.id.txt_message, View.GONE);
+            views.setViewVisibility(R.id.img_graph, View.VISIBLE);
+        }
+        else
+        {
+            views.setViewVisibility(R.id.txt_message, View.VISIBLE);
+            views.setViewVisibility(R.id.img_graph, View.GONE);
+        }
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);

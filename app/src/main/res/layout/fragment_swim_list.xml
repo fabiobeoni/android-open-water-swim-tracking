@@ -32,12 +32,21 @@
         <!-- //TODO change icons on res folders and use different icon sizes according to device resolution. \For testing only 48dp icons are available in all folders -->
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="254dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:textAlignment="center"
             android:text="@string/no_swim"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:layout_marginTop="4dp"/>
+
+        <Button
+            android:id="@+id/btn_add_swim"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/btn_add_swim"
+            style="@style/Widget.AppCompat.Button.Colored"
             android:layout_marginTop="4dp"/>
 
     </LinearLayout>

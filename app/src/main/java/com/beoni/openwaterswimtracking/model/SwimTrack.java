@@ -1,12 +1,30 @@
 package com.beoni.openwaterswimtracking.model;
 
 
+import com.beoni.openwaterswimtracking.utils.DateUtils;
+
 import java.io.Serializable;
 import java.util.Date;
 
-//TODO: replace validation with annotation based one if you can find one specifically designed for android that works on model classes instead of forms
 public class SwimTrack implements Serializable
 {
+    public static SwimTrack createNewEmptySwim(){
+        return new SwimTrack("A nice swim","","Somewhere there is water ;)", DateUtils.stringToDate("01/01/2017",DateUtils.SHORT_FORMAT),0,0,1,1,1);
+    }
+
+    private SwimTrack(String title, String notes, String location, Date date, int duration, int length, int perceivedTemperature, int waves, int flow)
+    {
+        this.title = title;
+        this.notes = notes;
+        this.location = location;
+        this.date = date;
+        this.duration = duration;
+        this.length = length;
+        this.perceivedTemperature = perceivedTemperature;
+        this.waves = waves;
+        this.flow = flow;
+    }
+
     public SwimTrack()
     {
     }

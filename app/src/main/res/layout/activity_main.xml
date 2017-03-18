@@ -21,7 +21,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/AppThemeNoBar.PopupOverlay">
+            app:popupTheme="@style/AppThemeBar">
 
         </android.support.v7.widget.Toolbar>
 

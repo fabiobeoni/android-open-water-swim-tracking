@@ -47,10 +47,9 @@ public class SwimTrackManager
         mPreferences = mContext.getSharedPreferences(ctx.getString(R.string.preferences_file), Context.MODE_PRIVATE);
     }
 
-    public static Bitmap createSwimmingGraph(Context ctx,int w, int h){
-        SwimTrackManager mng = new SwimTrackManager(ctx);
+    public Bitmap createSwimmingGraph(int w, int h){
 
-        ArrayList<SwimTrack> swimTrackList = mng.getSwimTracks(false);
+        ArrayList<SwimTrack> swimTrackList = getSwimTracks(false);
 
         //sorts by date
         Collections.sort(swimTrackList, new Comparator<SwimTrack>() {
@@ -67,12 +66,12 @@ public class SwimTrackManager
         for (int i=0;i<swimTrackList.size();i++)
             dataPointsLength[i] = new DataPoint(i, (swimTrackList.get(i).getLength()/1000));
 
-        GraphView graph = new GraphView(ctx);
+        GraphView graph = new GraphView(mContext);
         graph.setLayoutParams(new RelativeLayout.LayoutParams(w,h));
 
 
         LineGraphSeries<DataPoint> seriesDistance = new LineGraphSeries<>(dataPointsLength);
-        seriesDistance.setTitle(ctx.getString(R.string.swim_length));
+        seriesDistance.setTitle(mContext.getString(R.string.swim_length));
         seriesDistance.setThickness(8);
         seriesDistance.setDrawDataPoints(true);
         seriesDistance.setDataPointsRadius(10);
@@ -80,7 +79,7 @@ public class SwimTrackManager
         graph.addSeries(seriesDistance);
 
         LineGraphSeries<DataPoint> seriesDuration = new LineGraphSeries<>(dataPointsDuration);
-        seriesDuration.setTitle(ctx.getString(R.string.swim_duration));
+        seriesDuration.setTitle(mContext.getString(R.string.swim_duration));
         seriesDuration.setColor(Color.RED);
         seriesDuration.setThickness(8);
         seriesDuration.setDrawDataPoints(true);
@@ -90,13 +89,13 @@ public class SwimTrackManager
         // the y bounds are always manual for second scale
         graph.getSecondScale().setMinY(0);
         graph.getSecondScale().setMaxY(10);
-        graph.getSecondScale().setVerticalAxisTitle(ctx.getString(R.string.duration_houres));
+        graph.getSecondScale().setVerticalAxisTitle(mContext.getString(R.string.duration_houres));
         graph.getSecondScale().setVerticalAxisTitleTextSize(22);
         graph.getSecondScale().setVerticalAxisTitleColor(Color.RED);
 
         GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
 
-        gridLabel.setVerticalAxisTitle(ctx.getString(R.string.swim_length));
+        gridLabel.setVerticalAxisTitle(mContext.getString(R.string.swim_length));
         gridLabel.setVerticalAxisTitleTextSize(22);
         gridLabel.setVerticalAxisTitleColor(Color.BLUE);
         gridLabel.setTextSize(22);
@@ -128,7 +127,6 @@ public class SwimTrackManager
     }
 
 
-
     public ArrayList<SwimTrack> getSwimTracks(boolean forceReload)
     {
         if(mSwimTracks==null || forceReload)
@@ -148,9 +146,9 @@ public class SwimTrackManager
         mSwimTracks.add(index,currentSwim);
     }
 
-    public void deleteSwimTrack(SwimTrack swim){
+    public void deleteSwimTrack(int index){
         getSwimTracks(false);
-        mSwimTracks.remove(swim);
+        mSwimTracks.remove(index);
     }
 
     public void save(){
@@ -170,8 +168,39 @@ public class SwimTrackManager
         ArrayList<SwimTrack> items = new ArrayList<SwimTrack>();
         String result = mStorage.readTextFile(FILE_NAME);
 
-        if(result.length()>0)
+        items = new Gson().fromJson(result, listType);
+
+        if(items.size()>0)
             items = new Gson().fromJson(result, listType);
+        /*
+        else{
+            //sample data on the list to simplify project review
+
+            items.add(new SwimTrack(
+                "Albano Lake Swimming Maraton",
+                "Valid for Italian senior swimming championship",
+                "Albano, Latium - Italy",
+                DateUtils.stringToDate("01/06/2000",DateUtils.SHORT_FORMAT),
+                50, 3000, 1, 1, 1
+            ));
+
+            items.add(new SwimTrack(
+                "Crossing Messina",
+                "Valid for Italian senior swimming championship",
+                "Messina, Sicily - Italy",
+                DateUtils.stringToDate("10/07/2001",DateUtils.SHORT_FORMAT),
+                65, 3500, 2, 3, 1
+            ));
+
+            items.add(new SwimTrack(
+                "Swimming Gibilterra (Europe to Africa)",
+                "",
+                "Gibilterra - Spain",
+                DateUtils.stringToDate("12/08/202",DateUtils.SHORT_FORMAT),
+                30, 25000, 1, 2, 2
+            ));
+        }
+        */
 
         return items;
     }
