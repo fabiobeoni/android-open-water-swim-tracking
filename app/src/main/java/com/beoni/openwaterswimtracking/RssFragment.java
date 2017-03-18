@@ -1,4 +1,5 @@
 package com.beoni.openwaterswimtracking;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.ProgressBar;
 
 import com.beoni.openwaterswimtracking.bll.RssManager;
 import com.beoni.openwaterswimtracking.model.RssItemSimplified;
+import com.beoni.openwaterswimtracking.utils.ConnectivityUtils;
 import com.beoni.openwaterswimtracking.utils.LLog;
 
 import org.androidannotations.annotations.AfterViews;
@@ -15,6 +17,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
+import org.androidannotations.annotations.Receiver;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
@@ -65,6 +68,12 @@ public class RssFragment extends Fragment {
     @ViewById(R.id.rss_message_panel)
     LinearLayout mMessagePanel;
 
+    @Receiver(actions = ConnectivityManager.CONNECTIVITY_ACTION, registerAt = Receiver.RegisterAt.OnResumeOnPause)
+    void onConnectivityChange() {
+        if(ConnectivityUtils.isDeviceConnected(getContext()) && mRssItems==null)
+            loadData();
+    }
+
     // Required empty public constructor
     public RssFragment() {}
 
@@ -98,7 +107,7 @@ public class RssFragment extends Fragment {
      * when cache is not valid anymore and network
      * is available, then request list view update
      */
-    //TODO: as requested by the rubric: using here AsyncTask instead of annotation.
+    //TODO: as requested by the rubric: using here AsyncTask for atomic one time request.
     //@Background
     void loadData() {
         //Performs data load at once, when starting the app
