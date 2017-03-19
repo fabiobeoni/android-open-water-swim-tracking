@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.matshofman.saxrssreader;
+package com.beoni.openwaterswimtracking.saxRssReader;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

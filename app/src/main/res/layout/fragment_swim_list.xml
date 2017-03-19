@@ -1,4 +1,4 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:app="http://schemas.android.com/apk/res-auto"
              xmlns:tools="http://schemas.android.com/tools"
              android:id="@+id/container"
@@ -20,7 +20,6 @@
         android:indeterminate="true"
         android:id="@+id/progress_bar"/>
 
-    <!-- //TODO:check center positioning on tabs. Ask to the forum -->
     <LinearLayout
         android:id="@+id/swim_message_panel"
         android:layout_width="match_parent"
@@ -28,8 +27,6 @@
         android:orientation="vertical"
         android:layout_gravity="center"
         android:gravity="center">
-
-        <!-- //TODO change icons on res folders and use different icon sizes according to device resolution. \For testing only 48dp icons are available in all folders -->
 
         <TextView
             android:layout_width="254dp"
@@ -40,16 +37,18 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:layout_marginTop="4dp"/>
 
-        <Button
-            android:id="@+id/btn_add_swim"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="@string/btn_add_swim"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_marginTop="4dp"/>
-
     </LinearLayout>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btn_add_swim"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_add_box_white"
+        app:fabSize="normal"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="96dp"
+        android:layout_gravity="bottom|right"/>
 
-</FrameLayout>
+
+</android.support.design.widget.CoordinatorLayout>

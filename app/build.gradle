@@ -29,8 +29,22 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+    // ###### INSTALL RELEASE
+    signingConfigs {
+        release {
+            storeFile file("../keys.jks")
+            storePassword "udacity85"
+            keyAlias "udacity"
+            keyPassword "udacity85"
+        }
+    }
+
+
     buildTypes {
         release {
+            // ###### INSTALL RELEASE
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -43,14 +57,12 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile files('libs/gson-2.2.2.jar')
-    compile project(path: ':sAXRSSReader')
     apt "org.androidannotations:androidannotations:$AAVersion"
     compile "org.androidannotations:androidannotations-api:$AAVersion"
 
     compile files('libs/picasso-2.5.2.jar')
     compile files('libs/GraphView-4.2.1.jar')
-    
-    // Google Sign In SDK (only required for Google Sign In)
+
     compile 'com.android.support:appcompat-v7:25.1.1'
     compile 'com.android.support:support-v4:25.1.1'
     compile 'com.android.support:recyclerview-v7:25.1.1'

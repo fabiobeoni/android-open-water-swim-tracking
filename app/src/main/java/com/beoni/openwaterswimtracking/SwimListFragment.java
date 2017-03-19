@@ -177,7 +177,6 @@ public class SwimListFragment extends Fragment implements LoaderManager.LoaderCa
     //when the menu item Add Swim is clicked
     //display the SwimEditActivity to add new
     //a new swim track
-    @OptionsItem(R.id.menu_add_swim)
     @Click(R.id.btn_add_swim)
     void displayEditSwimActivity(){
         Intent displayIntent = new Intent(getActivity(), SwimEditActivity_.class);

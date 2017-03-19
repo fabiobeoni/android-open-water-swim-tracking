@@ -168,39 +168,8 @@ public class SwimTrackManager
         ArrayList<SwimTrack> items = new ArrayList<SwimTrack>();
         String result = mStorage.readTextFile(FILE_NAME);
 
-        items = new Gson().fromJson(result, listType);
-
-        if(items.size()>0)
+        if(result!=""&&result!="[]")
             items = new Gson().fromJson(result, listType);
-        /*
-        else{
-            //sample data on the list to simplify project review
-
-            items.add(new SwimTrack(
-                "Albano Lake Swimming Maraton",
-                "Valid for Italian senior swimming championship",
-                "Albano, Latium - Italy",
-                DateUtils.stringToDate("01/06/2000",DateUtils.SHORT_FORMAT),
-                50, 3000, 1, 1, 1
-            ));
-
-            items.add(new SwimTrack(
-                "Crossing Messina",
-                "Valid for Italian senior swimming championship",
-                "Messina, Sicily - Italy",
-                DateUtils.stringToDate("10/07/2001",DateUtils.SHORT_FORMAT),
-                65, 3500, 2, 3, 1
-            ));
-
-            items.add(new SwimTrack(
-                "Swimming Gibilterra (Europe to Africa)",
-                "",
-                "Gibilterra - Spain",
-                DateUtils.stringToDate("12/08/202",DateUtils.SHORT_FORMAT),
-                30, 25000, 1, 2, 2
-            ));
-        }
-        */
 
         return items;
     }

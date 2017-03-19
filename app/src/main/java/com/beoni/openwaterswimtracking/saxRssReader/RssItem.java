@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.matshofman.saxrssreader;
+package com.beoni.openwaterswimtracking.saxRssReader;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

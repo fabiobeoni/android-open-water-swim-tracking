@@ -21,9 +21,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 
-import nl.matshofman.saxrssreader.RssFeed;
-import nl.matshofman.saxrssreader.RssItem;
-import nl.matshofman.saxrssreader.RssReader;
+import com.beoni.openwaterswimtracking.saxRssReader.RssFeed;
+import com.beoni.openwaterswimtracking.saxRssReader.RssItem;
+import com.beoni.openwaterswimtracking.saxRssReader.RssReader;
 
 /**
  * Class performs rss restoreFromFireDatabase, manages the local

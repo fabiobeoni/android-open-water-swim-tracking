@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
-import nl.matshofman.saxrssreader.RssItem;
+import com.beoni.openwaterswimtracking.saxRssReader.RssItem;
 
 public class RssItemSimplified implements Serializable
 {
