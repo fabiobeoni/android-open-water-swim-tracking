@@ -205,6 +205,14 @@ public class BackupActivity extends AppCompatActivity
             mProgress.setProgress(100);
             setUIState(UISTATE_LOGGED_IN);
             mTxtMessage.setText(R.string.task_completed);
+
+            new android.os.Handler().postDelayed(new Runnable() {
+                public void run() {
+                    Intent intent = new Intent(getBaseContext(),MainActivity_.class);
+                    intent.putExtra(MainActivity.REQUEST_SELECTED_TAB_KEY, 1);
+                    startActivity(intent);
+                }
+            }, 1000);
         }
         else{
             setUIState(UISTATE_LOGGED_IN);

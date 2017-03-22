@@ -10,6 +10,7 @@ import org.androidannotations.annotations.RootContext;
 import org.androidannotations.annotations.res.StringRes;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 
 public class FormattingUtils
@@ -17,7 +18,9 @@ public class FormattingUtils
     public static String formatDuration(Context ctx, int duration){
         //"i" are minutes
         double h = ((double)duration/60.00);
-        NumberFormat format = new DecimalFormat("#.##");
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        NumberFormat format = new DecimalFormat("#.##",symbols);
         String full = format.format(h);
         String hours = "0";
         String minutes = "0";
