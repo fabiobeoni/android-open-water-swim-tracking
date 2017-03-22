@@ -13,8 +13,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.beoni.openwaterswimtracking.model.SwimTrack;
+import com.beoni.openwaterswimtracking.utils.DateUtils;
 import com.beoni.openwaterswimtracking.utils.FormattingUtils;
 
+import java.sql.Date;
 import java.util.ArrayList;
 
 //TODO: change implementation of the all adapter by using Android Annotations https://github.com/androidannotations/androidannotations/wiki/Adapters-and-lists
@@ -63,6 +65,7 @@ public class SwimTracksAdapter extends ArrayAdapter
             itemView.locationTvw = (TextView) view.findViewById(R.id.swim_location);
             itemView.lengthTvw = (TextView) view.findViewById(R.id.swim_length);
             itemView.durationTvw = (TextView) view.findViewById(R.id.swim_duration);
+            itemView.dateTvw = (TextView) view.findViewById(R.id.swim_date);
             view.setTag(itemView);
         }
         else
@@ -75,6 +78,7 @@ public class SwimTracksAdapter extends ArrayAdapter
         itemView.locationTvw.setText(swimTrack.getLocation());
         itemView.durationTvw.setText(FormattingUtils.formatDuration(getContext(),swimTrack.getDuration()));
         itemView.lengthTvw.setText(String.valueOf(swimTrack.getLength())+resources.getString(R.string.swim_length_label));
+        itemView.dateTvw.setText(DateUtils.dateToString(swimTrack.getDate(), DateUtils.SHORT_FORMAT));
 
         temperatureColor = Color.parseColor(tempColors[swimTrack.getPerceivedTemperature()]);
         itemView.wavesImgVw.setColorFilter(temperatureColor);
@@ -84,7 +88,7 @@ public class SwimTracksAdapter extends ArrayAdapter
         resourceID = resources.getIdentifier(resourceName, DRAWABLE, packageName);
         itemView.wavesImgVw.setImageResource(resourceID);
 
-        resourceName = wavesIconNames[swimTrack.getWaves()];
+        resourceName = flowIconNames[swimTrack.getFlow()];
         resourceID = resources.getIdentifier(resourceName, DRAWABLE, packageName);
         itemView.flowImgVw.setImageResource(resourceID);
 
@@ -97,6 +101,7 @@ public class SwimTracksAdapter extends ArrayAdapter
         TextView titleTvw;
         TextView lengthTvw;
         TextView durationTvw;
+        TextView dateTvw;
         ImageView wavesImgVw;
         ImageView flowImgVw;
     }

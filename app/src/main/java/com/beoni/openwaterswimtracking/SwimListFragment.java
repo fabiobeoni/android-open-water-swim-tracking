@@ -191,12 +191,6 @@ public class SwimListFragment extends Fragment implements LoaderManager.LoaderCa
             return;
         }
 
-        if(mSwimTracksList.size()==0)
-        {
-            Toast.makeText(getContext(), R.string.no_swim, Toast.LENGTH_LONG).show();
-            return;
-        }
-
         Intent displayIntent = new Intent(getActivity(), BackupActivity_.class);
             startActivity(displayIntent);
     }

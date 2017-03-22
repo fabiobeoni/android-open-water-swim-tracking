@@ -68,8 +68,8 @@
         <item>Small waves</item>
     </string-array>
     <string-array name="waves_icons">
-        <item>waves</item>
-        <item>waves</item>
+        <item>flat</item>
+        <item>choppy</item>
         <item>waves</item>
     </string-array>
     <string name="swim_flow">Flow</string>
@@ -80,9 +80,10 @@
         <item>Strong</item>
     </string-array>
     <string-array name="flow_icons">
-        <item>waves</item>
-        <item>waves</item>
-        <item>waves</item>
+        <item>noflow</item>
+        <item>lowflow</item>
+        <item>mediumflow</item>
+        <item>highflow</item>
     </string-array>
     <string name="swim_title_validate">Title is required</string>
     <string name="swim_date_validate">When is required</string>

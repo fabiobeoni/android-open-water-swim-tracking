@@ -126,6 +126,12 @@ public class BackupActivity extends AppCompatActivity
 
     @Click(R.id.btn_backup)
     void onBtnBackupClick(){
+        if(mSwimTrackMng.getSwimTracks(false).size()==0)
+        {
+            Toast.makeText(getBaseContext(),R.string.no_swim,Toast.LENGTH_LONG).show();
+            return;
+        }
+
         setUIState(UISTATE_PERFORMS_BACKUP_RESTORE);
         performBackup();
     }
@@ -216,6 +222,15 @@ public class BackupActivity extends AppCompatActivity
             mProgress.setProgress(100);
             setUIState(UISTATE_LOGGED_IN);
             mTxtMessage.setText(R.string.task_completed);
+
+            new android.os.Handler().postDelayed(new Runnable() {
+                public void run() {
+                    Intent intent = new Intent(getBaseContext(),MainActivity_.class);
+                    intent.putExtra(MainActivity.REQUEST_SELECTED_TAB_KEY, 1);
+                    intent.putExtra(SwimListFragment.UPDATE_LIST_KEY, true);
+                    startActivity(intent);
+                }
+            }, 1000);
         }
         else{
             setUIState(UISTATE_LOGGED_IN);
