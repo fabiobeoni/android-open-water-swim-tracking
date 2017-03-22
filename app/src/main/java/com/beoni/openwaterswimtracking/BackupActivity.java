@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.beoni.openwaterswimtracking.bll.FirebaseManager;
 import com.beoni.openwaterswimtracking.bll.SwimTrackManager;
+import com.beoni.openwaterswimtracking.utils.ConnectivityUtils;
 import com.beoni.openwaterswimtracking.utils.LLog;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -106,6 +107,11 @@ public class BackupActivity extends AppCompatActivity
 
     @Click(R.id.btn_signin)
     void signIn() {
+        if(!ConnectivityUtils.isDeviceConnected(this))
+        {
+            Toast.makeText(getBaseContext(),R.string.no_connection,Toast.LENGTH_LONG).show();
+            return;
+        }
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
@@ -126,6 +132,11 @@ public class BackupActivity extends AppCompatActivity
 
     @Click(R.id.btn_backup)
     void onBtnBackupClick(){
+        if(!ConnectivityUtils.isDeviceConnected(this))
+        {
+            Toast.makeText(getBaseContext(),R.string.no_connection,Toast.LENGTH_LONG).show();
+            return;
+        }
         if(mSwimTrackMng.getSwimTracks(false).size()==0)
         {
             Toast.makeText(getBaseContext(),R.string.no_swim,Toast.LENGTH_LONG).show();
@@ -138,6 +149,11 @@ public class BackupActivity extends AppCompatActivity
 
     @Click(R.id.btn_restore)
     void onBtnRestoreClick(){
+        if(!ConnectivityUtils.isDeviceConnected(this))
+        {
+            Toast.makeText(getBaseContext(),R.string.no_connection,Toast.LENGTH_LONG).show();
+            return;
+        }
 
         new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)

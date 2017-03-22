@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.beoni.openwaterswimtracking.model.RssItemSimplified;
+import com.beoni.openwaterswimtracking.utils.DateUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -52,24 +53,24 @@ public class RssListAdapter extends ArrayAdapter
         else
             holder = (RssItemView) viewItem.getTag();
 
-        final RssItemSimplified item = (RssItemSimplified) this.getItem(position);
+        final RssItemSimplified rssItemSimplified = (RssItemSimplified) this.getItem(position);
 
-        if(item.getImageUrl()!=null)
-            Picasso.with(getContext()).load(item.getImageUrl())
+        if(rssItemSimplified.getImageUrl()!=null)
+            Picasso.with(getContext()).load(rssItemSimplified.getImageUrl())
                     .placeholder(R.drawable.placeholder)
                     .error(R.drawable.placeholder)
                     .into(holder.imageView);
 
-        holder.titleView.setText(item.getTitle());
-        holder.dateView.setText(item.getDate().toString());
-        holder.descriptionView.setText(item.getDescription());
+        holder.titleView.setText(rssItemSimplified.getTitle());
+        holder.dateView.setText(DateUtils.dateToString(rssItemSimplified.getDate(),DateUtils.SHORT_FORMAT));
+        holder.descriptionView.setText(rssItemSimplified.getDescription());
 
         holder.btnKnowMore.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
-                String link = item.getLink();
+                String link = rssItemSimplified.getLink();
                 Uri uri = Uri.parse(link);
                 Intent intent = new Intent(Intent.ACTION_VIEW).setData(uri);
                 getContext().startActivity(intent);

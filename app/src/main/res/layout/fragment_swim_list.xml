@@ -32,10 +32,11 @@
             android:layout_width="254dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:textAlignment="center"
+            android:layout_marginTop="4dp"
             android:text="@string/no_swim"
+            android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:layout_marginTop="4dp"/>
+            android:textColor="@color/colorDark"/>
 
     </LinearLayout>
 

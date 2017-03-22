@@ -97,14 +97,14 @@
                 android:id="@+id/swim_duration_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:fontFamily="sans-serif"
-                android:text="[value]"
-                android:textColor="@android:color/black"
                 android:layout_marginTop="4dp"
-                android:paddingStart="8dp"
+                android:fontFamily="sans-serif"
                 android:paddingLeft="8dp"
-                android:paddingRight="8dp"/>
+                android:paddingRight="8dp"
+                android:paddingStart="8dp"
+                android:text="[value]"
+                android:textColor="@color/colorDark"
+                android:textSize="18sp"/>
 
 
             <TextView
@@ -132,12 +132,12 @@
                 android:id="@+id/swim_length_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:fontFamily="sans-serif"
-                android:text="[value]"
-                android:textColor="@android:color/black"
                 android:layout_marginTop="4dp"
-                android:paddingStart="8dp"/>
+                android:fontFamily="sans-serif"
+                android:paddingStart="8dp"
+                android:text="[value]"
+                android:textColor="@color/colorDark"
+                android:textSize="18sp"/>
 
 
             <TextView
@@ -165,14 +165,14 @@
                 android:id="@+id/swim_temperature_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:fontFamily="sans-serif"
-                android:text="[value]"
-                android:textColor="@android:color/black"
                 android:layout_marginTop="4dp"
-                android:paddingStart="8dp"
+                android:fontFamily="sans-serif"
                 android:paddingLeft="8dp"
-                android:paddingRight="8dp"/>
+                android:paddingRight="8dp"
+                android:paddingStart="8dp"
+                android:text="[value]"
+                android:textColor="@color/colorDark"
+                android:textSize="18sp"/>
 
 
             <TextView
@@ -200,14 +200,14 @@
                 android:id="@+id/swim_waves_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:fontFamily="sans-serif"
-                android:text="[value]"
-                android:textColor="@android:color/black"
                 android:layout_marginTop="4dp"
-                android:paddingStart="8dp"
+                android:fontFamily="sans-serif"
                 android:paddingLeft="8dp"
-                android:paddingRight="8dp"/>
+                android:paddingRight="8dp"
+                android:paddingStart="8dp"
+                android:text="[value]"
+                android:textColor="@color/colorDark"
+                android:textSize="18sp"/>
 
 
             <TextView
@@ -238,7 +238,7 @@
                 android:textSize="18sp"
                 android:fontFamily="sans-serif"
                 android:text="[value]"
-                android:textColor="@android:color/black"
+                android:textColor="@color/colorDark"
                 android:layout_marginTop="4dp"
                 android:paddingStart="8dp"
                 android:paddingLeft="8dp"

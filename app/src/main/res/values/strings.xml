@@ -10,7 +10,7 @@
     <string name="swim_activity_label">Swim Track</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="action_settings">Settings</string>
-    <string name="rss_no_connection">Looks like you are not connected</string>
+    <string name="no_connection">Looks like you are not connected</string>
     <string name="btn_show_swim_list">Don\'t care, show Swim Track</string>
     <string name="menu_add_swim">Add New Swim</string>
     <string name="btn_know_more">Read More</string>

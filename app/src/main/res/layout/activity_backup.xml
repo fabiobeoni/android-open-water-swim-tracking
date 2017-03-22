@@ -48,8 +48,10 @@
                 android:id="@+id/backup_message"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
                 android:text="@string/please_login"
-                android:paddingBottom="8dp"/>
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/colorDark"/>
 
             <ProgressBar
                 android:id="@+id/progress_bar"

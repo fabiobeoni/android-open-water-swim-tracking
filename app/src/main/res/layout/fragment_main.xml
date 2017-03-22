@@ -19,7 +19,6 @@
         android:indeterminate="true"
         android:id="@+id/progress_bar"/>
 
-    <!-- //TODO:check center positioning on tabs. Ask to the forum -->
     <LinearLayout
         android:id="@+id/rss_message_panel"
         android:layout_width="match_parent"
@@ -40,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:textAlignment="center"
-            android:text="@string/rss_no_connection"
+            android:text="@string/no_connection"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:layout_marginTop="4dp"/>
 

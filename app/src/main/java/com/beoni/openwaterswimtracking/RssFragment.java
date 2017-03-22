@@ -28,7 +28,7 @@ import java.util.ArrayList;
  * RssManager, handles the navigation to the swim
  * list activity.
  */
-@EFragment(R.layout.fragment_rss)
+@EFragment(R.layout.fragment_main)
 public class RssFragment extends Fragment {
 
     //interface to communicate with the hosting
