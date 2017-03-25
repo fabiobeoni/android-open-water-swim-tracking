@@ -22,16 +22,18 @@
             android:layout_width="72dp"
             android:layout_height="72dp"
             android:scaleType="centerInside"
-            android:src="@drawable/waves"/>
+            android:src="@drawable/waves"
+            android:contentDescription="@string/swim_temperature"/>
 
         <ImageView
             android:id="@+id/icon_swim_flow"
             android:layout_width="84dp"
             android:layout_height="84dp"
-            android:paddingLeft="6dp"
             android:paddingStart="6dp"
+            android:paddingEnd="6dp"
             android:paddingTop="2dp"
-            android:src="@drawable/mediumflow"/>
+            android:src="@drawable/mediumflow"
+            android:contentDescription="@string/swim_flow"/>
 
     </RelativeLayout>
 

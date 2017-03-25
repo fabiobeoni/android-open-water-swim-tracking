@@ -4,8 +4,6 @@
     <string name="date_format_default" translatable="false">dd/mm/yyyy</string>
 
     <string name="app_name">Open Water Swim Tracking</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="rss_activity_label">Open Water News</string>
     <string name="swim_activity_label">Swim Track</string>
     <string name="title_activity_main">MainActivity</string>
@@ -17,8 +15,6 @@
     <string name="menu_backup">Backup/Restore swim tracks with Google Cloud</string>
     <string name="no_swim">Looks like you don\'t have any swim yet</string>
     <string name="title_activity_login">Sign in</string>
-
-    <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password (optional)</string>
     <string name="action_sign_in">Sign in or register</string>
@@ -98,8 +94,6 @@
     <string name="google_status_fmt">Google User: %s</string>
     <string name="firebase_status_fmt">Firebase User: %s</string>
     <string name="label_google_sign_in">Sign In with Google</string>
-
-    <!-- FIREBASE -->
     <string name="camera_button_text">Upload</string>
     <string name="sign_in_prompt">Sign In to begin</string>
     <string name="take_photo_prompt">Upload a Photo</string>
@@ -110,14 +104,11 @@
     <string name="label_download">Download File</string>
     <string name="log_out">Log out</string>
     <string name="success">Success</string>
-
     <string name="progress_downloading">Downloading…</string>
     <string name="progress_uploading">Uploading…</string>
     <string name="progress_auth">Signing In…</string>
-
     <string name="upload_success">Upload finished</string>
-    <string name="upload_failure">Upload failed</string>\
-
+    <string name="upload_failure">Upload failed</string>
     <string name="download_success">Download finished</string>
     <string name="download_failure">Download failure</string>
     <string name="backup">Backup</string>
@@ -136,10 +127,8 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="error_restore">Error restoring the backup. This can happen if you didn\'t save any backup before. Please try later.</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="appwidget_text">EXAMPLE</string>
+    <string name="appwidget_text">_</string>
     <string name="add_widget">Add widget</string>
     <string name="distance_km">KM</string>
     <string name="duration_houres">HOURS</string>

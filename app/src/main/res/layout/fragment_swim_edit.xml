@@ -74,33 +74,30 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="?android:attr/textColorHint"
-                android:textSize="18sp"
-                android:fontFamily="sans-serif"
-                android:text="@string/swim_duration"
                 android:paddingBottom="12dp"
                 android:paddingEnd="4dp"
                 android:paddingStart="4dp"
-                android:paddingTop="16dp"/>
+                android:paddingTop="16dp"
+                android:text="@string/swim_duration"
+                android:textColor="?android:attr/textColorHint"
+                android:textSize="18sp"/>
 
 
             <SeekBar
                 android:id="@+id/swim_duration"
-                    style="@style/Widget.AppCompat.SeekBar.Discrete"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:max="600"
-                    android:progress="1"
-                    android:layout_weight="1"/>
+                style="@style/Widget.AppCompat.SeekBar.Discrete"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:max="600"
+                android:progress="1"/>
 
             <TextView
                 android:id="@+id/swim_duration_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:fontFamily="sans-serif"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
+                android:paddingEnd="8dp"
                 android:paddingStart="8dp"
                 android:text="[value]"
                 android:textColor="@color/colorDark"
@@ -110,31 +107,31 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="?android:attr/textColorHint"
-                android:textSize="18sp"
-                android:fontFamily="sans-serif"
-                android:text="@string/swim_length"
                 android:paddingBottom="12dp"
                 android:paddingEnd="4dp"
                 android:paddingStart="4dp"
-                android:paddingTop="16dp"/>
+                android:paddingTop="16dp"
+                android:text="@string/swim_length"
+                android:textColor="?android:attr/textColorHint"
+                android:textSize="18sp"/>
 
             <SeekBar
                 android:id="@+id/swim_length"
                 style="@style/Widget.AppCompat.SeekBar.Discrete"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_weight="1"
                 android:max="600"
-                android:progress="1"
-                android:layout_weight="1"/>
+                android:progress="1"/>
 
             <TextView
                 android:id="@+id/swim_length_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:fontFamily="sans-serif"
                 android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingLeft="8dp"
                 android:text="[value]"
                 android:textColor="@color/colorDark"
                 android:textSize="18sp"/>
@@ -143,30 +140,28 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="?android:attr/textColorHint"
-                android:textSize="18sp"
-                android:fontFamily="sans-serif"
-                android:text="@string/swim_temperature"
                 android:paddingBottom="12dp"
                 android:paddingEnd="4dp"
                 android:paddingStart="4dp"
-                android:paddingTop="16dp"/>
+                android:paddingTop="16dp"
+                android:text="@string/swim_temperature"
+                android:textColor="?android:attr/textColorHint"
+                android:textSize="18sp"/>
 
             <SeekBar
                 android:id="@+id/swim_temperature"
                 style="@style/Widget.AppCompat.SeekBar.Discrete"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_weight="1"
                 android:max="6"
-                android:progress="0"
-                android:layout_weight="1"/>
+                android:progress="0"/>
 
             <TextView
                 android:id="@+id/swim_temperature_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:fontFamily="sans-serif"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:paddingStart="8dp"
@@ -178,33 +173,30 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="?android:attr/textColorHint"
-                android:textSize="18sp"
-                android:fontFamily="sans-serif"
-                android:text="@string/swim_waves"
                 android:paddingBottom="12dp"
                 android:paddingEnd="4dp"
                 android:paddingStart="4dp"
-                android:paddingTop="16dp"/>
+                android:paddingTop="16dp"
+                android:text="@string/swim_waves"
+                android:textColor="?android:attr/textColorHint"
+                android:textSize="18sp"/>
 
             <SeekBar
                 android:id="@+id/swim_waves"
                 style="@style/Widget.AppCompat.SeekBar.Discrete"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_weight="1"
                 android:max="2"
-                android:progress="0"
-                android:layout_weight="1"/>
+                android:progress="0"/>
 
             <TextView
                 android:id="@+id/swim_waves_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:fontFamily="sans-serif"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
                 android:paddingStart="8dp"
+                android:paddingEnd="8dp"
                 android:text="[value]"
                 android:textColor="@color/colorDark"
                 android:textSize="18sp"/>
@@ -213,36 +205,33 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="?android:attr/textColorHint"
-                android:textSize="18sp"
-                android:fontFamily="sans-serif"
-                android:text="@string/swim_flow"
                 android:paddingBottom="12dp"
                 android:paddingEnd="4dp"
                 android:paddingStart="4dp"
-                android:paddingTop="16dp"/>
+                android:paddingTop="16dp"
+                android:text="@string/swim_flow"
+                android:textColor="?android:attr/textColorHint"
+                android:textSize="18sp"/>
 
             <SeekBar
                 android:id="@+id/swim_flow"
                 style="@style/Widget.AppCompat.SeekBar.Discrete"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_weight="1"
                 android:max="3"
-                android:progress="0"
-                android:layout_weight="1"/>
+                android:progress="0"/>
 
             <TextView
                 android:id="@+id/swim_flow_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:fontFamily="sans-serif"
+                android:layout_marginTop="4dp"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
                 android:text="[value]"
                 android:textColor="@color/colorDark"
-                android:layout_marginTop="4dp"
-                android:paddingStart="8dp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"/>
+                android:textSize="18sp"/>
 
         </LinearLayout>
     </ScrollView>
