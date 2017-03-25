@@ -26,18 +26,33 @@ import com.beoni.openwaterswimtracking.saxRssReader.RssItem;
 import com.beoni.openwaterswimtracking.saxRssReader.RssReader;
 
 /**
- * Class performs rss restoreFromFireDatabase, manages the local
- * cached version and provides rss data to the client.
+ * The class manages the reading of the RSS data
+ * from remote address, as well as storing and reading
+ * the local cached version.
+ * The manager also takes care of updating the local
+ * cache when RSS data are too old (1 day).
  */
 @EBean
 public class RssManager
 {
+    /**
+     * Name of the file where local cached file get stored
+     */
     private static final String RSS_FILE_NAME = "OWSTRss.txt";
-    private static final String LAST_DOWNLOAD_DATE = "LAST_DOWNLOAD_DATE";
+
+    /**
+     * Preference key that stores the date about the latest
+     * download performed. Needed to check if the local cached
+     * file is too old and needs to be updated.
+     */
+    private static final String PREF_LAST_DOWNLOAD_DATE = "LAST_DOWNLOAD_DATE";
 
     private Context mContext;
-    private LocalFileStorage mStorage;
     private SharedPreferences mPreferences;
+
+    //instance of DAO class to manage read/write
+    // files to the local disk
+    private LocalFileStorage mStorage;
 
     public RssManager(Context ctx){
         mContext = ctx;
@@ -46,7 +61,7 @@ public class RssManager
     }
 
     /**
-     * ASYNC INVOCATION REQUIRED FROM VIEW.
+     * ASYNC INVOCATION REQUIRED WHEN INVOKED FROM UI THREAD
      * This methods returns the list of rss items.
      * Rss items are downloaded from the web and stored
      * locally. The cache becomes invalid after one day.
@@ -69,8 +84,9 @@ public class RssManager
     }
 
     /**
-     * Performs the restoreFromFireDatabase from the web of the rss file
-     * configured in app resources.
+     * ASYNC INVOCATION REQUIRED WHEN INVOKED FROM UI THREAD
+     * Performs the request of RSS data to the remote address
+     * and returns a list of objects from parsing.
      * @return list of RssItemSimplified items. Empty list when exception occurs.
      */
     private ArrayList<RssItemSimplified> downloadRss(){
@@ -118,7 +134,7 @@ public class RssManager
 
         //stores the date about the current restoreFromFireDatabase
         Date today = new Date();
-        mPreferences.edit().putString(LAST_DOWNLOAD_DATE, DateUtils.dateToString(today)).commit();
+        mPreferences.edit().putString(PREF_LAST_DOWNLOAD_DATE, DateUtils.dateToString(today)).commit();
     }
 
     /**
@@ -131,7 +147,7 @@ public class RssManager
     private boolean isDownloadedRssObsolete(){
         long diff = 0;
         Date today = new Date();
-        String lastDownloadDateStr = mPreferences.getString(LAST_DOWNLOAD_DATE,"");
+        String lastDownloadDateStr = mPreferences.getString(PREF_LAST_DOWNLOAD_DATE,"");
 
         //gets the last data restoreFromFireDatabase date
         if(!lastDownloadDateStr.equals("")){

@@ -182,7 +182,7 @@ public class BackupActivity extends AppCompatActivity
     @Background
     void performBackup(){
         String fileContent = mSwimTrackMng.getLocalDataForBackup();
-        mFirebaseMng.backupOnFireDatabase(fileContent, new FirebaseManager.ICallback()
+        mFirebaseMng.backupOnFireDatabase(fileContent, new FirebaseManager.IBackupCallback()
         {
             @Override
             public void onSuccess(Object _null)
@@ -222,7 +222,7 @@ public class BackupActivity extends AppCompatActivity
 
     @Background
     void performRestore(){
-        mFirebaseMng.restoreFromFireDatabase(new FirebaseManager.ICallback()
+        mFirebaseMng.restoreFromFireDatabase(new FirebaseManager.IBackupCallback()
         {
             @Override
             public void onSuccess(Object data)
