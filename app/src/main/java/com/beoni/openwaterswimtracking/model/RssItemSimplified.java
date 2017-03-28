@@ -28,8 +28,8 @@ public class RssItemSimplified implements Serializable
      * Utility, takes a regular RssItem object and returns
      * a simplified version of it with only needed
      * data on the UI by parsing some contents too.
-     * @param rssItem
-     * @return
+     * @param rssItem Source full Rss item to be simplified
+     * @return Rss item ready to be used on view
      */
     public static RssItemSimplified factory(RssItem rssItem)
     {
@@ -43,7 +43,7 @@ public class RssItemSimplified implements Serializable
         //available to use it has the main image of the rss item
         //on UI. Works quite well, most of the original RSS items
         //have the first image quite big and RSS context related.
-        ArrayList<String> imagesUrls = getImagesURL(rssItem.getDescription());
+        ArrayList<String> imagesUrls = getExternalURLs(rssItem.getDescription());
         if (imagesUrls.size() > 0)
             item.setImageUrl(imagesUrls.get(0));
 
@@ -80,11 +80,11 @@ public class RssItemSimplified implements Serializable
     }
 
     /**
-     * Extract image URL from image HTML tag.
-     * @param rssHTMLContent
-     * @return
+     * Extract external resources URLs from HTML tags.
+     * @param rssHTMLContent HTML tags from Rss description field
+     * @return List of URLs of resources included in the HTML of the given rss description.
      */
-    private static ArrayList<String> getImagesURL(String rssHTMLContent){
+    private static ArrayList<String> getExternalURLs(String rssHTMLContent){
         Pattern p = Pattern.compile("src=\"(.*?)\"");
         Matcher m = p.matcher(rssHTMLContent);
         ArrayList<String> urls = new ArrayList<>();
@@ -95,6 +95,13 @@ public class RssItemSimplified implements Serializable
         return urls;
     }
 
+    /**
+     * Utility to clean empty HTML tags from a string and return
+     * a clean version of it. It's needed to well display text
+     * from an HTML content into a TextView.
+     * @param inStr HTML string to process
+     * @return cleaned HTML string
+     */
     private static Spanned removeImageSpanObjects(String inStr) {
         SpannableStringBuilder spannedStr = (SpannableStringBuilder) Html
                 .fromHtml(inStr.trim());
