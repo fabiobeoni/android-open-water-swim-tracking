@@ -32,10 +32,13 @@ public class SwimTrackManager
     //to the client
     private ArrayList<SwimTrack> mSwimTracks;
 
+    private Context mContext;
+
 
     public SwimTrackManager(Context ctx)
     {
-        mStorage = LocalFileStorage.get(ctx);
+        mContext = ctx;
+        mStorage = LocalFileStorage.get();
     }
 
 
@@ -111,7 +114,7 @@ public class SwimTrackManager
      */
     public String getLocalDataForBackup()
     {
-        return mStorage.readTextFile(FILE_NAME);
+        return mStorage.readTextFile(mContext,FILE_NAME);
     }
 
     /**
@@ -123,7 +126,7 @@ public class SwimTrackManager
      */
     public void restoreLocalDataFromBackup(String data)
     {
-        mStorage.writeTextFile(FILE_NAME, data);
+        mStorage.writeTextFile(mContext, FILE_NAME, data);
     }
 
     /**
@@ -136,7 +139,7 @@ public class SwimTrackManager
     {
         Type listType = new TypeToken<ArrayList<SwimTrack>>(){}.getType();
         ArrayList<SwimTrack> items = new ArrayList<SwimTrack>();
-        String result = mStorage.readTextFile(FILE_NAME);
+        String result = mStorage.readTextFile(mContext,FILE_NAME);
 
         if (result != "" && result != "[]")
             items = new Gson().fromJson(result, listType);
@@ -155,7 +158,7 @@ public class SwimTrackManager
         if (swimTracks != null)
         {
             String itemsAsString = new Gson().toJson(swimTracks);
-            mStorage.writeTextFile(FILE_NAME, itemsAsString);
+            mStorage.writeTextFile(mContext, FILE_NAME, itemsAsString);
         }
     }
 

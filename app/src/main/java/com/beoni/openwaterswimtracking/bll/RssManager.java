@@ -56,7 +56,7 @@ public class RssManager
 
     public RssManager(Context ctx){
         mContext = ctx;
-        mStorage = LocalFileStorage.get(ctx);
+        mStorage = LocalFileStorage.get();
         mPreferences = mContext.getSharedPreferences(ctx.getString(R.string.preferences_file), android.content.Context.MODE_PRIVATE);
     }
 
@@ -115,7 +115,7 @@ public class RssManager
     private ArrayList<RssItemSimplified> readRssFile(){
         Type listType = new TypeToken<ArrayList<RssItemSimplified>>(){}.getType();
         ArrayList<RssItemSimplified> rssItems = new ArrayList<RssItemSimplified>();
-        String result = mStorage.readTextFile(RSS_FILE_NAME);
+        String result = mStorage.readTextFile(mContext,RSS_FILE_NAME);
 
         if(result.length()>0)
             rssItems = new Gson().fromJson(result, listType);
@@ -131,7 +131,7 @@ public class RssManager
      */
     private void writeRssFile(ArrayList<RssItemSimplified> rssItemsSimp){
         String rssAsString = new Gson().toJson(rssItemsSimp);
-        mStorage.writeTextFile(RSS_FILE_NAME, rssAsString);
+        mStorage.writeTextFile(mContext,RSS_FILE_NAME, rssAsString);
 
         //stores the date about the current restoreFromFireDatabase
         Date today = new Date();
