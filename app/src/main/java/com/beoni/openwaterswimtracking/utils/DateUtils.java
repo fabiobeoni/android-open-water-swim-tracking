@@ -6,7 +6,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-
+/**
+ * Utility to transform dates from/to strings in a easy and
+ * uniform way.
+ */
+//TODO: replace with library
 public class DateUtils
 {
     public final static String FORMAT = "dd/mm/yyyy hh:mm:ss";
@@ -39,6 +43,12 @@ public class DateUtils
         return formatter.format(date).toString();
     }
 
+    /**
+     * Returns the difference in days between two dates.
+     * @param startdate
+     * @param endDate
+     * @return
+     */
     public static long dateDiff(Date startdate, Date endDate){
 
         long diff = endDate.getTime() - startdate.getTime();

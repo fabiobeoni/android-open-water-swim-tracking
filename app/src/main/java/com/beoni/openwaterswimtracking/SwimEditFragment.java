@@ -2,8 +2,6 @@ package com.beoni.openwaterswimtracking;
 import android.content.Intent;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
-import android.view.KeyEvent;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -12,8 +10,6 @@ import android.widget.Toast;
 import com.beoni.openwaterswimtracking.bll.SwimTrackManager;
 import com.beoni.openwaterswimtracking.model.SwimTrack;
 import com.beoni.openwaterswimtracking.utils.DateUtils;
-import com.beoni.openwaterswimtracking.utils.FormattingUtils;
-import com.beoni.openwaterswimtracking.utils.LLog;
 import com.google.gson.Gson;
 
 import org.androidannotations.annotations.AfterTextChange;
@@ -28,13 +24,6 @@ import org.androidannotations.annotations.SeekBarProgressChange;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.StringRes;
 import org.androidannotations.annotations.res.StringArrayRes;
-
-import java.sql.Date;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 
 @EFragment(R.layout.fragment_swim_edit)
@@ -132,7 +121,7 @@ public class SwimEditFragment extends Fragment {
         isNewSwim = (mSwimTrackSerialized ==null);
 
         if(isNewSwim)
-            mSwimTrack = SwimTrack.createNewEmptySwim();
+            mSwimTrack = SwimTrack.createNewEmptySwim(getContext());
         else
             mSwimTrack = new Gson().fromJson(mSwimTrackSerialized,SwimTrack.class);
 
@@ -201,7 +190,7 @@ public class SwimEditFragment extends Fragment {
 
     @SeekBarProgressChange(R.id.swim_duration)
     void onDurationChange(SeekBar seekBar, int i, boolean b){
-        mDurationLabelTvw.setText(FormattingUtils.formatDuration(getContext(),i));
+        mDurationLabelTvw.setText(SwimTrack.formatDuration(getContext(),i));
         mSwimTrack.setDuration(i);
     }
 

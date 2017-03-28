@@ -1,182 +1,160 @@
 package com.beoni.openwaterswimtracking.bll;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.view.View;
-import android.widget.RelativeLayout;
 
-import com.beoni.openwaterswimtracking.R;
 import com.beoni.openwaterswimtracking.data.LocalFileStorage;
-import com.beoni.openwaterswimtracking.model.RssItemSimplified;
 import com.beoni.openwaterswimtracking.model.SwimTrack;
-import com.beoni.openwaterswimtracking.utils.DateUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.GridLabelRenderer;
-import com.jjoe64.graphview.LegendRenderer;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
 
 import org.androidannotations.annotations.EBean;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 
+/**
+ * Class performing CRUD operations over swimming tracks.
+ * Works with the LocalStorage class to store data in
+ * a local text file (JSON format). Exposes the local
+ * copy in string format to make it available for backup.
+ */
 @EBean
 public class SwimTrackManager
 {
+    //file where user swim tracks are stored as JSON string
     private static final String FILE_NAME = "OWSTSwimTrack.txt";
 
-    private Context mContext;
+    //instance of class performing file reading/writing
+    //on device hard-drive
     private LocalFileStorage mStorage;
-    private SharedPreferences mPreferences;
+
+    //in memory list of swim tracks to provide
+    //to the client
     private ArrayList<SwimTrack> mSwimTracks;
 
-    public SwimTrackManager(Context ctx){
-        mContext = ctx;
+
+    public SwimTrackManager(Context ctx)
+    {
         mStorage = LocalFileStorage.get(ctx);
-        mPreferences = mContext.getSharedPreferences(ctx.getString(R.string.preferences_file), Context.MODE_PRIVATE);
-    }
-
-    public Bitmap createSwimmingGraph(int w, int h){
-
-        ArrayList<SwimTrack> swimTrackList = getSwimTracks(false);
-
-        //sorts by date
-        Collections.sort(swimTrackList, new Comparator<SwimTrack>() {
-            public int compare(SwimTrack o1, SwimTrack o2) {
-                return o1.getDate().compareTo(o2.getDate());
-            }
-        });
-
-        DataPoint[] dataPointsDuration = new DataPoint[swimTrackList.size()];
-        for (int i=0;i<swimTrackList.size();i++)
-            dataPointsDuration[i] = new DataPoint(i, (swimTrackList.get(i).getDuration()/60));
-
-        DataPoint[] dataPointsLength = new DataPoint[swimTrackList.size()];
-        for (int i=0;i<swimTrackList.size();i++)
-            dataPointsLength[i] = new DataPoint(i, (swimTrackList.get(i).getLength()/1000));
-
-        GraphView graph = new GraphView(mContext);
-        graph.setLayoutParams(new RelativeLayout.LayoutParams(w,h));
-
-
-        LineGraphSeries<DataPoint> seriesDistance = new LineGraphSeries<>(dataPointsLength);
-        seriesDistance.setTitle(mContext.getString(R.string.swim_length));
-        seriesDistance.setThickness(8);
-        seriesDistance.setDrawDataPoints(true);
-        seriesDistance.setDataPointsRadius(10);
-        seriesDistance.setColor(Color.BLUE);
-        graph.addSeries(seriesDistance);
-
-        LineGraphSeries<DataPoint> seriesDuration = new LineGraphSeries<>(dataPointsDuration);
-        seriesDuration.setTitle(mContext.getString(R.string.swim_duration));
-        seriesDuration.setColor(Color.RED);
-        seriesDuration.setThickness(8);
-        seriesDuration.setDrawDataPoints(true);
-        seriesDuration.setDataPointsRadius(10);
-        graph.getSecondScale().addSeries(seriesDuration);
-
-        // the y bounds are always manual for second scale
-        graph.getSecondScale().setMinY(0);
-        graph.getSecondScale().setMaxY(10);
-        graph.getSecondScale().setVerticalAxisTitle(mContext.getString(R.string.duration_houres));
-        graph.getSecondScale().setVerticalAxisTitleTextSize(22);
-        graph.getSecondScale().setVerticalAxisTitleColor(Color.RED);
-
-        GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
-
-        gridLabel.setVerticalAxisTitle(mContext.getString(R.string.swim_length));
-        gridLabel.setVerticalAxisTitleTextSize(22);
-        gridLabel.setVerticalAxisTitleColor(Color.BLUE);
-        gridLabel.setTextSize(22);
-        gridLabel.setGridColor(Color.GRAY);
-        gridLabel.setVerticalLabelsColor(Color.BLUE);
-        gridLabel.setVerticalLabelsSecondScaleColor(Color.RED);
-        gridLabel.reloadStyles();
-
-
-        Bitmap b = SwimTrackManager.loadBitmapFromView(graph);
-
-        Bitmap bitmap = Bitmap.createBitmap(b);
-        graph.setDrawingCacheEnabled(false); // clear drawing cache
-
-        return bitmap;
-    }
-
-    public static Bitmap loadBitmapFromView(View v) {
-        Bitmap b = Bitmap.createBitmap( v.getLayoutParams().width, v.getLayoutParams().height, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(b) {
-            @Override
-            public boolean isHardwareAccelerated() {
-                return true;
-            }
-        };
-        v.layout(0, 0, v.getLayoutParams().width, v.getLayoutParams().height);
-        v.draw(c);
-        return b;
     }
 
 
+    /**
+     * Loads the swim tracks from a text json
+     * file locally stored. Loading is performed
+     * at first invocation, then a in memory cache
+     * is served unless the client requires a new
+     * load from disk.
+     *
+     * @param forceReload
+     * @return
+     */
     public ArrayList<SwimTrack> getSwimTracks(boolean forceReload)
     {
-        if(mSwimTracks==null || forceReload)
+        if (mSwimTracks == null || forceReload)
             mSwimTracks = readFile();
 
         return mSwimTracks;
     }
 
-    public void addNewSwimTrack(SwimTrack swim){
-        getSwimTracks(false);
-        mSwimTracks.add(swim);
+    /**
+     * Add a new swim track to the in-memory
+     * cached list of swimming. To store changes
+     * you must invoke .save() method.
+     *
+     * @param swim new swim to add
+     */
+    public void addNewSwimTrack(SwimTrack swim)
+    {
+        getSwimTracks(false).add(swim);
     }
 
-    public void updateSwimTrack(int index, SwimTrack currentSwim){
-        getSwimTracks(false);
-        mSwimTracks.remove(index);
-        mSwimTracks.add(index,currentSwim);
+    /**
+     * Update the given swim track in the in-memory
+     * cached list of swimming. To store changes
+     * you must invoke .save() method.
+     *
+     * @param index       index of the swim to update in the list of swim tracks
+     * @param currentSwim the updated swim track
+     */
+    public void updateSwimTrack(int index, SwimTrack currentSwim)
+    {
+        deleteSwimTrack(index).add(index, currentSwim);
     }
 
-    public void deleteSwimTrack(int index){
-        getSwimTracks(false);
-        mSwimTracks.remove(index);
+    /**
+     * Delete the given swim track from the in-memory
+     * cached list of swimming. To store changes
+     * you must invoke .save() method.
+     *
+     * @param index index of the swim to delete in the list of swim tracks
+     * @return list of remaining swim tracks
+     */
+    public ArrayList<SwimTrack> deleteSwimTrack(int index)
+    {
+        getSwimTracks(false).remove(index);
+        return mSwimTracks;
     }
 
-    public void save(){
+    /**
+     * Performs saving to text file of cached
+     * list of swim tracks
+     */
+    public void save()
+    {
         writeFile(mSwimTracks);
     }
 
-    public String getLocalDataForBackup(){
+    /**
+     * Load, serialize and return the swim list.
+     * @return serialized swim tracks list as json string
+     */
+    public String getLocalDataForBackup()
+    {
         return mStorage.readTextFile(FILE_NAME);
     }
 
-    public void restoreLocalDataFromBackup(String content){
-        mStorage.writeTextFile(FILE_NAME, content);
+    /**
+     * Deserialize the given json string
+     * and store the list of swim tracks
+     * on text file overriding any existing
+     * swim track list on local device.
+     * @param data backup serialized data
+     */
+    public void restoreLocalDataFromBackup(String data)
+    {
+        mStorage.writeTextFile(FILE_NAME, data);
     }
 
-    private ArrayList<SwimTrack> readFile(){
+    /**
+     * Perform reading from json text file
+     * the list of swim tracks, the deserialize
+     * it and return it to the client.
+     * @return list of swim tracks
+     */
+    private ArrayList<SwimTrack> readFile()
+    {
         Type listType = new TypeToken<ArrayList<SwimTrack>>(){}.getType();
         ArrayList<SwimTrack> items = new ArrayList<SwimTrack>();
         String result = mStorage.readTextFile(FILE_NAME);
 
-        if(result!=""&&result!="[]")
+        if (result != "" && result != "[]")
             items = new Gson().fromJson(result, listType);
 
         return items;
     }
 
-    private void writeFile(ArrayList<SwimTrack> items){
-        if(items!=null){
-            String itemsAsString = new Gson().toJson(items);
+    /**
+     * Perform serialization and writing to
+     * a local json text file the list of
+     * swim tracks.
+     * @param swimTracks list of swim tracks to be stored locally
+     */
+    private void writeFile(ArrayList<SwimTrack> swimTracks)
+    {
+        if (swimTracks != null)
+        {
+            String itemsAsString = new Gson().toJson(swimTracks);
             mStorage.writeTextFile(FILE_NAME, itemsAsString);
         }
     }

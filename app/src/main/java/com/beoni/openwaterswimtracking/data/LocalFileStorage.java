@@ -7,6 +7,7 @@ import java.io.IOException;
 
 /**
  * DAO class to read/write files on app files directory.
+ * Async invoke from UI thread is required.
  */
 public class LocalFileStorage
 {

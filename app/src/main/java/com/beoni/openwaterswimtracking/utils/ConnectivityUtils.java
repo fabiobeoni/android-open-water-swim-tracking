@@ -7,6 +7,9 @@ import android.net.NetworkInfo;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 
+/**
+ * Utility to check if device is connected from anywhere in the app.
+ */
 public class ConnectivityUtils
 {
     public static boolean isDeviceConnected(Context _ctx) {

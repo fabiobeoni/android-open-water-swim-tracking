@@ -13,11 +13,13 @@ import com.beoni.openwaterswimtracking.utils.ConnectivityUtils;
 import com.beoni.openwaterswimtracking.utils.LLog;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.Receiver;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
@@ -42,6 +44,8 @@ public class RssFragment extends Fragment {
     private static final int UISTATE_GETTING_DATA = 0;
     private static final int UISTATE_OFFLINE = 1;
     private static final int UISTATE_VIEW_DATA = 2;
+
+    private static boolean isLoadingData = false;
 
 
     //list of Rss items presented on view
@@ -70,7 +74,8 @@ public class RssFragment extends Fragment {
 
     @Receiver(actions = ConnectivityManager.CONNECTIVITY_ACTION, registerAt = Receiver.RegisterAt.OnResumeOnPause)
     void onConnectivityChange() {
-        if(ConnectivityUtils.isDeviceConnected(getContext()) && mRssItems==null)
+        if(ConnectivityUtils.isDeviceConnected(getContext()) &&
+                mRssItems==null && isLoadingData==false)
             loadData();
     }
 
@@ -107,30 +112,14 @@ public class RssFragment extends Fragment {
      * when cache is not valid anymore and network
      * is available, then request list view update
      */
-    //TODO: as requested by the rubric: using here AsyncTask for atomic one time request.
-    //@Background
+    @Background
     void loadData() {
+        isLoadingData = true;
         //Performs data load at once, when starting the app
         //and your local data are obsolete (see RssManager).
         //Otherwise loads from local cache.
-        new AsyncTask(){
-            @Override
-            protected Object doInBackground(Object[] objects)
-            {
-                RssManager mng = new RssManager(getContext());
-                return mng.getRssItems();
-            }
-
-            @Override
-            protected void onPostExecute(Object o)
-            {
-                mRssItems = (ArrayList<RssItemSimplified>)o;
-                onDataLoadCompleted();
-            }
-        }.execute(getContext());
-
-        //mRssItems = mRssManager.getRssItems();
-        //onDataLoadCompleted();
+        mRssItems = mRssManager.getRssItems();
+        onDataLoadCompleted();
     }
 
     /**
@@ -138,8 +127,7 @@ public class RssFragment extends Fragment {
      with loaded rss data (if any), otherwise
      displays the swim list activity
      */
-    //TODO: for project approval. Restore commented code after.
-    //@UiThread
+    @UiThread
     void onDataLoadCompleted() {
         //updates the list adapter to display the data
         if(mRssItems!=null && mRssItems.size()>0){
@@ -156,6 +144,8 @@ public class RssFragment extends Fragment {
             //background process is completed
             //and shows a message
             setUIState(UISTATE_OFFLINE);
+
+        isLoadingData = false;
     }
 
 

@@ -107,6 +107,7 @@ public class RssManager
     }
 
     /**
+     * ASYNC INVOCATION REQUIRED WHEN INVOKED FROM UI THREAD
      * Performs read of cached rss text file and returns typed
      * list of rss items.
      * @return list of RssItemSimplified items.
@@ -123,9 +124,9 @@ public class RssManager
     }
 
     /**
+     * ASYNC INVOCATION REQUIRED WHEN INVOKED FROM UI THREAD
      * Performs writing of rss data to a local text file for caching,
      * and updates shared preference with the current cache date time.
-     * purposes.
      * @param rssItemsSimp
      */
     private void writeRssFile(ArrayList<RssItemSimplified> rssItemsSimp){
@@ -134,7 +135,7 @@ public class RssManager
 
         //stores the date about the current restoreFromFireDatabase
         Date today = new Date();
-        mPreferences.edit().putString(PREF_LAST_DOWNLOAD_DATE, DateUtils.dateToString(today)).commit();
+        mPreferences.edit().putString(PREF_LAST_DOWNLOAD_DATE, DateUtils.dateToString(today)).apply();
     }
 
     /**
@@ -145,7 +146,7 @@ public class RssManager
      * @return true|false according to cache valid status.
      */
     private boolean isDownloadedRssObsolete(){
-        long diff = 0;
+        long diff = 1;
         Date today = new Date();
         String lastDownloadDateStr = mPreferences.getString(PREF_LAST_DOWNLOAD_DATE,"");
 
@@ -155,7 +156,7 @@ public class RssManager
             diff = DateUtils.dateDiff(lastDownloadDate,today);
         }
 
-        return true; //(diff>1); //TODO: development, remove
+        return (diff>=1);
     }
 
 }

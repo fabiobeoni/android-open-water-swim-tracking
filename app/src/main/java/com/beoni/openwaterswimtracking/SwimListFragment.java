@@ -18,6 +18,7 @@ import com.beoni.openwaterswimtracking.utils.LLog;
 import com.google.gson.Gson;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
@@ -25,6 +26,7 @@ import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
@@ -36,7 +38,7 @@ import java.util.ArrayList;
  */
 @EFragment(R.layout.fragment_swim_list)
 @OptionsMenu(R.menu.menu_swim_list)
-public class SwimListFragment extends Fragment implements LoaderManager.LoaderCallbacks
+public class SwimListFragment extends Fragment
 {
     public static final String UPDATE_LIST_KEY = "UPDATE_LIST";
 
@@ -80,7 +82,6 @@ public class SwimListFragment extends Fragment implements LoaderManager.LoaderCa
     {
         boolean forceListReload = getActivity().getIntent().getBooleanExtra(UPDATE_LIST_KEY,false);
 
-        //TODO: for project approval using here AsyncTaskLoader instead of annotation. Restore commented code after.
         //mSwimTracksList is saved in instance state
         //so can be reused
         if (mSwimTracksList == null || forceListReload)
@@ -90,48 +91,19 @@ public class SwimListFragment extends Fragment implements LoaderManager.LoaderCa
             setUIState(UISTATE_GETTING_DATA);
 
             //gets data from the web or from cached
-            ////loadData();
-            getActivity().getSupportLoaderManager().initLoader(1, null, this).forceLoad();
+            loadData();
         } else //just proceed with UI update
             onDataLoadCompleted();
     }
 
-    //creates a loader to load list of swim track
-    @Override
-    public Loader onCreateLoader(int id, Bundle args)
-    {
-        return new AsyncTaskLoader(getActivity()){
-            @Override
-            public Object loadInBackground()
-            {
-                SwimTrackManager mng = new SwimTrackManager(getContext());
-                return mng.getSwimTracks(true);
-            }
-        };
-    }
-
-    //populate the list of swim tracks and updates the ui
-    @Override
-    public void onLoadFinished(Loader loader, Object data)
-    {
-        mSwimTracksList = (ArrayList<SwimTrack>) data;
+    @Background
+    void loadData() {
+        mSwimTracksList = mSwimTrackManager.getSwimTracks(true);
         onDataLoadCompleted();
     }
 
-    @Override
-    public void onLoaderReset(Loader loader)
-    {
-        //do nothing, list is empty already
-    }
-
-    //TODO: for project approval using here AsyncTaskLoader instead of annotation. Restore commented code after.
-    ////@Background
-    ////void loadData() {
-        ////mSwimTracksList = mSwimTrackMng.getSwimTracks();
-        ////onDataLoadCompleted();
-    ////}
     //Updates the UI to display loaded swim tracks
-    //@UiThread
+    @UiThread
     void onDataLoadCompleted() {
         //updates the list adapter to display the data
         if(mSwimTracksList !=null && mSwimTracksList.size()>0){

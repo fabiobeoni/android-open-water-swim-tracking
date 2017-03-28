@@ -16,6 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:textAlignment="center"
+        android:textColor="@color/colorPrimaryDark"
         android:text="@string/no_swim"/>
 
 </RelativeLayout>

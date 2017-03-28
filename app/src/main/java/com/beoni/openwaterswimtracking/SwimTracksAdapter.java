@@ -11,12 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.beoni.openwaterswimtracking.model.SwimTrack;
 import com.beoni.openwaterswimtracking.utils.DateUtils;
-import com.beoni.openwaterswimtracking.utils.FormattingUtils;
-
-import java.sql.Date;
 import java.util.ArrayList;
 
 //TODO: change implementation of the all adapter by using Android Annotations https://github.com/androidannotations/androidannotations/wiki/Adapters-and-lists
@@ -76,7 +72,7 @@ public class SwimTracksAdapter extends ArrayAdapter
 
         itemView.titleTvw.setText(swimTrack.getTitle());
         itemView.locationTvw.setText(swimTrack.getLocation());
-        itemView.durationTvw.setText(FormattingUtils.formatDuration(getContext(),swimTrack.getDuration()));
+        itemView.durationTvw.setText(SwimTrack.formatDuration(getContext(),swimTrack.getDuration()));
         itemView.lengthTvw.setText(String.valueOf(swimTrack.getLength())+resources.getString(R.string.swim_length_label));
         itemView.dateTvw.setText(DateUtils.dateToString(swimTrack.getDate(), DateUtils.SHORT_FORMAT));
 
