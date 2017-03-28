@@ -30,21 +30,21 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
-    // ###### INSTALL RELEASE
+    /* ###### INSTALL RELEASE
     signingConfigs {
         release {
             storeFile file("../keys.jks")
-            storePassword "udacity85"
-            keyAlias "udacity"
-            keyPassword "udacity85"
+            storePassword "XXXXXX"
+            keyAlias "XXXXXX"
+            keyPassword "XXXXXX"
         }
-    }
+    }*/
 
 
     buildTypes {
         release {
             // ###### INSTALL RELEASE
-            signingConfig signingConfigs.release
+            //signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
