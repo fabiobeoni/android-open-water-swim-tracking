@@ -16,6 +16,13 @@ import com.beoni.openwaterswimtracking.utils.DateUtils;
 import java.util.ArrayList;
 
 //TODO: change implementation of the all adapter by using Android Annotations https://github.com/androidannotations/androidannotations/wiki/Adapters-and-lists
+/**
+ * Adapter to present relevant swim track data to the UI.
+ * Most of the data are presented as normal text, while
+ * water temperature displays with an icon that changes
+ * it's color (from blue to red) according to the temperature.
+ * Icon also changes according to the flow and waves conditions.
+ */
 public class SwimTracksAdapter extends ArrayAdapter
 {
 
@@ -23,7 +30,6 @@ public class SwimTracksAdapter extends ArrayAdapter
     private Context ctx;
     private int layoutId;
     private String[] tempColors;
-    private String[] tempValues;
     private String[] flowIconNames;
     private String[] wavesIconNames;
     private Resources resources;
@@ -34,13 +40,21 @@ public class SwimTracksAdapter extends ArrayAdapter
         this.layoutId = layoutId;
         this.ctx = ctx;
         resources = ctx.getResources();
+
+        //loads all names of icons since they will change programmatically
         tempColors = resources.getStringArray(R.array.temperature_colors);
-        tempValues = resources.getStringArray(R.array.temperature_values);
         flowIconNames = resources.getStringArray(R.array.flow_icons);
         wavesIconNames = resources.getStringArray(R.array.waves_icons);
     }
 
 
+    /**
+     * Fills all swim track item data into the view holder.
+     * @param position
+     * @param view
+     * @param viewGroup
+     * @return
+     */
     @Override
     public View getView(int position, View view, ViewGroup viewGroup) {
         final String packageName = getContext().getPackageName();

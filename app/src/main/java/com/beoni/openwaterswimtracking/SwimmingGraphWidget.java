@@ -23,12 +23,20 @@ import java.util.Collections;
 import java.util.Comparator;
 
 /**
- * Implementation of App Widget functionality.
+ * Basic widget to display important swim tracks
+ * on a graph.
  */
-public class SwimminhGraphWidget extends AppWidgetProvider
+public class SwimmingGraphWidget extends AppWidgetProvider
 {
     private static SwimTrackManager swimTrackManager;
 
+    /**
+     * Updates all widget instances on a screen by
+     * creating a graph of swim tracks (if any)
+     * @param context
+     * @param appWidgetManager
+     * @param appWidgetId
+     */
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId)
     {
@@ -36,6 +44,7 @@ public class SwimminhGraphWidget extends AppWidgetProvider
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.swimminh_graph_widget);
 
+        //displays the graph only when actually there are swim tracks to display
         int size = getSwimManager(context).getSwimTracks(true).size();
         if(size>0)
         {
@@ -46,6 +55,7 @@ public class SwimminhGraphWidget extends AppWidgetProvider
             views.setViewVisibility(R.id.txt_message, View.GONE);
             views.setViewVisibility(R.id.img_graph, View.VISIBLE);
         }
+        //alert the user that there are no swim tracks to create a graph
         else
         {
             Toast.makeText(context,R.string.no_swim,Toast.LENGTH_LONG).show();
@@ -57,6 +67,12 @@ public class SwimminhGraphWidget extends AppWidgetProvider
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
+    /**
+     * Creates an instance of the SwimManager, to request
+     * the list of swim tracks to build the graph.
+     * @param context
+     * @return
+     */
     private static SwimTrackManager getSwimManager(Context context)
     {
         if(swimTrackManager==null)
@@ -70,23 +86,35 @@ public class SwimminhGraphWidget extends AppWidgetProvider
     {
         // There may be multiple widgets active, so update all of them
         for (int appWidgetId : appWidgetIds)
-        {
             updateAppWidget(context, appWidgetManager, appWidgetId);
-        }
     }
 
     @Override
     public void onEnabled(Context context)
     {
-        // Enter relevant functionality for when the first widget is created
+        // Not needed
     }
 
     @Override
     public void onDisabled(Context context)
     {
-        // Enter relevant functionality for when the last widget is disabled
+        // Not needed
     }
 
+    /**
+     * Creates the swim tracks graph displaying
+     * two dimensions on it: the swim "duration"
+     * and the "length". The combination of the
+     * two lines makes easy to see swim performance
+     * improvements.
+     * Since graphs cannot be displayed on a widget
+     * remote view, this method makes an image out
+     * of the graph and returns it to the client.
+     * @param ctx
+     * @param width
+     * @param height
+     * @return A bitmap to be loaded in a widget ImageView
+     */
     private static Bitmap createSwimmingGraph(Context ctx, int width, int height){
 
         ArrayList<SwimTrack> swimTrackList = getSwimManager(ctx).getSwimTracks(false);
@@ -108,7 +136,6 @@ public class SwimminhGraphWidget extends AppWidgetProvider
 
         GraphView graph = new GraphView(ctx);
         graph.setLayoutParams(new RelativeLayout.LayoutParams(width,height));
-
 
         LineGraphSeries<DataPoint> seriesDistance = new LineGraphSeries<>(dataPointsLength);
         seriesDistance.setTitle(ctx.getString(R.string.swim_length));
@@ -144,7 +171,6 @@ public class SwimminhGraphWidget extends AppWidgetProvider
         gridLabel.setVerticalLabelsSecondScaleColor(Color.RED);
         gridLabel.reloadStyles();
 
-
         Bitmap b = createBitmapFromView(graph);
 
         Bitmap bitmap = Bitmap.createBitmap(b);
@@ -153,6 +179,11 @@ public class SwimminhGraphWidget extends AppWidgetProvider
         return bitmap;
     }
 
+    /**
+     * Utility method to grab in image out of a view control.
+     * @param v
+     * @return
+     */
     private static Bitmap createBitmapFromView(View v) {
         Bitmap b = Bitmap.createBitmap( v.getLayoutParams().width, v.getLayoutParams().height, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(b) {

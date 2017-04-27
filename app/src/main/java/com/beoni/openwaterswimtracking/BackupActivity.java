@@ -44,25 +44,48 @@ import org.androidannotations.annotations.ViewById;
 @EActivity(R.layout.activity_backup)
 public class BackupActivity extends AppCompatActivity
 {
-
     private static final String TAG = "BackupActivity";
-
     private static final int RC_SIGN_IN = 9001;
 
-    private static final int UISTATE_LOGGED_OUT = 0;
-    private static final int UISTATE_LOGGED_IN = 1;
-    private static final int UISTATE_PERFORMS_BACKUP_RESTORE = 2;
-
-    private ProgressDialog mProgressDialog;
+    //instance of the Google API client needed
+    //to manage authentication with Gmail account
     private GoogleApiClient mGoogleApiClient;
 
-
+    //instance of the Firebase Manager needed
+    //to perform authentication on FB cloud
+    //and data storing with Real-time Database
     @Bean
     FirebaseManager mFirebaseMng;
 
+    //instance of the Swim Track Manager
+    //needed to get the data stored locally
+    //and to be backup/restored
     @Bean
     SwimTrackManager mSwimTrackMng;
 
+
+    //=========== UI STATES AVAILABLE ============//
+
+    /**
+     * Info message, login button are displayed
+     */
+    private static final int UISTATE_LOGGED_OUT = 0;
+
+    /**
+     * Info message, backup/restore/sign-out buttons
+     * are displayed
+     */
+    private static final int UISTATE_LOGGED_IN = 1;
+
+    /**
+     * Info message, action buttons displayed but disabled
+     */
+    private static final int UISTATE_PERFORMS_BACKUP_RESTORE = 2;
+
+    //================== UI CONTROLS ===============//
+
+    //build on-the-fly from activity
+    private ProgressDialog mProgressDialog;
 
     @ViewById(R.id.btn_signin)
     SignInButton mBtnSignIn;
@@ -82,7 +105,10 @@ public class BackupActivity extends AppCompatActivity
     @ViewById(R.id.progress_bar)
     ProgressBar mProgress;
 
-    @AfterViews
+    /**
+     * Sets the UI default state and initialize Google API client
+     */
+     @AfterViews
     void viewCreated(){
 
         setUIState(UISTATE_LOGGED_OUT);
@@ -105,19 +131,91 @@ public class BackupActivity extends AppCompatActivity
                 .build();
     }
 
-    @Click(R.id.btn_signin)
-    void signIn() {
-        if(!ConnectivityUtils.isDeviceConnected(this))
+    /**
+    Attaches Firebase authentication change listener,
+    and updates the UI displays right controls when
+    the session starts/ends
+     */
+    @Override
+    public void onStart() {
+        super.onStart();
+        mFirebaseMng.listenForAuthChanges(new FirebaseManager.IAuthChangeCallback()
         {
-            Toast.makeText(getBaseContext(),R.string.no_connection,Toast.LENGTH_LONG).show();
-            return;
-        }
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+            @Override
+            public void onLoggeIn(FirebaseUser user)
+            {
+                setUIState(UISTATE_LOGGED_IN);
+            }
+
+            @Override
+            public void onLoggedOut()
+            {
+                setUIState(UISTATE_LOGGED_OUT);
+            }
+        });
     }
 
+    /**
+    Same as onStart() method but detaching the Firebase
+    authentication listener
+     */
+    @Override
+    public void onStop() {
+        super.onStop();
+        hideProgressDialog();
+        if (mFirebaseMng != null)
+            mFirebaseMng.stopListeningForAuthChanges();
+    }
+
+    /**
+     * Gets the result of the Google authentication activity,
+     * reports the result to the user. When
+     * user is authenticated => registers/authenticates
+     * to Firebase too and updates UI state
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            if (result.isSuccess()) {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = result.getSignInAccount();
+                performFirebaseAuthWithGoogle(account);
+            } else {
+                // Google Sign In failed, update UI appropriately
+                mTxtMessage.setText(R.string.authentication_fail);
+                setUIState(UISTATE_LOGGED_OUT);
+            }
+        }
+    }
+
+    /**
+     * When device is connected, starts the Google
+     * authentication activity to let the user login
+     */
+    @Click(R.id.btn_signin)
+    void onSignBtnClick() {
+        if(ConnectivityUtils.isDeviceConnected(this))
+        {
+            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        }
+        else
+            Toast.makeText(getBaseContext(),R.string.no_connection,Toast.LENGTH_LONG).show();
+    }
+
+    /**
+     * Closes the sessions on Firebase
+     * as well as Google auth
+     */
     @Click(R.id.btn_sign_out)
-    void signOut() {
+    void onSignoutBtnClick() {
         // Firebase sign out
         mFirebaseMng.signOut();
         // Google sign out
@@ -130,6 +228,10 @@ public class BackupActivity extends AppCompatActivity
                 });
     }
 
+    /**
+     * When connection and swim tracks are available starts
+     * performing background data backup. See performBackup()
+     */
     @Click(R.id.btn_backup)
     void onBtnBackupClick(){
         if(!ConnectivityUtils.isDeviceConnected(this))
@@ -147,6 +249,69 @@ public class BackupActivity extends AppCompatActivity
         performBackup();
     }
 
+    /**
+     * Get data to be backup from swim track manager,
+     * then perform the backup with the
+     * firebase manager. When completed update the UI.
+     * See updateUIAfterBackup()
+     */
+    @Background
+    void performBackup(){
+        String fileContent = mSwimTrackMng.getLocalDataForBackup();
+        mFirebaseMng.backupOnFireDatabase(fileContent, new FirebaseManager.IBackupCallback()
+        {
+            @Override
+            public void onSuccess(Object _null)
+            {
+                updateUIAfterBackup(true);
+            }
+
+            @Override
+            public void onFail(Exception ex)
+            {
+                LLog.e(ex);
+                updateUIAfterBackup(false);
+            }
+        });
+    }
+
+    /**
+     * Update the UI to inform the user about
+     * the backup result, when completed successfully
+     * send the user back to the main activity
+     * and request the to display the swim list.
+     * @param completed backup successfully completed.
+     */
+    @UiThread
+    void updateUIAfterBackup(boolean completed){
+        if(completed){
+            mProgress.setProgress(100);
+            setUIState(UISTATE_LOGGED_IN);
+            mTxtMessage.setText(R.string.task_completed);
+
+            //after 1 second, send the user back to the
+            //main activity
+            new android.os.Handler().postDelayed(new Runnable() {
+                public void run() {
+                    Intent intent = new Intent(getBaseContext(),MainActivity_.class);
+                    intent.putExtra(MainActivity.REQUEST_SELECTED_TAB_KEY, 1);
+                    startActivity(intent);
+                }
+            }, 1000);
+        }
+        else{
+            setUIState(UISTATE_LOGGED_IN);
+            mTxtMessage.setText(R.string.error_backup);
+        }
+    }
+
+    /**
+     * When connection is available and the
+     * the user confirms overriding of local
+     * data, start the data restore from backup
+     * in background mode.
+     * See performRestore().
+     */
     @Click(R.id.btn_restore)
     void onBtnRestoreClick(){
         if(!ConnectivityUtils.isDeviceConnected(this))
@@ -179,47 +344,13 @@ public class BackupActivity extends AppCompatActivity
                 .show();
     }
 
-    @Background
-    void performBackup(){
-        String fileContent = mSwimTrackMng.getLocalDataForBackup();
-        mFirebaseMng.backupOnFireDatabase(fileContent, new FirebaseManager.IBackupCallback()
-        {
-            @Override
-            public void onSuccess(Object _null)
-            {
-                updateUIAfterBackup(true);
-            }
-
-            @Override
-            public void onFail(Exception ex)
-            {
-                LLog.e(ex);
-                updateUIAfterBackup(false);
-            }
-        });
-    }
-
-    @UiThread
-    void updateUIAfterBackup(boolean completed){
-        if(completed){
-            mProgress.setProgress(100);
-            setUIState(UISTATE_LOGGED_IN);
-            mTxtMessage.setText(R.string.task_completed);
-
-            new android.os.Handler().postDelayed(new Runnable() {
-                public void run() {
-                    Intent intent = new Intent(getBaseContext(),MainActivity_.class);
-                    intent.putExtra(MainActivity.REQUEST_SELECTED_TAB_KEY, 1);
-                    startActivity(intent);
-                }
-            }, 1000);
-        }
-        else{
-            setUIState(UISTATE_LOGGED_IN);
-            mTxtMessage.setText(R.string.error_backup);
-        }
-    }
-
+    /**
+     * Get data from Firebase Database using
+     * the firebase manager, then save data
+     * locally overriding existing once (if any)
+     * by the swim track manager.
+     * See updateUIAfterRestore().
+     */
     @Background
     void performRestore(){
         mFirebaseMng.restoreFromFireDatabase(new FirebaseManager.IBackupCallback()
@@ -240,6 +371,14 @@ public class BackupActivity extends AppCompatActivity
         });
     }
 
+    /**
+     * Update the UI to inform the user about
+     * the restore result, when completed successfully
+     * send the user back to the main activity
+     * and request the to display the swim list
+     * with new data downloaded.
+     * @param completed restore successfully completed
+     */
     @UiThread
     void updateUIAfterRestore(boolean completed){
         if(completed){
@@ -262,52 +401,11 @@ public class BackupActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        mFirebaseMng.listenForAuthChanges(new FirebaseManager.IAuthChangeCallback()
-        {
-            @Override
-            public void onLoggeIn(FirebaseUser user)
-            {
-                setUIState(UISTATE_LOGGED_IN);
-            }
-
-            @Override
-            public void onLoggedOut()
-            {
-                setUIState(UISTATE_LOGGED_OUT);
-            }
-        });
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        hideProgressDialog();
-        if (mFirebaseMng != null)
-            mFirebaseMng.stopListeningForAuthChanges();
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (result.isSuccess()) {
-                // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = result.getSignInAccount();
-                performFirebaseAuthWithGoogle(account);
-            } else {
-                // Google Sign In failed, update UI appropriately
-                mTxtMessage.setText(R.string.authentication_fail);
-                setUIState(UISTATE_LOGGED_OUT);
-            }
-        }
-    }
-
+    /**
+     * Perform a login to Firebase Auth service with
+     * Google account credentials
+     * @param acct google signin account
+     */
     private void performFirebaseAuthWithGoogle(GoogleSignInAccount acct) {
 
         showProgressDialog();
@@ -328,12 +426,16 @@ public class BackupActivity extends AppCompatActivity
                             Toast.LENGTH_SHORT).show();
                 }
 
-
                 hideProgressDialog();
             }
         });
     }
 
+    /**
+     * Shows/hides view controls according to the
+     * given view state.
+     * @param state the current state to display, see list of states available in this class.
+     */
     private void setUIState(int state) {
 
         hideProgressDialog();
@@ -371,6 +473,9 @@ public class BackupActivity extends AppCompatActivity
 
     }
 
+    /**
+     * Shows login progress dialog
+     */
     public void showProgressDialog() {
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(this);
@@ -381,6 +486,9 @@ public class BackupActivity extends AppCompatActivity
         mProgressDialog.show();
     }
 
+    /**
+     * Hides login progress dialog
+     */
     public void hideProgressDialog() {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();

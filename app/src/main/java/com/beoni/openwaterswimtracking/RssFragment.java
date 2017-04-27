@@ -1,6 +1,5 @@
 package com.beoni.openwaterswimtracking;
 import android.net.ConnectivityManager;
-import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -41,12 +40,27 @@ public class RssFragment extends Fragment {
 
     //============== UI STATES ==============/
 
+    /**
+     * App is getting Rss data from web site.
+     * Progress should be displayed to the user.
+     */
     private static final int UISTATE_GETTING_DATA = 0;
+
+    /**
+     * App cannot get Rss data since the divice
+     * is not connected. Alert the user.
+     */
     private static final int UISTATE_OFFLINE = 1;
+
+    /**
+     * Add has completed the download of Rss data
+     * and is showing them on the view.
+     */
     private static final int UISTATE_VIEW_DATA = 2;
 
-    private static boolean isLoadingData = false;
 
+    //keep track of Rss loading on progress
+    private static boolean isLoadingData = false;
 
     //list of Rss items presented on view
     @InstanceState
@@ -56,6 +70,7 @@ public class RssFragment extends Fragment {
     @Bean
     RssManager mRssManager;
 
+    //TODO:change adapter implementation to use AndroidAnnotations framework
     //adapt class for this view
     RssListAdapter rssListAdapter;
 
@@ -72,10 +87,21 @@ public class RssFragment extends Fragment {
     @ViewById(R.id.rss_message_panel)
     LinearLayout mMessagePanel;
 
-    @Receiver(actions = ConnectivityManager.CONNECTIVITY_ACTION, registerAt = Receiver.RegisterAt.OnResumeOnPause)
+    /**
+     * Perform download of Rss data
+     * if local cache is empty and connection
+     * becomes available.
+     */
+    @Receiver(
+        actions = ConnectivityManager.CONNECTIVITY_ACTION,
+        registerAt = Receiver.RegisterAt.OnResumeOnPause
+    )
     void onConnectivityChange() {
-        if(ConnectivityUtils.isDeviceConnected(getContext()) &&
-                mRssItems==null && isLoadingData==false)
+        if(
+            ConnectivityUtils.isDeviceConnected(getContext()) &&
+            mRssItems==null &&
+            !isLoadingData
+        )
             loadData();
     }
 
@@ -102,6 +128,11 @@ public class RssFragment extends Fragment {
             onDataLoadCompleted();
     }
 
+    /**
+     * Request to the hosting activity
+     * to display the swim tracks list
+     * tab.
+     */
     @Click(R.id.btn_show_swim)
     void onBtnShowSwimClick(){
         ((ITabSelectionRequest)getActivity()).onSelectTab(1);
@@ -148,7 +179,11 @@ public class RssFragment extends Fragment {
         isLoadingData = false;
     }
 
-
+    /**
+     * Manages view controls according
+     * to the current UI state.
+     * @param state see list of available states in this class.
+     */
     private void setUIState(int state){
         switch (state){
             case UISTATE_GETTING_DATA:

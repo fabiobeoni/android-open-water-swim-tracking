@@ -3,14 +3,13 @@ package com.beoni.openwaterswimtracking.utils;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
+//TODO: replace with library
 /**
  * Utility to transform dates from/to strings in a easy and
  * uniform way.
  */
-//TODO: replace with library
 public class DateUtils
 {
     public final static String FORMAT = "dd/mm/yyyy hh:mm:ss";
@@ -19,6 +18,11 @@ public class DateUtils
     public static String dateToString(Date date){
         DateFormat df = new SimpleDateFormat(FORMAT);
         return df.format(date);
+    }
+
+    public static String dateToString(Date date, String format){
+        DateFormat formatter = new SimpleDateFormat(format);
+        return formatter.format(date).toString();
     }
 
     /**
@@ -36,11 +40,6 @@ public class DateUtils
             LLog.e(e);
             return null;
         }
-    }
-
-    public static String dateToString(Date date, String format){
-        DateFormat formatter = new SimpleDateFormat(format);
-        return formatter.format(date).toString();
     }
 
     /**

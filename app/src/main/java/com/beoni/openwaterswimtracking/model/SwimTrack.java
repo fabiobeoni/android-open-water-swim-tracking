@@ -1,6 +1,5 @@
 package com.beoni.openwaterswimtracking.model;
 
-
 import android.content.Context;
 
 import com.beoni.openwaterswimtracking.R;
@@ -12,6 +11,7 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Date;
 
+//TODO: replace validation with annotations based library
 /**
  * Model class to host tracked swimming data.
  */

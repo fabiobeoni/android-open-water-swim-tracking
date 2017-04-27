@@ -4,7 +4,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 
 import org.androidannotations.annotations.AfterViews;
@@ -21,6 +20,9 @@ public class MainActivity extends AppCompatActivity implements RssFragment.ITabS
     public static final String REQUEST_SELECTED_TAB_KEY = "REQUEST_SELECTED_TAB_KEY";
 
     private TabsPagerAdapter mTabsPagerAdapter;
+
+
+    //================== UI CONTROLS ===============//
 
     @ViewById(R.id.toolbar)
     Toolbar mToolbar;
@@ -48,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements RssFragment.ITabS
     //is selected
     Map<Integer,Class> mTabsFragments;
 
-
+    //basic UI initialization
     @AfterViews
     void viewCreated(){
         setSupportActionBar(mToolbar);
@@ -82,6 +84,15 @@ public class MainActivity extends AppCompatActivity implements RssFragment.ITabS
         mTabLayout.getTabAt(mSelectedTab).select();
     }
 
+    /**
+     * By invoking this method a child fragment can
+     * request to this activity to select a specific tab.
+     * Is normally invoked when the user add, removes or
+     * restores the list of swimming tracks and gets redirected
+     * to this activity. Once redirected, the user will see
+     * the selected tab (swim tracks).
+     * @param index index of the tab to select an make visible
+     */
     @Override
     public void onSelectTab(int index)
     {

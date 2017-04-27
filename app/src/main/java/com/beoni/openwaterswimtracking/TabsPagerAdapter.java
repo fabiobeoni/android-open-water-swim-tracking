@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.beoni.openwaterswimtracking.utils.LLog;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**

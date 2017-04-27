@@ -1,10 +1,7 @@
 package com.beoni.openwaterswimtracking;
+
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
-import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -44,8 +41,26 @@ public class SwimListFragment extends Fragment
 
     //============ AVAILABLE UI STATES ===============/
 
+    /**
+     * App is loading data from locally stored file.
+     * User sees a loading progress.
+     */
     private static final int UISTATE_GETTING_DATA = 0;
+
+    /**
+     * App has completed the loading of
+     * data from the storing file and
+     * a list with all available swim
+     * tracks is visible to the user.
+     */
     private static final int UISTATE_VIEW_DATA = 1;
+
+    /**
+     * App has completed the load of the file
+     * hosting swim tracks data, but the list
+     * is empty. App presents UI controls to
+     * inform the user and to move to swim editing.
+     */
     private static final int UISTATE_NO_DATA = 2;
 
 
@@ -76,10 +91,12 @@ public class SwimListFragment extends Fragment
     //Required empty public constructor
     public SwimListFragment() {}
 
-    //initialization
+    //UI initialization with data loading
     @AfterViews
     void viewCreated()
     {
+        //the hosting activity can handle requests
+        //to refresh this list
         boolean forceListReload = getActivity().getIntent().getBooleanExtra(UPDATE_LIST_KEY,false);
 
         //mSwimTracksList is saved in instance state
@@ -96,13 +113,22 @@ public class SwimListFragment extends Fragment
             onDataLoadCompleted();
     }
 
+    /**
+     * Performs asynchronous loading
+     * of swim tracks data from the
+     * locally stored file.
+     */
     @Background
     void loadData() {
         mSwimTracksList = mSwimTrackManager.getSwimTracks(true);
         onDataLoadCompleted();
     }
 
-    //Updates the UI to display loaded swim tracks
+    /**
+     * Updates the UI to display loaded swim tracks,
+     * or just a message to user when no swim tracks
+     * are available.
+     */
     @UiThread
     void onDataLoadCompleted() {
         //updates the list adapter to display the data
@@ -118,6 +144,11 @@ public class SwimListFragment extends Fragment
             setUIState(UISTATE_NO_DATA);
     }
 
+    /**
+     * Updates view controls visibility
+     * according to the state.
+     * @param state
+     */
     private void setUIState(int state){
         switch (state){
             case UISTATE_GETTING_DATA:
@@ -144,15 +175,22 @@ public class SwimListFragment extends Fragment
 
     //=============== USER ACTIONS ================/d
 
-    //when the menu item Add Swim is clicked
-    //display the SwimEditActivity to add new
-    //a new swim track
+    /**
+     * When the menu item Add Swim is clicked
+     * display the SwimEditActivity to add new
+     * a new swim track
+     */
     @Click(R.id.btn_add_swim)
     void displayEditSwimActivity(){
         Intent displayIntent = new Intent(getActivity(), SwimEditActivity_.class);
         startActivity(displayIntent);
     }
 
+    /**
+     * If Internet connection is available
+     * redirects the user to the Google Sign-in
+     * activity.
+     */
     @OptionsItem(R.id.menu_backup)
     void displayGoogleLoginActivity(){
         if(!ConnectivityUtils.isDeviceConnected(getContext()))
@@ -165,6 +203,13 @@ public class SwimListFragment extends Fragment
             startActivity(displayIntent);
     }
 
+    /**
+     * When the user clicks on a swim track
+     * item, the data related to that item
+     * are serialized and sent to the editing
+     * swim activity.
+     * @param swimTrack
+     */
     @ItemClick(R.id.swim_list)
     void onSwimListItemClick(SwimTrack swimTrack){
         String swimJson = new Gson().toJson(swimTrack);

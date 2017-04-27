@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,13 +19,22 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 //TODO: change implementation of the all adapter by using Android Annotations https://github.com/androidannotations/androidannotations/wiki/Adapters-and-lists
+/**
+ * Adapter class to bind Rss item data to the view.
+ */
 public class RssListAdapter extends ArrayAdapter
 {
-
     private Context ctx;
 
     private int layoutId;
 
+    /**
+     * Initialize the adapter by passing the
+     * list of rss items to be displayed on view.
+     * @param ctx
+     * @param layoutId
+     * @param rssItems
+     */
     public RssListAdapter(Context ctx, int layoutId, ArrayList<RssItemSimplified> rssItems) {
         super(ctx, layoutId, rssItems);
         this.layoutId = layoutId;
@@ -53,8 +61,11 @@ public class RssListAdapter extends ArrayAdapter
         else
             holder = (RssItemView) viewItem.getTag();
 
+        //the single Rss item
         final RssItemSimplified rssItemSimplified = (RssItemSimplified) this.getItem(position);
 
+        //rss item usually has a main image...
+        //when not available displays a place holder
         if(rssItemSimplified.getImageUrl()!=null)
             Picasso.with(getContext()).load(rssItemSimplified.getImageUrl())
                     .placeholder(R.drawable.placeholder)
@@ -65,6 +76,9 @@ public class RssListAdapter extends ArrayAdapter
         holder.dateView.setText(DateUtils.dateToString(rssItemSimplified.getDate(),DateUtils.SHORT_FORMAT));
         holder.descriptionView.setText(rssItemSimplified.getDescription());
 
+        //clicking of the "Know More" button
+        //moves the user to the browser to read
+        //the full Rss post.
         holder.btnKnowMore.setOnClickListener(new View.OnClickListener()
         {
             @Override

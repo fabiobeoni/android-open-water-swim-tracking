@@ -1,6 +1,5 @@
 package com.beoni.openwaterswimtracking.data;
 
-import android.content.ContentProvider;
 import android.content.Context;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -12,7 +11,6 @@ import java.io.IOException;
 public class LocalFileStorage
 {
     private static LocalFileStorage instance;
-
 
     /**
      * Factory method to initialize the LocalFileStorage singleton class.

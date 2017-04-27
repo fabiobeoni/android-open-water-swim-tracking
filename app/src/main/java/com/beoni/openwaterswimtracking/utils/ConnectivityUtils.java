@@ -4,9 +4,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import org.androidannotations.annotations.EBean;
-import org.androidannotations.annotations.RootContext;
-
 /**
  * Utility to check if device is connected from anywhere in the app.
  */

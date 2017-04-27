@@ -25,16 +25,34 @@ import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.StringRes;
 import org.androidannotations.annotations.res.StringArrayRes;
 
-
+/**
+ * Fragment hosting the form to edit
+ * swim track data like location, duration,
+ * length, temperature, etc.
+ */
 @EFragment(R.layout.fragment_swim_edit)
 @OptionsMenu(R.menu.menu_edit_swim)
 public class SwimEditFragment extends Fragment {
 
+    /**
+     * Intent key checked by this fragment to
+     * display a specific swim track to edit.
+     * The key must return a JSON serialized
+     * swim track.
+     */
     public static final String SWIM_ITEM_KEY = "SWIM_ITEM_KEY";
+
+    /**
+     * Intent key checked by this fragment
+     * to know the index of the current editing
+     * swim track (the one on SWIM_ITEM_KEY)
+     */
     public static final String SWIM_ITEM_INDEX = "SWIM_ITEM_INDEX";
 
+    //keep track of editing swim track status
     private boolean isNewSwim;
 
+    //keep track of editing swim index (if not new swim)
     private int mSwimIndex;
 
     //list of swim track items presented on view
@@ -45,15 +63,18 @@ public class SwimEditFragment extends Fragment {
     @Bean
     SwimTrackManager mSwimTrackManager;
 
+    //swim track waves options
     @StringArrayRes
     String[] wavesValues;
 
+    //swim track temperature options
     @StringArrayRes
     String[] temperatureValues;
 
     @StringRes(R.string.swim_length_label)
     String mLengthLabel;
 
+    //swim track flow options
     @StringArrayRes
     String[] flowValues;
 
@@ -66,45 +87,54 @@ public class SwimEditFragment extends Fragment {
     @StringRes(R.string.swim_location_validate)
     String mLocationValidation;
 
+    //swim track duration input control
     @ViewById(R.id.swim_duration)
     SeekBar mDurationSkb;
 
     @ViewById(R.id.swim_duration_label)
     TextView mDurationLabelTvw;
 
+    //swim track length input control
     @ViewById(R.id.swim_length)
     SeekBar mLengthSkb;
 
     @ViewById(R.id.swim_length_label)
     TextView mLengthLabelTvw;
 
+    //swim track temperature input control
     @ViewById(R.id.swim_temperature)
     SeekBar mTemperatureSkb;
 
     @ViewById(R.id.swim_temperature_label)
     TextView mTemperatureTvw;
 
+    //swim track waves input control
     @ViewById(R.id.swim_waves)
     SeekBar mWavesSkb;
 
     @ViewById(R.id.swim_waves_label)
     TextView mWavesTvw;
 
+    //swim track flow input control
     @ViewById(R.id.swim_flow)
     SeekBar mFlowSkb;
 
     @ViewById(R.id.swim_flow_label)
     TextView mFlowTvw;
 
+    //swim track title input control
     @ViewById(R.id.swim_title)
     EditText mTitleTxt;
 
+    //swim track date input control
     @ViewById(R.id.swim_date)
     EditText mDateTxt;
 
+    //swim track location input control
     @ViewById(R.id.swim_location)
     EditText mLocationTxt;
 
+    //swim track notes input control
     @ViewById(R.id.swim_notes)
     EditText mNotesTxt;
 
@@ -112,7 +142,9 @@ public class SwimEditFragment extends Fragment {
     // Required empty public constructor
     public SwimEditFragment() {}
 
-
+    //Set the starting UI status by presenting
+    //an empty swim track to edit, or by deserializing
+    //the one coming from the swim list intent.
     @AfterViews
     void viewCreated(){
         //initialize the swim instance to edit
@@ -140,12 +172,23 @@ public class SwimEditFragment extends Fragment {
         mFlowTvw.setText(flowValues[mSwimTrack.getFlow()]);
     }
 
+    /**
+     * Stores swim data from the form
+     * and sends back the user to
+     * the list of swim tracks.
+     */
     @Background
     void performAsyncSaving(){
         mSwimTrackManager.save();
         displaySwimList();
     }
 
+    /**
+     * Sends the user back to the
+     * swim tracks list activity
+     * and request it to update
+     * and display the latest changes.
+     */
     @UiThread
     void displaySwimList(){
         Intent displayIntent = new Intent(getActivity(), MainActivity_.class);
@@ -224,6 +267,11 @@ public class SwimEditFragment extends Fragment {
 
     //========== USER ACTIONS ===============/
 
+    /**
+     * Adds or updates the current editing
+     * swim. When data are not valid,
+     * displays a toast message the to user.
+     */
     @OptionsItem(R.id.menu_save_swim)
     void saveSwim(){
         if(mSwimTrack.isValid()){
@@ -238,6 +286,11 @@ public class SwimEditFragment extends Fragment {
             Toast.makeText(getContext(),R.string.swim_invalid, Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Deletes the current editing swim
+     * track or displays a message to the
+     * user.
+     */
     @OptionsItem(R.id.menu_delete_swim)
     void deleteSwim(){
         if(!isNewSwim)
