@@ -1,7 +1,7 @@
 
 <h2 id="open-water-swim-tracking-app"><strong>Open Water Swim Tracking App</strong></h2>
 
-<p>I developed this project as part of the graduation steps of the <strong>Android Development Nanodegree</strong> course (designed by Google and Udacity).</p>
+<p>I developed this project as part of the graduation steps of the <a href="https://www.udacity.com/course/android-developer-nanodegree-by-google--nd801" target="_blank"><strong>Android Development Nanodegree</strong></a> course (designed by Google and Udacity).</p>
 
 <p>App design follows the course project “rubric”, with <strong>requirements related to the implementation of many important Android framework features</strong> (like Activities, Services, Loaders, AsynchTasks, Widgets, Google Firebase Authentication and Real-time Database, Material Design UI, etc.).  <br>
 The app also uses well known Android libraries like AndroidAnnotations, GSon, Picasso and GraphView.</p>
