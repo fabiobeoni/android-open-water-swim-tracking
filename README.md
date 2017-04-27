@@ -16,6 +16,8 @@ The app also uses well known Android libraries like AndroidAnnotations, GSon, Pi
 <li>Present news about the “open water swim world” coming from external service</li>
 </ol>
 
+<p>Please note that the google-services.json file is not published on this repository, so to build the app you must add your own (related to your Google Cloud service account)</p>
+
 <p><strong>Design Note:</strong> unfortunately the development process could not involve a graphic designer, so even implementing some of the Material Design specs, the look and feel of the app is quite basic.</p>
 
 <h2 id="screenshots">Screenshots</h2>
