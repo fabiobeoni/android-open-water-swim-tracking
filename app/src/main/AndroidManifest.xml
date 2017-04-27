@@ -34,7 +34,7 @@
             android:label="@string/backup_activity_label"
             android:theme="@style/AppThemeNoBar"/>
 
-        <receiver android:name=".SwimminhGraphWidget">
+        <receiver android:name=".SwimmingGraphWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
