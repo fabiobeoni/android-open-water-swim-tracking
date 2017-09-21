@@ -1,6 +1,9 @@
 package com.beoni.openwaterswimtracking;
 import android.net.ConnectivityManager;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -12,13 +15,11 @@ import com.beoni.openwaterswimtracking.utils.ConnectivityUtils;
 import com.beoni.openwaterswimtracking.utils.LLog;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.Receiver;
-import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
@@ -30,7 +31,9 @@ import java.util.ArrayList;
  * list activity.
  */
 @EFragment(R.layout.fragment_main)
-public class RssFragment extends Fragment {
+public class RssFragment extends Fragment implements
+        LoaderManager.LoaderCallbacks<ArrayList<RssItemSimplified>>{
+
 
     //interface to communicate with the hosting
     //activity and request a tab change, if any.
@@ -87,22 +90,29 @@ public class RssFragment extends Fragment {
     @ViewById(R.id.rss_message_panel)
     LinearLayout mMessagePanel;
 
+    private boolean hasRssItems(){
+        return (mRssItems!=null && mRssItems.size()>0);
+    }
+
     /**
      * Perform download of Rss data
      * if local cache is empty and connection
      * becomes available.
      */
-    @Receiver(
-        actions = ConnectivityManager.CONNECTIVITY_ACTION,
-        registerAt = Receiver.RegisterAt.OnResumeOnPause
-    )
+    @Receiver(actions = ConnectivityManager.CONNECTIVITY_ACTION)
     void onConnectivityChange() {
         if(
             ConnectivityUtils.isDeviceConnected(getContext()) &&
-            mRssItems==null &&
+            !hasRssItems() &&
             !isLoadingData
-        )
-            loadData();
+        ){
+            //starts getting data since now connection is available
+            //so displays the loading message on UI and starts
+            //background data loading
+            setUIState(UISTATE_GETTING_DATA);
+            getLoaderManager().restartLoader(0,null,this);
+        }
+
     }
 
     // Required empty public constructor
@@ -116,16 +126,16 @@ public class RssFragment extends Fragment {
     void viewCreated() {
         //mSwimTracksList is saved in instance state
         //so can be reused
-        if(mRssItems==null){
+        if(!hasRssItems()){
             //updates the UI showing progress bar
             //for background tasks
             setUIState(UISTATE_GETTING_DATA);
 
             //gets data from the web or from cached
-            loadData();
+            getLoaderManager().initLoader(0,null,this);
         }
         else //just proceed with UI update
-            onDataLoadCompleted();
+            bindDataToUI();
     }
 
     /**
@@ -138,19 +148,25 @@ public class RssFragment extends Fragment {
         ((ITabSelectionRequest)getActivity()).onSelectTab(1);
     }
 
-    /**
-     * Async load rss data from cache or from the web
-     * when cache is not valid anymore and network
-     * is available, then request list view update
-     */
-    @Background
-    void loadData() {
-        isLoadingData = true;
-        //Performs data load at once, when starting the app
-        //and your local data are obsolete (see RssManager).
-        //Otherwise loads from local cache.
-        mRssItems = mRssManager.getRssItems();
-        onDataLoadCompleted();
+    @Override
+    public Loader<ArrayList<RssItemSimplified>> onCreateLoader(int id, Bundle args)
+    {
+        isLoadingData = true; //for ui
+        return new RssDataLoader(getContext());
+    }
+
+    @Override
+    public void onLoadFinished(Loader<ArrayList<RssItemSimplified>> loader, ArrayList<RssItemSimplified> data)
+    {
+        isLoadingData = false;
+        mRssItems = data;
+        bindDataToUI();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<ArrayList<RssItemSimplified>> loader) {
+        isLoadingData = false;
+        bindDataToUI();
     }
 
     /**
@@ -158,10 +174,9 @@ public class RssFragment extends Fragment {
      with loaded rss data (if any), otherwise
      displays the swim list activity
      */
-    @UiThread
-    void onDataLoadCompleted() {
+    private void bindDataToUI() {
         //updates the list adapter to display the data
-        if(mRssItems!=null && mRssItems.size()>0){
+        if(hasRssItems()){
             rssListAdapter = new RssListAdapter(getContext(), R.layout.rss_item, mRssItems);
             mRssList.setAdapter(rssListAdapter);
 
@@ -175,8 +190,6 @@ public class RssFragment extends Fragment {
             //background process is completed
             //and shows a message
             setUIState(UISTATE_OFFLINE);
-
-        isLoadingData = false;
     }
 
     /**
