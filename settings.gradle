@@ -1,1 +1,1 @@
-include ':app', ':openwaterswimtrackingwear'
+include ':app', ':wear'

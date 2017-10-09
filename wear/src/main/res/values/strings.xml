@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Open Water Swim Tracking: Wear</string>
+    <string name="distance_label">%1$s meters</string>
+    <string name="allow_location_alert">Please allow location tracking.</string>
+    <string name="enable_location_alert">Please enable GPS in settings.</string>
+    <string name="error_label">Error</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="hello_round">Hello Round World!</string>
+    <string name="hello_square">Hello Square World!</string>
+    <string name="title_activity_wear_main">WearMainActivity</string>
+    <string name="hello_world">Hello World!</string>
+</resources>

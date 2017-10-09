@@ -12,6 +12,11 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppThemeNoBar">
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
+
         <activity
             android:name=".MainActivity_"
             android:allowBackup="true"
@@ -24,6 +29,9 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED"/>
+            </intent-filter>
         </activity>
         <activity
             android:name=".SwimEditActivity_"
@@ -34,6 +42,7 @@
             android:name=".BackupActivity_"
             android:label="@string/backup_activity_label"
             android:theme="@style/AppThemeNoBar"/>
+        <activity android:name=".MainActivity"/>
 
         <receiver android:name=".SwimmingGraphWidget">
             <intent-filter>
@@ -44,6 +53,7 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/swimminh_graph_widget_info"/>
         </receiver>
+
     </application>
 
 </manifest>
