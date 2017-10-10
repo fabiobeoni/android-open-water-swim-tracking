@@ -5,6 +5,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -42,11 +43,13 @@ public class TrackingActivity extends WearableActivity
     /**
      * Milliseconds between updates based on state.
      */
-    private static final long ACTIVE_INTERVAL_MS = (1000);  //1 second
+    private static final long ACTIVE_MODE_UPDATE_INTERVAL_MS = (1000);  //1 second
+
     //TODO:consider moving app settings to let the user decide...
-    private static final long AMBIENT_INTERVAL_MS = (2 * 60 * 1000); //2 minutes
-    private static final long MIN_MINUTES = (0); //0 milli-seconds
-    private static final long MIN_METERS = 100; //100 meters
+    private static final long AMBIENT_MODE_UPDATE_INTERVAL_MS = (2 * 60 * 1000); //2 minutes
+
+    private static final long TRACK_MIN_TIME_DIFF_MINUTES = (0); //0 milli-seconds
+    private static final long TRACK_MIN_DISTANCE_METERS = 100; //100 meters
     private static final int AMBIENT_INT_REQ_CODE = 0;
 
     /**
@@ -68,6 +71,7 @@ public class TrackingActivity extends WearableActivity
     private LocationManager mLocationManager;
     private LocationListener mLocationListener;
     private Location mLastLocation;
+    private SwimmingTrackStorage mSwimmingTrackStorage;
     private float mTotalDistance = 0;
 
     private TextView mTotalDistanceTxt;
@@ -82,13 +86,20 @@ public class TrackingActivity extends WearableActivity
 
         setContentView(R.layout.activity_tracking);
 
-        setAmbientEnabled();
-
-
         mContainerView = findViewById(R.id.container);
         mTotalDistanceTxt = findViewById(R.id.totalDistanceTxt);
 
+        setAmbientEnabled();
+
+
+        SharedPreferences mSharedPref = getSharedPreferences(getString(R.string.locations_list_pref), Context.MODE_PRIVATE);
+
+        //removes existing tracked locations, if any, and starts new track
+        mSwimmingTrackStorage = SwimmingTrackStorage.get(mSharedPref).newTracking();
+
+
         mAmbientStateAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
         Intent ambientStateIntent = new Intent(getApplicationContext(), TrackingActivity.class);
 
         mAmbientStatePendingIntent = PendingIntent.getActivity(
@@ -238,7 +249,7 @@ public class TrackingActivity extends WearableActivity
         if (isAmbient())
         {
             /* Calculate next trigger time (based on state). */
-            long delayMs = AMBIENT_INTERVAL_MS - (currentTimeMillis % AMBIENT_INTERVAL_MS);
+            long delayMs = AMBIENT_MODE_UPDATE_INTERVAL_MS - (currentTimeMillis % AMBIENT_MODE_UPDATE_INTERVAL_MS);
             long triggerTimeMs = currentTimeMillis + delayMs;
 
             /*
@@ -255,7 +266,7 @@ public class TrackingActivity extends WearableActivity
         } else
         {
             /* Calculate next trigger time (based on state). */
-            long delayMs = ACTIVE_INTERVAL_MS - (currentTimeMillis % ACTIVE_INTERVAL_MS);
+            long delayMs = ACTIVE_MODE_UPDATE_INTERVAL_MS - (currentTimeMillis % ACTIVE_MODE_UPDATE_INTERVAL_MS);
 
             mActiveModeUpdateHandler.removeMessages(MSG_UPDATE_SCREEN);
             mActiveModeUpdateHandler.sendEmptyMessageDelayed(MSG_UPDATE_SCREEN, delayMs);
@@ -278,14 +289,17 @@ public class TrackingActivity extends WearableActivity
                         mLastLocation = location;
 
                     mTotalDistance += location.distanceTo(mLastLocation);
-
                     mTotalDistanceTxt.setText(getString(R.string.distance_label, String.valueOf(mTotalDistance)));
+
                     mLocationManager.removeUpdates(mLocationListener);
                     mLocationListener = null;
 
                     //updates to be ready for next coming
                     //location and calculate the distance again
                     mLastLocation = location;
+
+                    //stores the location on the wear
+                    mSwimmingTrackStorage.add(location);
                 }
 
                 @Override
@@ -302,8 +316,8 @@ public class TrackingActivity extends WearableActivity
             {
                 mLocationManager.requestLocationUpdates(
                         LocationManager.GPS_PROVIDER,
-                        MIN_MINUTES, //5
-                        MIN_METERS,  //100
+                        TRACK_MIN_TIME_DIFF_MINUTES, //5
+                        TRACK_MIN_DISTANCE_METERS,  //100
                         mLocationListener
                 );
 
