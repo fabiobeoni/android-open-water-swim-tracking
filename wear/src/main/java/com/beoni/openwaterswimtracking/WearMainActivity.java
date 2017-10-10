@@ -1,33 +1,27 @@
 package com.beoni.openwaterswimtracking;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.wearable.activity.WearableActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.MessageApi;
-import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.NodeApi;
-import com.google.android.gms.wearable.Wearable;
+import com.beoninet.android.easymessage.EasyMessageManager;
+import com.google.android.gms.wearable.MessageEvent;
 
 
-public class WearMainActivity extends WearableActivity implements
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener
+public class WearMainActivity extends WearableActivity
 {
     private static final String TAG = "OWST.WearMainActivity";
-    private static final String PATH = "/SWIM";
+
+    //these two paths must be defined on phone module too
+    public static final String MSG_SWIM_DATA_AVAILABLE = WearMainActivity.class.getPackage().getName()+".MSG_SWIM_DATA_AVAILABLE";
+    public static final String MSG_SWIM_DATA_RECEIVED = WearMainActivity.class.getPackage().getName()+".MSG_SWIM_DATA_RECEIVED";
 
     private TextView mMessageTxt;
 
-
-    GoogleApiClient mGoogleApiClient;
+    private EasyMessageManager easyMessageManager;
 
 
     @Override
@@ -38,64 +32,35 @@ public class WearMainActivity extends WearableActivity implements
 
         mMessageTxt = findViewById(R.id.messageTxt);
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(Wearable.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
+        final Context ctx = this;
+        easyMessageManager = new EasyMessageManager(this){
+            @Override
+            public void onMessageReceived(MessageEvent messageEvent)
+            {
+                if(messageEvent.getPath().equals(MSG_SWIM_DATA_RECEIVED))
+                    Toast.makeText(ctx,R.string.swim_data_downlaoded,Toast.LENGTH_LONG).show();
+            }
+        };
     }
 
     @Override
     protected void onStart()
     {
         super.onStart();
-        mGoogleApiClient.connect();
+        easyMessageManager.connect();
     }
 
     @Override
     protected void onStop()
     {
         super.onStop();
-
-        if (null != mGoogleApiClient && mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
+        easyMessageManager.disconnect();
     }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle){
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {}
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {}
 
     public void sendMessage(View v){
-        if(mGoogleApiClient.isConnected()) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
-                    for(Node node : nodes.getNodes()) {
-                        MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(
-                                mGoogleApiClient,
-                                node.getId(),
-                                PATH,
-                                "Hello World".getBytes()
-                        ).await();
-
-                        if(!result.getStatus().isSuccess()){
-                            Log.e("test", "error");
-                        } else {
-                            Log.i("test", "success!! sent to: " + node.getDisplayName());
-                        }
-                    }
-                }
-            }).start();
-        }
+        if(easyMessageManager.isConnected())
+            easyMessageManager.sendMessage(MSG_SWIM_DATA_AVAILABLE,"json data here");
         else
-            Toast.makeText(this,"Please connect the phone.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,R.string.missing_device_connection,Toast.LENGTH_LONG).show();
     }
 }

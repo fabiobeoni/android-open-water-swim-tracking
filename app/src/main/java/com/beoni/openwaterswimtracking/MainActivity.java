@@ -1,19 +1,15 @@
 package com.beoni.openwaterswimtracking;
 
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.content.Context;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.support.v4.view.ViewPager;
+import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.MessageApi;
+import com.beoninet.android.easymessage.EasyMessageManager;
 import com.google.android.gms.wearable.MessageEvent;
-import com.google.android.gms.wearable.Wearable;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
@@ -25,17 +21,17 @@ import java.util.Map;
 
 @EActivity(R.layout.activity_main)
 public class MainActivity extends AppCompatActivity implements
-        RssFragment.ITabSelectionRequest,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        MessageApi.MessageListener
+        RssFragment.ITabSelectionRequest
 {
     public static final String REQUEST_SELECTED_TAB_KEY = "REQUEST_SELECTED_TAB_KEY";
 
+    //these two paths must be defined on wear module too
+    public static final String MSG_SWIM_DATA_AVAILABLE = MainActivity.class.getPackage().getName()+".MSG_SWIM_DATA_AVAILABLE";
+    public static final String MSG_SWIM_DATA_RECEIVED = MainActivity.class.getPackage().getName()+".MSG_SWIM_DATA_RECEIVED";
 
     private TabsPagerAdapter mTabsPagerAdapter;
 
-    GoogleApiClient mGoogleApiClient;
+    private EasyMessageManager easyMessageManager;
 
 
     //================== UI CONTROLS ===============//
@@ -69,13 +65,9 @@ public class MainActivity extends AppCompatActivity implements
     //basic UI initialization
     @AfterViews
     void viewCreated(){
-        setSupportActionBar(mToolbar);
+        final Context ctx = this;
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(Wearable.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
+        setSupportActionBar(mToolbar);
 
         //populates the list of titles. See SectionsPagerAdapter
         mTabsTitles = new HashMap<Integer, String>(){{
@@ -104,41 +96,35 @@ public class MainActivity extends AppCompatActivity implements
 
         //default 0
         mTabLayout.getTabAt(mSelectedTab).select();
+
+        easyMessageManager = new EasyMessageManager(ctx){
+            @Override
+            public void onMessageReceived(MessageEvent messageEvent)
+            {
+                if(messageEvent.getPath().equals(MSG_SWIM_DATA_AVAILABLE))
+                {
+                    Toast.makeText(ctx, (new String(messageEvent.getData())), Toast.LENGTH_LONG).show();
+
+                    //process data, then send back the answer...
+
+                    easyMessageManager.sendMessage(MSG_SWIM_DATA_RECEIVED, String.valueOf(true));
+                }
+            }
+        };
     }
 
     @Override
     protected void onStart()
     {
         super.onStart();
-        mGoogleApiClient.connect();
+        easyMessageManager.connect();
     }
 
     @Override
     protected void onStop()
     {
         super.onStop();
-
-        if (null != mGoogleApiClient && mGoogleApiClient.isConnected()) {
-            Wearable.MessageApi.removeListener(mGoogleApiClient, this);
-            mGoogleApiClient.disconnect();
-        }
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle){
-        Wearable.MessageApi.addListener(mGoogleApiClient,this);
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {}
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {}
-
-    @Override
-    public void onMessageReceived(MessageEvent messageEvent)
-    {
-        String f = "";
+        easyMessageManager.disconnect();
     }
 
     /**

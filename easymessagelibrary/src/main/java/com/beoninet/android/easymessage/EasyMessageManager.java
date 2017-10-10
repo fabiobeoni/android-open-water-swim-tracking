@@ -45,23 +45,28 @@ public class EasyMessageManager implements
         }
     }
 
-    public List<Node> getNodes(){
-        return Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await().getNodes();
+    public boolean isConnected(){
+        return mGoogleApiClient.isConnected();
     }
 
-    public void sendMessage(final String path, final String msg, @Nullable final String nodeID){
+    public void sendMessage(final String path, final String msg){
+        sendMessage(path,msg,null);
+    }
 
-        final List<Node> nodes = getNodes();
-
+    public void sendMessage(final String path, final String msg, @Nullable final String[] nodeIDs){
         if(mGoogleApiClient.isConnected()) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    if(nodeID!=null)
-                        performSending(nodeID, path, msg);
+                    if(nodeIDs!=null && nodeIDs.length>0)
+                        for (String nodeID:nodeIDs)
+                            performSending(nodeID, path, msg);
                     else
-                       for(Node node : nodes)
-                           performSending(node.getId(), path, msg);
+                    {
+                        List<Node>nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await().getNodes();
+                        for (Node node : nodes)
+                            performSending(node.getId(), path, msg);
+                    }
                 }
             }).start();
         }
