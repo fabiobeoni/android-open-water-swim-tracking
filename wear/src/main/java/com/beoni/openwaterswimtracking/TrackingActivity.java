@@ -32,7 +32,7 @@ import java.lang.ref.WeakReference;
 
 public class TrackingActivity extends WearableActivity
 {
-    private static final String TAG = "OWST.Wear.TrackingActivity";
+    private static final String TAG = "OWST.Wear.TrackingAct";
 
     /**
      * Custom 'what' for Message sent to Handler.
