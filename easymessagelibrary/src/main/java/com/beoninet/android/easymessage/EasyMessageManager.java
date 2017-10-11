@@ -26,7 +26,15 @@ public class EasyMessageManager implements
 
     private GoogleApiClient mGoogleApiClient;
 
+    public Context getContext()
+    {
+        return mContext;
+    }
+
+    private Context mContext;
+
     public EasyMessageManager(Context context){
+        mContext = context;
         mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addApi(Wearable.API)
                 .addConnectionCallbacks(this)

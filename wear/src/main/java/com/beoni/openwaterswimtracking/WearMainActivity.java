@@ -1,6 +1,7 @@
 package com.beoni.openwaterswimtracking;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.view.View;
@@ -22,6 +23,7 @@ public class WearMainActivity extends WearableActivity
     private TextView mMessageTxt;
 
     private EasyMessageManager easyMessageManager;
+    private SwimmingTrackStorage mSwimmingTrackStorage;
 
 
     @Override
@@ -32,13 +34,12 @@ public class WearMainActivity extends WearableActivity
 
         mMessageTxt = findViewById(R.id.messageTxt);
 
-        final Context ctx = this;
         easyMessageManager = new EasyMessageManager(this){
             @Override
             public void onMessageReceived(MessageEvent messageEvent)
             {
                 if(messageEvent.getPath().equals(MSG_SWIM_DATA_RECEIVED))
-                    Toast.makeText(ctx,R.string.swim_data_downlaoded,Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(),R.string.swim_data_downlaoded,Toast.LENGTH_LONG).show();
             }
         };
     }
@@ -59,8 +60,14 @@ public class WearMainActivity extends WearableActivity
 
     public void sendMessage(View v){
         if(easyMessageManager.isConnected())
-            easyMessageManager.sendMessage(MSG_SWIM_DATA_AVAILABLE,"json data here");
+        {
+            SharedPreferences mSharedPref = getSharedPreferences(getString(R.string.locations_list_pref), Context.MODE_PRIVATE);
+            mSwimmingTrackStorage = SwimmingTrackStorage.get(mSharedPref);
+
+            easyMessageManager.sendMessage(MSG_SWIM_DATA_AVAILABLE, mSwimmingTrackStorage.getAllAsString());
+        }
         else
             Toast.makeText(this,R.string.missing_device_connection,Toast.LENGTH_LONG).show();
     }
+
 }

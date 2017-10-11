@@ -3,7 +3,6 @@ package com.beoni.openwaterswimtracking;
 
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +13,11 @@ public class SwimmingTrackStorage
     private static SwimmingTrackStorage mInstance;
     private static SharedPreferences mPreferences;
 
+    private LocationSerializer mLocationSerializer;
+
     private SwimmingTrackStorage(SharedPreferences preferences){
         mPreferences = preferences;
+        mLocationSerializer = new LocationSerializer();
     }
 
     public static SwimmingTrackStorage get(SharedPreferences preferences){
@@ -31,36 +33,18 @@ public class SwimmingTrackStorage
     }
 
     public void add(Location location){
-        String time = String.valueOf(location.getTime());
-
-        String newLocationStr = TextUtils.join(",", new String[]{
-                time,
-                String.valueOf(location.getSpeed()),
-                String.valueOf(location.getLatitude()),
-                String.valueOf(location.getLongitude()),
-                String.valueOf(location.getAltitude())
-        });
-
-        mPreferences.edit().putString(time,newLocationStr).apply();
+        mPreferences.edit().putString(
+                String.valueOf(location.getTime()),
+                mLocationSerializer.serialize(location)
+        ).apply();
     }
 
-    public List<Location> getAll(){
-        ArrayList<Location> locations = new ArrayList<>();
+    public String getAllAsString(){
+        String locations = "";
 
         Map<String,?> all = mPreferences.getAll();
-
-        for (Map.Entry<String,?> entry:all.entrySet()){
-            String[] locationArr = entry.getValue().toString().split(",");
-
-            Location location = new Location("");
-            location.setTime(Long.parseLong(locationArr[0]));
-            location.setSpeed(Float.parseFloat(locationArr[1]));
-            location.setLatitude(Double.parseDouble(locationArr[2]));
-            location.setLongitude(Double.parseDouble(locationArr[3]));
-            location.setAltitude(Double.parseDouble(locationArr[4]));
-
-            locations.add(location);
-        }
+        for (Map.Entry<String,?> entry:all.entrySet())
+            locations += System.lineSeparator() + entry.getValue().toString();
 
         return locations;
     }
