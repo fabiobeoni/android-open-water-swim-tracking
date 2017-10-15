@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:text="Send ms"
         android:layout_gravity="bottom|center"
-        android:onClick="sendMessage"
+        android:onClick="btnSendMessageOnClick"
 
         />
 

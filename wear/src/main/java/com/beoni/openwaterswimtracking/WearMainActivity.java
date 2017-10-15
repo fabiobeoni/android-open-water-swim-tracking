@@ -1,5 +1,6 @@
 package com.beoni.openwaterswimtracking;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,16 +10,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.beoninet.android.easymessage.EasyMessageManager;
+import com.beoninet.android.easymessage.INodeConnection;
+import com.beoninet.openwaterswimtracking.shared.Constants;
 import com.google.android.gms.wearable.MessageEvent;
 
 
 public class WearMainActivity extends WearableActivity
 {
-    private static final String TAG = "OWST.WearMainActivity";
-
-    //these two paths must be defined on phone module too
-    public static final String MSG_SWIM_DATA_AVAILABLE = WearMainActivity.class.getPackage().getName()+".MSG_SWIM_DATA_AVAILABLE";
-    public static final String MSG_SWIM_DATA_RECEIVED = WearMainActivity.class.getPackage().getName()+".MSG_SWIM_DATA_RECEIVED";
+    private static final String TAG = WearMainActivity.class.getSimpleName();
 
     private TextView mMessageTxt;
 
@@ -38,10 +37,56 @@ public class WearMainActivity extends WearableActivity
             @Override
             public void onMessageReceived(MessageEvent messageEvent)
             {
-                if(messageEvent.getPath().equals(MSG_SWIM_DATA_RECEIVED))
-                    Toast.makeText(getContext(),R.string.swim_data_downlaoded,Toast.LENGTH_LONG).show();
+                if(messageEvent.getPath().equals(Constants.MSG_SWIM_MESSAGE_RECEIVED))
+                    Toast.makeText(getContext(),new String(messageEvent.getData()),Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onMessageDelivered(boolean result)
+            {
+                ((Activity)getContext()).runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        Toast.makeText(getContext(),R.string.data_delivered,Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         };
+    }
+
+    public void btnSendMessageOnClick(final View view){ //button click on view
+
+        easyMessageManager.checkNodes(new INodeConnection()
+        {
+            @Override
+            public void onNodeCheckCompleted(boolean hsNodes)
+            {
+                //message delivered only when there are actually nodes
+                //connected
+                if(easyMessageManager.hasNodes())
+                {
+                    SharedPreferences mSharedPref = getSharedPreferences(getString(R.string.locations_list_pref), Context.MODE_PRIVATE);
+                    mSwimmingTrackStorage = SwimmingTrackStorage.get(mSharedPref);
+
+                    easyMessageManager.sendMessage(
+                            Constants.MSG_SWIM_DATA_AVAILABLE,
+                            mSwimmingTrackStorage.getAllAsString()
+                    );
+                }
+                else
+                    ((Activity)view.getContext()).runOnUiThread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            Toast.makeText(view.getContext(),R.string.missing_device_connection,Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+            }
+        });
     }
 
     @Override
@@ -56,18 +101,6 @@ public class WearMainActivity extends WearableActivity
     {
         super.onStop();
         easyMessageManager.disconnect();
-    }
-
-    public void sendMessage(View v){
-        if(easyMessageManager.isConnected())
-        {
-            SharedPreferences mSharedPref = getSharedPreferences(getString(R.string.locations_list_pref), Context.MODE_PRIVATE);
-            mSwimmingTrackStorage = SwimmingTrackStorage.get(mSharedPref);
-
-            easyMessageManager.sendMessage(MSG_SWIM_DATA_AVAILABLE, mSwimmingTrackStorage.getAllAsString());
-        }
-        else
-            Toast.makeText(this,R.string.missing_device_connection,Toast.LENGTH_LONG).show();
     }
 
 }

@@ -1,5 +1,6 @@
 package com.beoni.openwaterswimtracking;
 import android.content.Intent;
+import android.location.Location;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
 import android.widget.EditText;
@@ -10,6 +11,8 @@ import android.widget.Toast;
 import com.beoni.openwaterswimtracking.bll.SwimTrackManager;
 import com.beoni.openwaterswimtracking.model.SwimTrack;
 import com.beoni.openwaterswimtracking.utils.DateUtils;
+import com.beoninet.openwaterswimtracking.shared.Constants;
+import com.beoninet.openwaterswimtracking.shared.LocationSerializer;
 import com.google.gson.Gson;
 
 import org.androidannotations.annotations.AfterTextChange;
@@ -25,6 +28,8 @@ import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.StringRes;
 import org.androidannotations.annotations.res.StringArrayRes;
 
+import java.util.List;
+
 /**
  * Fragment hosting the form to edit
  * swim track data like location, duration,
@@ -33,6 +38,8 @@ import org.androidannotations.annotations.res.StringArrayRes;
 @EFragment(R.layout.fragment_swim_edit)
 @OptionsMenu(R.menu.menu_edit_swim)
 public class SwimEditFragment extends Fragment {
+
+    private static final String TAG = SwimEditFragment.class.getCanonicalName();
 
     /**
      * Intent key checked by this fragment to
@@ -147,9 +154,19 @@ public class SwimEditFragment extends Fragment {
     //the one coming from the swim list intent.
     @AfterViews
     void viewCreated(){
+
+        //todo: move to method
+        List<Location> locations;
+        String swimGPSData  = getActivity().getIntent().getStringExtra(Constants.EXTRA_SWIM_GPS_DATA);
+        if(swimGPSData!=null)
+            locations = new LocationSerializer().parseMany(swimGPSData);
+
+
+        //todo: move to method
         //initialize the swim instance to edit
         String mSwimTrackSerialized = getActivity().getIntent().getStringExtra(SWIM_ITEM_KEY);
         mSwimIndex = getActivity().getIntent().getIntExtra(SWIM_ITEM_INDEX,-1);
+
         isNewSwim = (mSwimTrackSerialized ==null);
 
         if(isNewSwim)
@@ -177,6 +194,7 @@ public class SwimEditFragment extends Fragment {
      * and sends back the user to
      * the list of swim tracks.
      */
+    //todo: replace with Loader
     @Background
     void performAsyncSaving(){
         mSwimTrackManager.save();

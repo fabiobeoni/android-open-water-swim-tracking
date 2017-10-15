@@ -10,6 +10,7 @@
     <string name="title_activity_wear_main">WearMainActivity</string>
     <string name="hello_world">Hello World!</string>
     <string name="missing_device_connection">Please connect your phone or table to send data to it.</string>
-    <string name="swim_data_downlaoded">Swimming data downloaded to device.</string>
+    <string name="swim_data_downlaoded">Swimming data fully downloaded to device.</string>
     <string name="locations_list_pref">LOCATIONS_LIST</string>
+    <string name="data_delivered">Swimming data delivered</string>
 </resources>

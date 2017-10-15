@@ -135,4 +135,6 @@
     <string name="btn_add_swim">Add a New Swimming</string>
     <string name="new_swim_title">Such a nice swim</string>
     <string name="new_swim_location">Some where there is water ;)</string>
+    <string name="swim_data_downloaded">Swimming data downloaded to device</string>
+    <string name="no_data_received">Did not reveice any swimming data</string>
 </resources>

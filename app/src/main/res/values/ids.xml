@@ -3,4 +3,5 @@
     <!-- this file is only needed to fix a bug in the  android.support.design.widget.TextInputLayout used in ui -->
     <item name="visible" type="id"/>
     <item name="masked" type="id"/>
+    <item name="no_data_received" type="id">Did not receive any swimming data</item>
 </resources>

@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements
 
     //these two paths must be defined on wear module too
     public static final String MSG_SWIM_DATA_AVAILABLE = MainActivity.class.getPackage().getName()+".MSG_SWIM_DATA_AVAILABLE";
-    public static final String MSG_SWIM_DATA_RECEIVED = MainActivity.class.getPackage().getName()+".MSG_SWIM_DATA_RECEIVED";
+    public static final String MSG_SWIM_DATA_RECEIVED = MainActivity.class.getPackage().getName()+".MSG_SWIM_MESSAGE_RECEIVED";
 
     private TabsPagerAdapter mTabsPagerAdapter;
 
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements
 
         //starts the service who listens for messages coming
         //from the wear
-        WearMessageListener.startService(this);
+        //WearMessageListener.startService(this);
 
         //populates the list of titles. See SectionsPagerAdapter
         mTabsTitles = new HashMap<Integer, String>(){{

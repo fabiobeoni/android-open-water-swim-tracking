@@ -4,6 +4,8 @@ package com.beoni.openwaterswimtracking;
 import android.content.SharedPreferences;
 import android.location.Location;
 
+import com.beoninet.openwaterswimtracking.shared.LocationSerializer;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +14,6 @@ public class SwimmingTrackStorage
 {
     private static SwimmingTrackStorage mInstance;
     private static SharedPreferences mPreferences;
-
     private LocationSerializer mLocationSerializer;
 
     private SwimmingTrackStorage(SharedPreferences preferences){

@@ -25,13 +25,14 @@ public class EasyMessageManager implements
     private static final String GOOGLE_API_NOT_CONNECTED = "Google API Client is not connected and cannot send the message to nodes.";
 
     private GoogleApiClient mGoogleApiClient;
+    private boolean mHasNodes = false;
+    private Context mContext;
 
     public Context getContext()
     {
         return mContext;
     }
-
-    private Context mContext;
+    public boolean hasNodes() { return mHasNodes; }
 
     public EasyMessageManager(Context context){
         mContext = context;
@@ -82,7 +83,7 @@ public class EasyMessageManager implements
             Log.e(TAG, GOOGLE_API_NOT_CONNECTED);
     }
 
-    private boolean performSending(String nodeID, String path, String msg)
+    private void performSending(String nodeID, String path, String msg)
     {
         MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(
                 mGoogleApiClient,
@@ -91,16 +92,39 @@ public class EasyMessageManager implements
                 msg.getBytes()
         ).await();
 
-        return result.getStatus().isSuccess();
+        onMessageDelivered(result.getStatus().isSuccess());
     }
 
     /**
-     * Mandatory to invoke super class method.
+     *
+     * @param iNodeConnection: if null, no callback invoked
+     */
+    public void checkNodes(final INodeConnection iNodeConnection){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<Node>nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await().getNodes();
+                mHasNodes = (nodes.size()>0);
+
+                if(iNodeConnection!=null)
+                    iNodeConnection.onNodeCheckCompleted(mHasNodes);
+            }
+        }).start();
+    }
+
+    public void onMessageDelivered(boolean result){}
+
+    /**
+     * Mandatory to invoke super class method
+     * to check the connected nodes and invoke
+     * the callback method onHasNode() check is
+     * completed.
      * @param bundle
      */
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Wearable.MessageApi.addListener(mGoogleApiClient,this);
+        checkNodes(null);
     }
 
     @Override
