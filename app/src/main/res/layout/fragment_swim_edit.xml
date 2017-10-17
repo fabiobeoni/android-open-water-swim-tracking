@@ -129,9 +129,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:paddingStart="8dp"
                 android:paddingEnd="8dp"
                 android:paddingLeft="8dp"
+                android:paddingStart="8dp"
                 android:text="[value]"
                 android:textColor="@color/colorDark"
                 android:textSize="18sp"/>
@@ -195,8 +195,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:paddingStart="8dp"
                 android:paddingEnd="8dp"
+                android:paddingStart="8dp"
                 android:text="[value]"
                 android:textColor="@color/colorDark"
                 android:textSize="18sp"/>
@@ -232,6 +232,17 @@
                 android:text="[value]"
                 android:textColor="@color/colorDark"
                 android:textSize="18sp"/>
+
+            <com.google.android.gms.maps.MapView
+                xmlns:map="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/map_view"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_weight="1"
+                android:paddingTop="12dp"
+                map:mapType="normal"
+                map:liteMode="true"
+                />
 
         </LinearLayout>
     </ScrollView>

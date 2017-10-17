@@ -1,15 +1,20 @@
 package com.beoni.openwaterswimtracking.model;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.location.Location;
 
 import com.beoni.openwaterswimtracking.R;
 import com.beoni.openwaterswimtracking.utils.DateUtils;
+import com.beoni.openwaterswimtracking.utils.ImageBase64;
+import com.beoninet.openwaterswimtracking.shared.LocationSerializer;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Date;
+import java.util.List;
 
 //TODO: replace validation with annotations based library
 /**
@@ -176,6 +181,51 @@ public class SwimTrack implements Serializable
         this.flow = flow;
     }
 
+    public List<Location> getGpsLocations(LocationSerializer serializer)
+    {
+        if(gpsLocationsAsString!=null)
+            return serializer.parseMany(gpsLocationsAsString);
+        else
+            return null;
+    }
+
+    public void setGpsLocations(LocationSerializer serializer, List<Location> gpsLocations)
+    {
+        this.setGpsLocationsAsString(serializer.serializeMany(gpsLocations));
+    }
+
+    public String getGpsLocationsAsString()
+    {
+        return gpsLocationsAsString;
+    }
+
+    public void setGpsLocationsAsString(String gpsLocationsAsString)
+    {
+        this.gpsLocationsAsString = gpsLocationsAsString;
+    }
+
+    public String getMapPreviewBase64()
+    {
+        return mapPreviewBase64;
+    }
+
+    public void setMapPreviewBase64(String mapPreviewBase64){
+        this.mapPreviewBase64 = mapPreviewBase64;
+    }
+
+    public void setMapPreview(Bitmap bitmap)
+    {
+        setMapPreviewBase64(ImageBase64.convert(bitmap));
+    }
+
+    public Bitmap getMapPreview()
+    {
+        if(mapPreviewBase64!=null)
+            return ImageBase64.convert(getMapPreviewBase64());
+        else
+            return null;
+    }
+
     private String notes;
     private String location;
     private Date date;
@@ -186,5 +236,8 @@ public class SwimTrack implements Serializable
     private int perceivedTemperature = 0;
     private int waves = 0;
     private int flow = 0;
+    private String mapPreviewBase64;
+    private String gpsLocationsAsString;
+
 
 }

@@ -107,6 +107,15 @@
 
         </RelativeLayout>
 
+        <ImageView
+            android:id="@+id/swim_map_preview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:paddingTop="2dp"
+            android:contentDescription="@string/swim_map_preview"/>
+
     </LinearLayout>
 
 </LinearLayout>

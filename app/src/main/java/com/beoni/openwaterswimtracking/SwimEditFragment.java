@@ -1,18 +1,38 @@
 package com.beoni.openwaterswimtracking;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.location.Location;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.beoni.openwaterswimtracking.bll.MapManager;
 import com.beoni.openwaterswimtracking.bll.SwimTrackManager;
 import com.beoni.openwaterswimtracking.model.SwimTrack;
 import com.beoni.openwaterswimtracking.utils.DateUtils;
 import com.beoninet.openwaterswimtracking.shared.Constants;
 import com.beoninet.openwaterswimtracking.shared.LocationSerializer;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 
 import org.androidannotations.annotations.AfterTextChange;
@@ -37,9 +57,12 @@ import java.util.List;
  */
 @EFragment(R.layout.fragment_swim_edit)
 @OptionsMenu(R.menu.menu_edit_swim)
-public class SwimEditFragment extends Fragment {
+public class SwimEditFragment extends Fragment
+{
 
     private static final String TAG = SwimEditFragment.class.getCanonicalName();
+
+    private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
     /**
      * Intent key checked by this fragment to
@@ -62,7 +85,6 @@ public class SwimEditFragment extends Fragment {
     //keep track of editing swim index (if not new swim)
     private int mSwimIndex;
 
-    //list of swim track items presented on view
     @InstanceState
     SwimTrack mSwimTrack;
 
@@ -145,36 +167,82 @@ public class SwimEditFragment extends Fragment {
     @ViewById(R.id.swim_notes)
     EditText mNotesTxt;
 
+    @ViewById(R.id.map_view)
+    MapView mapVw;
+
+    @Bean
+    MapManager mMapManager;
+
+    private LocationSerializer mLocationSerializer;
+
+    private Bundle mSavedInstanceState;
+
 
     // Required empty public constructor
-    public SwimEditFragment() {}
+    public SwimEditFragment() {
+        mLocationSerializer = new LocationSerializer();
+    }
 
-    //Set the starting UI status by presenting
-    //an empty swim track to edit, or by deserializing
-    //the one coming from the swim list intent.
-    @AfterViews
-    void viewCreated(){
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
+    {
+        super.onViewCreated(view, savedInstanceState);
+        mSavedInstanceState = savedInstanceState;
+    }
 
-        //todo: move to method
-        List<Location> locations;
-        String swimGPSData  = getActivity().getIntent().getStringExtra(Constants.EXTRA_SWIM_GPS_DATA);
-        if(swimGPSData!=null)
-            locations = new LocationSerializer().parseMany(swimGPSData);
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        readSwimTrackToEdit();
+        bindData();
+    }
 
 
-        //todo: move to method
+    private void readSwimTrackToEdit()
+    {
         //initialize the swim instance to edit
+        if(mSwimTrack==null) //nothing in instance state, looks somewhere else...
+        {
+            //swim track available in intent from MainActivity?
+            String mSwimTrackSerialized = getEditingTrackFromIntent();
+            if(mSwimTrackSerialized!=null)
+            {
+                isNewSwim = false; //keep track to perform insert v.s. update
+                mSwimTrack = new Gson().fromJson(mSwimTrackSerialized, SwimTrack.class);
+            }
+            else
+            {
+                isNewSwim = true; //keep track to perform insert v.s. update
+                mSwimTrack = SwimTrack.createNewEmptySwim(getContext());
+                mSwimTrack.setGpsLocations(mLocationSerializer, getGPSLocationsFromIntent());
+            }
+        }
+
+        //at this point mSwimTrack must have a value!
+        Log.i(TAG, "SwimTrack to edit found: " + String.valueOf((mSwimTrack!=null)));
+    }
+
+    private String getEditingTrackFromIntent()
+    {
         String mSwimTrackSerialized = getActivity().getIntent().getStringExtra(SWIM_ITEM_KEY);
         mSwimIndex = getActivity().getIntent().getIntExtra(SWIM_ITEM_INDEX,-1);
+        return mSwimTrackSerialized;
+    }
 
-        isNewSwim = (mSwimTrackSerialized ==null);
+    private List<Location> getGPSLocationsFromIntent()
+    {
+        List<Location> locations = null;
+        String swimGPSData  = getActivity().getIntent().getStringExtra(Constants.EXTRA_SWIM_GPS_DATA);
+        if(swimGPSData!=null) locations = new LocationSerializer().parseMany(swimGPSData);
 
-        if(isNewSwim)
-            mSwimTrack = SwimTrack.createNewEmptySwim(getContext());
-        else
-            mSwimTrack = new Gson().fromJson(mSwimTrackSerialized,SwimTrack.class);
+        return locations;
+    }
 
-
+    private void bindData()
+    {
+        //binds data to UI
         mTitleTxt.setText(mSwimTrack.getTitle());
         mLocationTxt.setText(mSwimTrack.getLocation());
         mDateTxt.setText(DateUtils.dateToString(mSwimTrack.getDate(),DateUtils.SHORT_FORMAT));
@@ -187,7 +255,35 @@ public class SwimEditFragment extends Fragment {
         mWavesTvw.setText(wavesValues[mSwimTrack.getWaves()]);
         mFlowSkb.setProgress(mSwimTrack.getFlow());
         mFlowTvw.setText(flowValues[mSwimTrack.getFlow()]);
+
+        //prepares map to show the swimming path
+        mapVw.onCreate(mSavedInstanceState);
+        mapVw.getMapAsync(new OnMapReadyCallback(){
+            @Override
+            public void onMapReady(GoogleMap googleMap)
+            {
+                List<Location> locations = mSwimTrack.getGpsLocations(mLocationSerializer);
+                if(locations!=null)
+                {
+                    mapVw.setVisibility(View.VISIBLE);
+
+                    mMapManager.drawSwimmingPath(googleMap, locations, false);
+                    mMapManager.addStartStopMarkers();
+                    mMapManager.getMapAsBitmap(new GoogleMap.SnapshotReadyCallback()
+                    {
+                        @Override
+                        public void onSnapshotReady(Bitmap mapBitmap)
+                        {
+                            mSwimTrack.setMapPreview(mapBitmap);
+                        }
+                    });
+                }
+                else
+                    mapVw.setVisibility(View.GONE);
+            }
+        });
     }
+
 
     /**
      * Stores swim data from the form

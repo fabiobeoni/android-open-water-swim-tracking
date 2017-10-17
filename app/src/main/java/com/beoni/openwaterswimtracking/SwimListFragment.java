@@ -91,10 +91,8 @@ public class SwimListFragment extends Fragment
     //Required empty public constructor
     public SwimListFragment() {}
 
-    //UI initialization with data loading
-    @AfterViews
-    void viewCreated()
-    {
+    //@AfterViews
+    public void viewCreated(){
         //the hosting activity can handle requests
         //to refresh this list
         boolean forceListReload = getActivity().getIntent().getBooleanExtra(UPDATE_LIST_KEY,false);
@@ -109,8 +107,16 @@ public class SwimListFragment extends Fragment
 
             //gets data from the web or from cached
             loadData();
-        } else //just proceed with UI update
+        }
+        else //just proceed with UI update
             onDataLoadCompleted();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        viewCreated();
     }
 
     /**

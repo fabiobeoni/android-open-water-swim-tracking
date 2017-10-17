@@ -23,6 +23,14 @@ public class LocationSerializer
         return locationStr;
     }
 
+    public String serializeMany(List<Location> locations){
+        String[] locationRows = new String[locations.size()];
+        for(int i=0;i<locationRows.length;i++)
+            locationRows[i] = this.serialize(locations.get(i));
+
+        return TextUtils.join(System.lineSeparator(),locationRows);
+    }
+
     public Location parse(String locationData){
         String[] locationArr = locationData.split(",");
 
@@ -40,7 +48,8 @@ public class LocationSerializer
         String[] locationRows = manyLocationsData.split(System.lineSeparator());
         List<Location> locations = new ArrayList<>();
         for (String locationData:locationRows)
-            locations.add(parse(locationData));
+            if(locationData.trim().length()>0)
+                locations.add(parse(locationData));
 
         return locations;
     }

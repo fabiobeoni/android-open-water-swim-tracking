@@ -3,6 +3,7 @@ package com.beoni.openwaterswimtracking;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -76,6 +77,7 @@ public class SwimTracksAdapter extends ArrayAdapter
             itemView.lengthTvw = (TextView) view.findViewById(R.id.swim_length);
             itemView.durationTvw = (TextView) view.findViewById(R.id.swim_duration);
             itemView.dateTvw = (TextView) view.findViewById(R.id.swim_date);
+            itemView.mapImgVw = (ImageView) view.findViewById(R.id.swim_map_preview);
             view.setTag(itemView);
         }
         else
@@ -102,6 +104,15 @@ public class SwimTracksAdapter extends ArrayAdapter
         resourceID = resources.getIdentifier(resourceName, DRAWABLE, packageName);
         itemView.flowImgVw.setImageResource(resourceID);
 
+        Bitmap mapPreviewBtm = swimTrack.getMapPreview();
+        if(mapPreviewBtm!=null)
+        {
+            itemView.mapImgVw.setImageBitmap(mapPreviewBtm);
+            itemView.mapImgVw.setVisibility(View.VISIBLE);
+        }
+        else
+            itemView.mapImgVw.setVisibility(View.GONE);
+
         return view;
     }
 
@@ -114,5 +125,6 @@ public class SwimTracksAdapter extends ArrayAdapter
         TextView dateTvw;
         ImageView wavesImgVw;
         ImageView flowImgVw;
+        ImageView mapImgVw;
     }
 }

@@ -137,4 +137,7 @@
     <string name="new_swim_location">Some where there is water ;)</string>
     <string name="swim_data_downloaded">Swimming data downloaded to device</string>
     <string name="no_data_received">Did not reveice any swimming data</string>
+    <string name="swim_gps_track">GPS Track</string>
+    <string name="gmap_api_key">AIzaSyBDBs5brrVKla-LKiFlTVI8BwqMby3OjSI</string>
+    <string name="swim_map_preview">Swimming map preview</string>
 </resources>
