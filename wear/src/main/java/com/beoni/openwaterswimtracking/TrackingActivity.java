@@ -112,7 +112,6 @@ public class TrackingActivity extends WearableActivity
         refreshDisplayAndSetNextUpdate();
     }
 
-    //TODO: moved from onStart()
     @Override
     protected void onResume()
     {
