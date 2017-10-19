@@ -107,6 +107,7 @@
 
         </RelativeLayout>
 
+        <!--TODO: update layout to better present the map -->
         <ImageView
             android:id="@+id/swim_map_preview"
             android:layout_width="match_parent"
