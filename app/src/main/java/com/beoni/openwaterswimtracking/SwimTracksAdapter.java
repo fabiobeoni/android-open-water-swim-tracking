@@ -3,17 +3,19 @@ package com.beoni.openwaterswimtracking;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.beoni.openwaterswimtracking.model.SwimTrack;
 import com.beoni.openwaterswimtracking.utils.DateUtils;
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
 import java.util.ArrayList;
 
 //TODO: change implementation of the all adapter by using Android Annotations https://github.com/androidannotations/androidannotations/wiki/Adapters-and-lists
@@ -84,7 +86,7 @@ public class SwimTracksAdapter extends ArrayAdapter
             itemView = (ItemView) view.getTag();
 
 
-        SwimTrack swimTrack = (SwimTrack) this.getItem(position);
+        final SwimTrack swimTrack = (SwimTrack) this.getItem(position);
 
         itemView.titleTvw.setText(swimTrack.getTitle());
         itemView.locationTvw.setText(swimTrack.getLocation());
@@ -104,10 +106,9 @@ public class SwimTracksAdapter extends ArrayAdapter
         resourceID = resources.getIdentifier(resourceName, DRAWABLE, packageName);
         itemView.flowImgVw.setImageResource(resourceID);
 
-        Bitmap mapPreviewBtm = swimTrack.getMapPreview();
-        if(mapPreviewBtm!=null)
+        if(swimTrack.getMapPreviewFullFileName()!=null)
         {
-            itemView.mapImgVw.setImageBitmap(mapPreviewBtm);
+            Picasso.with(ctx).load(new File(swimTrack.getMapPreviewFullFileName())).into(itemView.mapImgVw);
             itemView.mapImgVw.setVisibility(View.VISIBLE);
         }
         else

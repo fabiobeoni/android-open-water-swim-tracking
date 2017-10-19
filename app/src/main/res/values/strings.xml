@@ -142,4 +142,6 @@
     <string name="swim_path_total_distance">%1$s meters - %2$s</string>
 
     <string name="gmap_api_key" translatable="false">AIzaSyBDBs5brrVKla-LKiFlTVI8BwqMby3OjSI</string>
+    <string name="map_marker_default_position">Default Location (0,0)</string>
+    <string name="error_storing_map_image">Error storing map image</string>
 </resources>

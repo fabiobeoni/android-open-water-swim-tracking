@@ -1,6 +1,5 @@
 package com.beoni.openwaterswimtracking;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -290,18 +289,12 @@ public class SwimEditFragment extends Fragment
                 List<Location> locations = mSwimTrack.getGpsLocations(mLocationSerializer);
                 if(locations!=null)
                 {
-                    mapVw.setVisibility(View.VISIBLE);
-
                     mMapManager.drawSwimmingPath(googleMap, locations, false);
-                    mMapManager.getMapAsBitmap(new GoogleMap.SnapshotReadyCallback()
-                    {
-                        @Override
-                        public void onSnapshotReady(Bitmap mapBitmap)
-                        {
-                            //TODO: check the size of this map
-                            mSwimTrack.setMapPreview(mapBitmap);
-                        }
-                    });
+
+                    if(mSwimTrack.getMapPreviewFullFileName()==null)
+                        mMapManager.createMapPreviewAsync(mSwimTrack);
+
+                    mapVw.setVisibility(View.VISIBLE);
                 }
                 else
                     mapVw.setVisibility(View.GONE);
@@ -431,6 +424,7 @@ public class SwimEditFragment extends Fragment
             if (mSwimIndex != -1)
             {
                 mSwimTrackManager.deleteSwimTrack(mSwimIndex);
+                mMapManager.deleteMapPreviewAsync(mSwimTrack);
                 performSavingAsync();
             }
             else

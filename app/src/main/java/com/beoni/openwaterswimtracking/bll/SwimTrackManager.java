@@ -13,6 +13,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 
+//TODO: change methods to work async with @Background annotation
 /**
  * Class performing CRUD operations over swimming tracks.
  * Works with the LocalStorage class to store data in

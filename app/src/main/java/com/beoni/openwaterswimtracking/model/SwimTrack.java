@@ -1,12 +1,10 @@
 package com.beoni.openwaterswimtracking.model;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.location.Location;
 
 import com.beoni.openwaterswimtracking.R;
 import com.beoni.openwaterswimtracking.utils.DateUtils;
-import com.beoni.openwaterswimtracking.utils.ImageBase64;
 import com.beoninet.openwaterswimtracking.shared.LocationSerializer;
 
 import java.io.Serializable;
@@ -78,6 +76,10 @@ public class SwimTrack implements Serializable
 
     public String getID(){
         return ID;
+    }
+
+    public String getMapPreviewImageFileName(){
+        return getID()+".png";
     }
 
     public boolean isValid(){
@@ -211,26 +213,14 @@ public class SwimTrack implements Serializable
         this.gpsLocationsAsString = gpsLocationsAsString;
     }
 
-    public String getMapPreviewBase64()
+    public void setMapPreviewFullFileName(String path)
     {
-        return mapPreviewBase64;
+        mapPreviewFullFileName = path;
     }
 
-    public void setMapPreviewBase64(String mapPreviewBase64){
-        this.mapPreviewBase64 = mapPreviewBase64;
-    }
-
-    public void setMapPreview(Bitmap bitmap)
+    public String getMapPreviewFullFileName()
     {
-        setMapPreviewBase64(ImageBase64.convert(bitmap));
-    }
-
-    public Bitmap getMapPreview()
-    {
-        if(mapPreviewBase64!=null)
-            return ImageBase64.convert(getMapPreviewBase64());
-        else
-            return null;
+        return mapPreviewFullFileName;
     }
 
     public void setID(String ID)
@@ -249,7 +239,7 @@ public class SwimTrack implements Serializable
     private int perceivedTemperature = 0;
     private int waves = 0;
     private int flow = 0;
-    private String mapPreviewBase64;
+    private String mapPreviewFullFileName;
     private String gpsLocationsAsString;
 
 

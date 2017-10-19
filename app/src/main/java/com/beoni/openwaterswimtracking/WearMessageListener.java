@@ -40,7 +40,7 @@ public class WearMessageListener extends WearableListenerService
             else
                 message = getString(R.string.no_data_received);
 
-
+            //Todo: show toast on device, not on wear
             mEasyMessageManager.sendMessage(
                     Constants.MSG_SWIM_MESSAGE_RECEIVED,
                     message
