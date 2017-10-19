@@ -2,8 +2,8 @@ package com.beoni.openwaterswimtracking;
 
 
 import android.content.Intent;
+import android.widget.Toast;
 
-import com.beoninet.android.easymessage.EasyMessageManager;
 import com.beoninet.openwaterswimtracking.shared.Constants;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
@@ -18,16 +18,13 @@ import com.google.android.gms.wearable.WearableListenerService;
  */
 public class WearMessageListener extends WearableListenerService
 {
-    EasyMessageManager mEasyMessageManager;
-
     @Override
     public void onMessageReceived(MessageEvent msgEv)
     {
-        boolean gotData = msgEv.getData()!=null && msgEv.getData().length>0;
-
         if(msgEv.getPath().equals(Constants.MSG_SWIM_DATA_AVAILABLE))
         {
             String message;
+            boolean gotData = msgEv.getData()!=null && msgEv.getData().length>0;
 
             if(gotData){
                 message = getString(R.string.swim_data_downloaded);
@@ -40,32 +37,7 @@ public class WearMessageListener extends WearableListenerService
             else
                 message = getString(R.string.no_data_received);
 
-            //Todo: show toast on device, not on wear
-            mEasyMessageManager.sendMessage(
-                    Constants.MSG_SWIM_MESSAGE_RECEIVED,
-                    message
-            );
+            Toast.makeText(this,message,Toast.LENGTH_LONG).show();
         }
-    }
-
-    @Override
-    public void onCreate()
-    {
-        super.onCreate();
-        mEasyMessageManager = new EasyMessageManager(this);
-    }
-
-    @Override
-    public void onStart(Intent intent, int startId)
-    {
-        super.onStart(intent, startId);
-        mEasyMessageManager.connect();
-    }
-
-    @Override
-    public void onDestroy()
-    {
-        super.onDestroy();
-        mEasyMessageManager.disconnect();
     }
 }
