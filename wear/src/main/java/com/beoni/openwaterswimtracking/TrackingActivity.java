@@ -49,7 +49,7 @@ public class TrackingActivity extends WearableActivity
     private static final long AMBIENT_MODE_UPDATE_INTERVAL_MS = (2 * 60 * 1000); //2 minutes
 
     private static final long TRACK_MIN_TIME_DIFF_MINUTES = (0); //0 milli-seconds
-    private static final long TRACK_MIN_DISTANCE_METERS = 100; //100 meters
+    private static final long TRACK_MIN_DISTANCE_METERS = 0; //100; //100 meters
     private static final int AMBIENT_INT_REQ_CODE = 0;
 
     /**
@@ -329,7 +329,7 @@ public class TrackingActivity extends WearableActivity
     }
 
     public void stop(View button){
-        
+        finish();
     }
 
 

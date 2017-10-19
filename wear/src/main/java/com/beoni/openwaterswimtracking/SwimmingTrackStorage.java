@@ -3,12 +3,14 @@ package com.beoni.openwaterswimtracking;
 
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.util.Log;
 
 import com.beoninet.openwaterswimtracking.shared.LocationSerializer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class SwimmingTrackStorage
 {
@@ -43,9 +45,19 @@ public class SwimmingTrackStorage
     public String getAllAsString(){
         String locations = "";
 
+        //TreeMap automatically sorts by key :)... time.
+        TreeMap<Long,String> locationTreeMap = new TreeMap<>();
+
         Map<String,?> all = mPreferences.getAll();
         for (Map.Entry<String,?> entry:all.entrySet())
-            locations += System.lineSeparator() + entry.getValue().toString();
+            locationTreeMap.put(
+                    Long.parseLong(entry.getKey()),
+                    entry.getValue().toString()
+            );
+
+        //now loops bu in the right order, by time
+        for (TreeMap.Entry<Long,String> entry:locationTreeMap.entrySet())
+            locations += System.lineSeparator() + entry.getValue();
 
         return locations;
     }

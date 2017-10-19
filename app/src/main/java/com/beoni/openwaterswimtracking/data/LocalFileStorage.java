@@ -16,7 +16,7 @@ public class LocalFileStorage
      * Factory method to initialize the LocalFileStorage singleton class.
      * @return Instance of the LocalFileStorage
      */
-    public static synchronized LocalFileStorage get(){
+    public static LocalFileStorage get(){
         if(LocalFileStorage.instance==null){
             LocalFileStorage.instance = new LocalFileStorage();
         }

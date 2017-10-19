@@ -2,6 +2,7 @@ package com.beoni.openwaterswimtracking;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
@@ -103,4 +104,10 @@ public class WearMainActivity extends WearableActivity
         easyMessageManager.disconnect();
     }
 
+    public void btnStartTrackingOnClick(View view)
+    {
+        Intent intent = new Intent(this, TrackingActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP); //to update the activity intent and related data
+        startActivity(intent);
+    }
 }

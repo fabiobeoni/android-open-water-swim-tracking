@@ -33,8 +33,8 @@ public class WearMessageListener extends WearableListenerService
                 message = getString(R.string.swim_data_downloaded);
 
                 Intent intent = new Intent(this,SwimEditActivity_.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra(Constants.EXTRA_SWIM_GPS_DATA,new String(msgEv.getData()));
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP); //to update the activity intent and related data
                 startActivity(intent);
             }
             else

@@ -15,6 +15,7 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 //TODO: replace validation with annotations based library
 /**
@@ -67,10 +68,16 @@ public class SwimTrack implements Serializable
         this.perceivedTemperature = perceivedTemperature;
         this.waves = waves;
         this.flow = flow;
+
+        this.ID = UUID.randomUUID().toString();
     }
 
     public SwimTrack()
     {
+    }
+
+    public String getID(){
+        return ID;
     }
 
     public boolean isValid(){
@@ -226,6 +233,12 @@ public class SwimTrack implements Serializable
             return null;
     }
 
+    public void setID(String ID)
+    {
+        this.ID = ID;
+    }
+
+    private String ID;
     private String notes;
     private String location;
     private Date date;

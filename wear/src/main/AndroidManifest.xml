@@ -20,6 +20,18 @@
             android:name="com.google.android.wearable"
             android:required="false"/>
 
+
+        <activity
+            android:name=".WearMainActivity"
+            android:label="@string/title_activity_wear_main"
+            android:theme="@android:style/Theme.DeviceDefault.Light">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
         <!--
             @singleInstance:
             To update the screen more than once
@@ -37,16 +49,6 @@
             android:launchMode="singleInstance"
             android:theme="@android:style/Theme.DeviceDefault.Light">
 
-        </activity>
-        <activity
-            android:name=".WearMainActivity"
-            android:label="@string/title_activity_wear_main"
-            android:theme="@android:style/Theme.DeviceDefault.Light">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
     </application>
 

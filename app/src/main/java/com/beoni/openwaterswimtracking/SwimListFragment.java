@@ -1,6 +1,7 @@
 package com.beoni.openwaterswimtracking;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -12,9 +13,9 @@ import com.beoni.openwaterswimtracking.bll.SwimTrackManager;
 import com.beoni.openwaterswimtracking.model.SwimTrack;
 import com.beoni.openwaterswimtracking.utils.ConnectivityUtils;
 import com.beoni.openwaterswimtracking.utils.LLog;
+import com.beoninet.openwaterswimtracking.shared.Constants;
 import com.google.gson.Gson;
 
-import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
@@ -25,6 +26,7 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.api.BackgroundExecutor;
 
 import java.util.ArrayList;
 
@@ -37,7 +39,7 @@ import java.util.ArrayList;
 @OptionsMenu(R.menu.menu_swim_list)
 public class SwimListFragment extends Fragment
 {
-    public static final String UPDATE_LIST_KEY = "UPDATE_LIST";
+    public static final String TASK_LOAD_DATA_ASYNC = "TASK_LOAD_DATA_ASYNC";
 
     //============ AVAILABLE UI STATES ===============/
 
@@ -72,9 +74,6 @@ public class SwimListFragment extends Fragment
     @Bean
     SwimTrackManager mSwimTrackManager;
 
-    //adapt class for this view
-    SwimTracksAdapter mSwimTracksAdapter;
-
     //list view presenting the swim tracks data
     @ViewById(R.id.swim_list)
     ListView mSwimListView;
@@ -91,11 +90,14 @@ public class SwimListFragment extends Fragment
     //Required empty public constructor
     public SwimListFragment() {}
 
-    //@AfterViews
-    public void viewCreated(){
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
         //the hosting activity can handle requests
         //to refresh this list
-        boolean forceListReload = getActivity().getIntent().getBooleanExtra(UPDATE_LIST_KEY,false);
+        boolean forceListReload = getActivity().getIntent().getBooleanExtra(Constants.INTENT_UPDATE_LIST,false);
 
         //mSwimTracksList is saved in instance state
         //so can be reused
@@ -106,17 +108,17 @@ public class SwimListFragment extends Fragment
             setUIState(UISTATE_GETTING_DATA);
 
             //gets data from the web or from cached
-            loadData();
+            loadDataAsync();
         }
         else //just proceed with UI update
             onDataLoadCompleted();
     }
 
     @Override
-    public void onResume()
+    public void onPause()
     {
-        super.onResume();
-        viewCreated();
+        super.onPause();
+        BackgroundExecutor.cancelAll(TASK_LOAD_DATA_ASYNC,true);
     }
 
     /**
@@ -124,8 +126,8 @@ public class SwimListFragment extends Fragment
      * of swim tracks data from the
      * locally stored file.
      */
-    @Background
-    void loadData() {
+    @Background(id=TASK_LOAD_DATA_ASYNC)
+    void loadDataAsync() {
         mSwimTracksList = mSwimTrackManager.getSwimTracks(true);
         onDataLoadCompleted();
     }
@@ -139,7 +141,7 @@ public class SwimListFragment extends Fragment
     void onDataLoadCompleted() {
         //updates the list adapter to display the data
         if(mSwimTracksList !=null && mSwimTracksList.size()>0){
-            mSwimTracksAdapter = new SwimTracksAdapter(getContext(), R.layout.swim_track_item, mSwimTracksList);
+            SwimTracksAdapter mSwimTracksAdapter = new SwimTracksAdapter(getContext(), R.layout.swim_track_item, mSwimTracksList);
             mSwimListView.setAdapter(mSwimTracksAdapter);
             //hides the progress bar since the
             //background process is completed
@@ -188,8 +190,11 @@ public class SwimListFragment extends Fragment
      */
     @Click(R.id.btn_add_swim)
     void displayEditSwimActivity(){
-        Intent displayIntent = new Intent(getActivity(), SwimEditActivity_.class);
-        startActivity(displayIntent);
+        Intent intent = new Intent(getActivity(), SwimEditActivity_.class);
+        //these two flags make sure your receiving activity will get new data from getIntent() instead of reusing first once
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra(Constants.INTENT_SWIM_ITEM, "");
+        startActivity(intent);
     }
 
     /**
@@ -220,8 +225,10 @@ public class SwimListFragment extends Fragment
     void onSwimListItemClick(SwimTrack swimTrack){
         String swimJson = new Gson().toJson(swimTrack);
         Intent intent = new Intent(getContext(), SwimEditActivity_.class);
-        intent.putExtra(SwimEditFragment.SWIM_ITEM_KEY, swimJson);
-        intent.putExtra(SwimEditFragment.SWIM_ITEM_INDEX, mSwimTracksList.indexOf(swimTrack));
+        //these two flags make sure your receiving activity will get new data from getIntent() instead of reusing first once
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra(Constants.INTENT_SWIM_ITEM, swimJson);
+        intent.putExtra(Constants.INTENT_SWIM_ITEM_INDEX, mSwimTracksList.indexOf(swimTrack));
         startActivity(intent);
     }
 

@@ -18,6 +18,7 @@ import com.beoni.openwaterswimtracking.bll.FirebaseManager;
 import com.beoni.openwaterswimtracking.bll.SwimTrackManager;
 import com.beoni.openwaterswimtracking.utils.ConnectivityUtils;
 import com.beoni.openwaterswimtracking.utils.LLog;
+import com.beoninet.openwaterswimtracking.shared.Constants;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -294,7 +295,7 @@ public class BackupActivity extends AppCompatActivity
             new android.os.Handler().postDelayed(new Runnable() {
                 public void run() {
                     Intent intent = new Intent(getBaseContext(),MainActivity_.class);
-                    intent.putExtra(MainActivity.REQUEST_SELECTED_TAB_KEY, 1);
+                    intent.putExtra(Constants.INTENT_REQUEST_SELECTED_TAB_KEY, 1);
                     startActivity(intent);
                 }
             }, 1000);
@@ -389,8 +390,8 @@ public class BackupActivity extends AppCompatActivity
             new android.os.Handler().postDelayed(new Runnable() {
                 public void run() {
                     Intent intent = new Intent(getBaseContext(),MainActivity_.class);
-                    intent.putExtra(MainActivity.REQUEST_SELECTED_TAB_KEY, 1);
-                    intent.putExtra(SwimListFragment.UPDATE_LIST_KEY, true);
+                    intent.putExtra(Constants.INTENT_REQUEST_SELECTED_TAB_KEY, 1);
+                    intent.putExtra(Constants.INTENT_UPDATE_LIST, true);
                     startActivity(intent);
                 }
             }, 1000);

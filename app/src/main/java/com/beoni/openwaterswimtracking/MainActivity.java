@@ -1,7 +1,7 @@
 package com.beoni.openwaterswimtracking;
 
 import android.content.Context;
-import android.content.Intent;
+import android.content.res.Resources;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -9,9 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.support.v4.view.ViewPager;
 import android.widget.Toast;
 
-import com.beoninet.android.easymessage.EasyMessageManager;
-import com.google.android.gms.wearable.MessageEvent;
-import com.google.android.gms.wearable.WearableListenerService;
+import com.beoninet.openwaterswimtracking.shared.Constants;
 
 import org.androidannotations.annotations.AfterExtras;
 import org.androidannotations.annotations.AfterViews;
@@ -26,7 +24,6 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity implements
         RssFragment.ITabSelectionRequest
 {
-    public static final String REQUEST_SELECTED_TAB_KEY = "REQUEST_SELECTED_TAB_KEY";
     public static final String WEAR_DATA_KEY = "WEAR_DATA_KEY";
 
     //these two paths must be defined on wear module too
@@ -51,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements
     //sending the user back to this activity
     //to display the swim tab instead of
     //the news one (default)
-    @Extra(REQUEST_SELECTED_TAB_KEY)
+    @Extra(Constants.INTENT_REQUEST_SELECTED_TAB_KEY)
     int mSelectedTab;
 
     @Extra(WEAR_DATA_KEY)

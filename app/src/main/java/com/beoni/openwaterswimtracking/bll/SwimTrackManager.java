@@ -11,6 +11,7 @@ import org.androidannotations.annotations.EBean;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Class performing CRUD operations over swimming tracks.
@@ -58,6 +59,20 @@ public class SwimTrackManager
             mSwimTracks = readFile();
 
         return mSwimTracks;
+    }
+
+    public boolean isNewSwim(SwimTrack swimTrack){
+        boolean result = true;
+
+        getSwimTracks(false);
+
+        for (SwimTrack t:mSwimTracks)
+            if (t.getID().equals(swimTrack.getID())){
+                result = false;
+                break;
+            }
+
+        return result;
     }
 
     /**
