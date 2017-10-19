@@ -151,9 +151,7 @@ public class FirebaseManager
             @Override
             public void onComplete(@NonNull Task<AuthResult> task)
             {
-                //TODO: check why I need to explicitly invoke it
                 mFirebaseAuthListener.onAuthStateChanged(mFirebaseAuth);
-
                 callback.onComplete(task);
             }
         });
