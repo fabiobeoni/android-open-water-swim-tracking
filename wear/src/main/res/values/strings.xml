@@ -13,4 +13,9 @@
     <string name="swim_data_downlaoded">Swimming data fully downloaded to device.</string>
     <string name="locations_list_pref">LOCATIONS_LIST</string>
     <string name="data_delivered">Swimming data delivered</string>
+    <string name="last_track">LAST TRACK</string>
+    <string name="last_track_distance">%1$s M</string>
+    <string name="last_track_time_length">%1$s H</string>
+    <string name="confirm">Confirm</string>
+    <string name="override_track_question">Override the current track?</string>
 </resources>

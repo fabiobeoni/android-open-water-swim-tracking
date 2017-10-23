@@ -42,7 +42,11 @@ public class SwimmingTrackStorage
         ).apply();
     }
 
-    public String getAllAsString(){
+    public List<Location> getAllLocations(){
+        return mLocationSerializer.parseMany(getAllLocationsAsString());
+    }
+
+    public String getAllLocationsAsString(){
         String locations = "";
 
         //TreeMap automatically sorts by key :)... time.
