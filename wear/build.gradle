@@ -51,6 +51,9 @@ dependencies {
     //permission management library
     compile 'com.thanosfisherman.mayi:mayi:1.4'
 
+    //async tasks lib
+    compile 'com.zsoltsafrany:needle:1.0.0'
+
     compile 'com.google.android.support:wearable:2.0.5'
     provided 'com.google.android.wearable:wearable:2.0.5'
     compile 'com.google.android.gms:play-services-wearable:11.0.4'

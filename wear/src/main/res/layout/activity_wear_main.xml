@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|center_horizontal"
         android:layout_marginBottom="36dp"
-        android:text="@string/last_track_time_length"
+        android:text="0h 0m 0s"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.Wearable.Large"
         android:textColor="@color/circular_button_normal"
@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|center_horizontal"
-        android:text="@string/last_track_distance"
+        android:text="0.0M"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.Wearable.Large"
         android:textColor="@color/dark_blue"
@@ -37,12 +37,11 @@
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="101dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|center_horizontal"
-        android:layout_marginEnd="16dp"
         android:layout_marginTop="36dp"
-        android:text="@string/last_track"
+        android:text="@string/no_track"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.Wearable.Small"
         android:textColor="@color/black_54p"
@@ -50,18 +49,6 @@
         app:layout_box="all"/>
 
     <!-- todo:add rotation animation -->
-    <ImageView
-        android:id="@+id/syncStatusImg"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_gravity="center|"
-        android:layout_marginStart="42dp"
-        android:layout_marginTop="36dp"
-        android:backgroundTintMode="add"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_sync_black_48dp"
-        android:tint="@android:color/holo_green_dark"
-        />
 
     <ImageButton
         android:id="@+id/sendDataToDeviceBtn"
@@ -72,7 +59,8 @@
         android:onClick="btnSendDataToDeviceOnClick"
         android:padding="4dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_upload_white_48dp"/>
+        android:src="@drawable/ic_upload_white_48dp"
+        android:contentDescription="@string/send_data_to_device"/>
 
     <ImageButton
         android:id="@+id/startTrackingBtn"
@@ -83,6 +71,7 @@
         android:onClick="btnStartTrackingOnClick"
         android:padding="4dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_swim_white_48dp"/>
+        android:src="@drawable/ic_swim_white_48dp"
+        android:contentDescription="@string/start_tracking"/>
 
 </android.support.wearable.view.BoxInsetLayout>

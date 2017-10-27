@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Open Water Swim Tracking: Wear</string>
-    <string name="distance_label">%1$s meters</string>
     <string name="allow_location_alert">Please allow location tracking.</string>
     <string name="enable_location_alert">Please enable GPS in settings.</string>
     <string name="error_label">Error</string>
@@ -8,14 +7,22 @@
     <string name="hello_round">Hello Round World!</string>
     <string name="hello_square">Hello Square World!</string>
     <string name="title_activity_wear_main">WearMainActivity</string>
-    <string name="hello_world">Hello World!</string>
     <string name="missing_device_connection">Please connect your phone or table to send data to it.</string>
     <string name="swim_data_downlaoded">Swimming data fully downloaded to device.</string>
-    <string name="locations_list_pref">LOCATIONS_LIST</string>
+
     <string name="data_delivered">Swimming data delivered</string>
-    <string name="last_track">LAST TRACK</string>
-    <string name="last_track_distance">%1$s M</string>
-    <string name="last_track_time_length">%1$s H</string>
     <string name="confirm">Confirm</string>
     <string name="override_track_question">Override the current track?</string>
+    <string name="data_sync_status">Data sync status</string>
+    <string name="send_data_to_device">Send data to device</string>
+    <string name="start_tracking">Start tracking</string>
+    <string name="stop_tracking">Stop tracking</string>
+
+    <string name="last_track_distance" translatable="false">%1$s M</string>
+    <string name="last_track_time_length" translatable="false">%1$sh %2$sm %3$ss</string>
+    <string name="current_time" translatable="false">%1$s H</string>
+    <string name="distance_label" translatable="false">%1$s M</string>
+    <string name="locations_list_pref" translatable="false">LOCATIONS_LIST</string>
+    <string name="last_track" translatable="false">LAST TRACK</string>
+    <string name="no_track" translatable="false">NO TRACK YET</string>
 </resources>

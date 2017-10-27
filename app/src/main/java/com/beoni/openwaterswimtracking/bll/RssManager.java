@@ -3,9 +3,9 @@ package com.beoni.openwaterswimtracking.bll;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.beoni.openwaterswimtracking.PrivateFileStorage;
 import com.beoni.openwaterswimtracking.R;
 import com.beoni.openwaterswimtracking.model.RssItemSimplified;
-import com.beoni.openwaterswimtracking.data.LocalFileStorage;
 import com.beoni.openwaterswimtracking.utils.ConnectivityUtils;
 import com.beoni.openwaterswimtracking.utils.DateUtils;
 import com.beoni.openwaterswimtracking.utils.LLog;
@@ -52,11 +52,11 @@ public class RssManager
 
     //instance of DAO class to manage read/write
     // files to the local disk
-    private LocalFileStorage mStorage;
+    private PrivateFileStorage mStorage;
 
     public RssManager(Context ctx){
         mContext = ctx;
-        mStorage = LocalFileStorage.get();
+        mStorage = PrivateFileStorage.get();
         mPreferences = mContext.getSharedPreferences(ctx.getString(R.string.preferences_file), android.content.Context.MODE_PRIVATE);
     }
 

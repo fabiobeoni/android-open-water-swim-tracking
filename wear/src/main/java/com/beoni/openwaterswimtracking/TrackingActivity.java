@@ -5,8 +5,8 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -17,10 +17,12 @@ import android.support.annotation.NonNull;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.beoninet.openwaterswimtracking.shared.ICallback;
+import com.beoninet.openwaterswimtracking.shared.SwimTrackCalculator;
 import com.thanosfisherman.mayi.Mayi;
 import com.thanosfisherman.mayi.PermissionBean;
 import com.thanosfisherman.mayi.PermissionToken;
@@ -29,11 +31,17 @@ import com.thanosfisherman.mayi.listeners.multi.PermissionResultMultiListener;
 import com.thanosfisherman.mayi.listeners.multi.RationaleMultiListener;
 
 import java.lang.ref.WeakReference;
+import java.util.Arrays;
+import java.util.Date;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 public class TrackingActivity extends WearableActivity
 {
-    private static final String TAG = "OWST.Wear.TrackingAct";
+    private static final String TAG = TrackingActivity.class.getSimpleName();
 
     /**
      * Custom 'what' for Message sent to Handler.
@@ -47,10 +55,11 @@ public class TrackingActivity extends WearableActivity
 
     //TODO:consider moving app settings to let the user decide...
     private static final long AMBIENT_MODE_UPDATE_INTERVAL_MS = (2 * 60 * 1000); //2 minutes
-
     private static final long TRACK_MIN_TIME_DIFF_MINUTES = (0); //0 milli-seconds
     private static final long TRACK_MIN_DISTANCE_METERS = 0; //100; //100 meters
     private static final int AMBIENT_INT_REQ_CODE = 0;
+
+    public static final SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("HH:mm:ss");
 
     /**
      * Since the handler (used in active mode) can't wake up the processor when the device is in
@@ -71,12 +80,15 @@ public class TrackingActivity extends WearableActivity
     private LocationManager mLocationManager;
     private LocationListener mLocationListener;
     private Location mLastLocation;
+    private Location mStartLocation;
     private SwimmingTrackStorage mSwimmingTrackStorage;
-    private float mTotalDistance = 0;
+    private float mTotalDistance;
 
-    private TextView mTotalDistanceTxt;
+    private TextView mTotalDistanceTxw;
+    private TextView mHoursTxw;
+    private TextView mCurrentTimeTxw;
     private View mContainerView;
-    private Button mStopBtn;
+    private ImageButton mStopBtn;
 
 
     @Override
@@ -87,16 +99,12 @@ public class TrackingActivity extends WearableActivity
         setContentView(R.layout.activity_tracking);
 
         mContainerView = findViewById(R.id.container);
-        mTotalDistanceTxt = findViewById(R.id.totalDistanceTxt);
+        mTotalDistanceTxw = findViewById(R.id.distanceTxw);
+        mHoursTxw = findViewById(R.id.hoursTxw);
+        mCurrentTimeTxw = findViewById(R.id.currentTimeTxw);
+        mStopBtn = findViewById(R.id.stopTrackingBtn);
 
         setAmbientEnabled();
-
-
-        SharedPreferences mSharedPref = getSharedPreferences(getString(R.string.locations_list_pref), Context.MODE_PRIVATE);
-
-        //removes existing tracked locations, if any, and starts new track
-        mSwimmingTrackStorage = SwimmingTrackStorage.get(mSharedPref).newTracking();
-
 
         mAmbientStateAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
@@ -109,6 +117,7 @@ public class TrackingActivity extends WearableActivity
                 PendingIntent.FLAG_UPDATE_CURRENT
         );
 
+        resetTotalDistance();
         refreshDisplayAndSetNextUpdate();
     }
 
@@ -116,6 +125,8 @@ public class TrackingActivity extends WearableActivity
     protected void onResume()
     {
         super.onResume();
+
+        displayTrackData(0,0);
 
         Mayi.withActivity(this)
                 .withPermissions(
@@ -143,6 +154,9 @@ public class TrackingActivity extends WearableActivity
                             Toast.makeText(TrackingActivity.this, R.string.enable_location_alert, Toast.LENGTH_LONG).show();
                             finish();
                         }
+                        else
+                            getSwimmingTrackStorage();
+
                     }
                 })
                 .onErrorListener(new MayiErrorListener()
@@ -165,6 +179,8 @@ public class TrackingActivity extends WearableActivity
     {
         super.onNewIntent(intent);
         setIntent(intent);
+
+        resetTotalDistance();
         refreshDisplayAndSetNextUpdate();
     }
 
@@ -194,8 +210,21 @@ public class TrackingActivity extends WearableActivity
          * and disabling anti-aliasing anti-aliasing, etc.)
          */
         mContainerView.setBackgroundColor(getResources().getColor(android.R.color.black));
-        mTotalDistanceTxt.setTextColor(Color.WHITE);
-        mTotalDistanceTxt.getPaint().setAntiAlias(false);
+
+        mTotalDistanceTxw.setTag(mTotalDistanceTxw.getCurrentTextColor());
+        mTotalDistanceTxw.setTextColor(Color.WHITE);
+        mTotalDistanceTxw.getPaint().setAntiAlias(false);
+
+        mHoursTxw.setTag(mHoursTxw.getCurrentTextColor());
+        mHoursTxw.setTextColor(Color.WHITE);
+        mHoursTxw.getPaint().setAntiAlias(false);
+
+        mCurrentTimeTxw.setTag(mCurrentTimeTxw.getCurrentTextColor());
+        mCurrentTimeTxw.setTextColor(Color.WHITE);
+        mCurrentTimeTxw.getPaint().setAntiAlias(false);
+
+        mStopBtn.setTag(((ColorDrawable) mStopBtn.getBackground()).getColor());
+        mStopBtn.setBackgroundColor(Color.BLACK);
 
         refreshDisplayAndSetNextUpdate();
     }
@@ -228,11 +257,29 @@ public class TrackingActivity extends WearableActivity
         /** Clears out Alarms since they are only used in ambient mode. */
         mAmbientStateAlarmManager.cancel(mAmbientStatePendingIntent);
 
-        mContainerView.setBackgroundColor(getResources().getColor(android.R.color.white));
-        mTotalDistanceTxt.setTextColor(Color.GREEN);
-        mTotalDistanceTxt.getPaint().setAntiAlias(true);
+        mContainerView.setBackgroundColor(Color.WHITE);
+
+        mTotalDistanceTxw.setTextColor((int) mTotalDistanceTxw.getTag());
+        mTotalDistanceTxw.getPaint().setAntiAlias(true);
+
+        mHoursTxw.setTextColor((int) mHoursTxw.getTag());
+        mHoursTxw.setTextColor((int) mHoursTxw.getTag());
+        mHoursTxw.getPaint().setAntiAlias(true);
+
+        mCurrentTimeTxw.setTextColor((int) mCurrentTimeTxw.getTag());
+        mCurrentTimeTxw.getPaint().setAntiAlias(true);
+
+        mStopBtn.setBackgroundColor((int)mStopBtn.getTag());
 
         refreshDisplayAndSetNextUpdate();
+    }
+
+    private SwimmingTrackStorage getSwimmingTrackStorage()
+    {
+        if(mSwimmingTrackStorage==null)
+            mSwimmingTrackStorage = new SwimmingTrackStorage(this);
+
+        return mSwimmingTrackStorage;
     }
 
     /**
@@ -241,7 +288,7 @@ public class TrackingActivity extends WearableActivity
      */
     private void refreshDisplayAndSetNextUpdate()
     {
-        getGPSLocationAndUpdateScreen();
+        getGPSLocationAndUpdate();
 
         long currentTimeMillis = System.currentTimeMillis();
 
@@ -275,30 +322,38 @@ public class TrackingActivity extends WearableActivity
     /**
      * Updates display based on Ambient state. If you need to pull data, you should do it here.
      */
-    private void getGPSLocationAndUpdateScreen()
+    private void getGPSLocationAndUpdate()
     {
         if (mLocationManager != null && mLocationListener == null)
         {
             mLocationListener = new LocationListener()
             {
                 @Override
-                public void onLocationChanged(Location location)
+                public void onLocationChanged(final Location location)
                 {
-                    if (mLastLocation == null) //first time only
+                    //keep track locally of first
+                    //registered location as track
+                    //starting point (for other calculations
+                    // like total time spent)
+                    if(mStartLocation==null)
+                        mStartLocation = location;
+
+                    if(mLastLocation==null)
                         mLastLocation = location;
 
-                    mTotalDistance += location.distanceTo(mLastLocation);
-                    mTotalDistanceTxt.setText(getString(R.string.distance_label, String.valueOf(mTotalDistance)));
+                    calculateTrackData(location);
 
-                    mLocationManager.removeUpdates(mLocationListener);
-                    mLocationListener = null;
+                    storeNewLocation(location);
 
                     //updates to be ready for next coming
                     //location and calculate the distance again
                     mLastLocation = location;
 
-                    //stores the location on the wear
-                    mSwimmingTrackStorage.add(location);
+                    if(mLocationListener!=null)
+                    {
+                        mLocationManager.removeUpdates(mLocationListener);
+                        mLocationListener = null;
+                    }
                 }
 
                 @Override
@@ -315,19 +370,74 @@ public class TrackingActivity extends WearableActivity
             {
                 mLocationManager.requestLocationUpdates(
                         LocationManager.GPS_PROVIDER,
-                        TRACK_MIN_TIME_DIFF_MINUTES, //5
-                        TRACK_MIN_DISTANCE_METERS,  //100
+                        TRACK_MIN_TIME_DIFF_MINUTES,
+                        TRACK_MIN_DISTANCE_METERS,
                         mLocationListener
                 );
 
             } catch (SecurityException ex)
             {
-                Log.e(TAG, ex.getMessage());
+                Log.e(TAG, ex.getMessage(),ex);
             }
         }
     }
 
-    public void stop(View button){
+    private void storeNewLocation(final Location location)
+    {
+        //reloading from data source is for some reasons
+        //needed to avoid to play with cached data in
+        //mSwimmingTrackStorage when the addAsync()
+        //methods adds to the locations collection.
+        //If the activity is resuming that collection
+        //not empty even if cleared with deletion
+        //method. It has something to do with the
+        //way the Handler stores the activity reference.
+        //So here you refresh the list to make sure
+        //the will be empty (if deleted before.. new track)
+        getSwimmingTrackStorage().getAllLocationsAsync(true, new ICallback<List<Location>>()
+        {
+            @Override
+            public void completed(List<Location> isCompleted)
+            {
+                //stores the location on the wear
+                //doesn't look for result because
+                //even in case a single location
+                //is not stored, many others should
+                //be. This method is invoked on a time
+                //bases, so you gonna have many locations
+                //anyway.
+                mSwimmingTrackStorage.addAsync(location, null);
+            }
+        });
+    }
+
+    private void calculateTrackData(Location location)
+    {
+        long duration = SwimTrackCalculator.calculateDuration(mStartLocation,location);
+        mTotalDistance += SwimTrackCalculator.calculateDistance(Arrays.asList(mLastLocation,location),true);
+
+        displayTrackData(duration,mTotalDistance);
+    }
+
+    private void displayTrackData(long duration, float totalDistance){
+        mHoursTxw.setText(getString(R.string.last_track_time_length,
+                String.valueOf(TimeUnit.MILLISECONDS.toHours(duration)),
+                String.valueOf(TimeUnit.MILLISECONDS.toMinutes(duration)),
+                String.valueOf(TimeUnit.MILLISECONDS.toSeconds(duration))
+        ));
+        mTotalDistanceTxw.setText(getString(R.string.last_track_distance, String.valueOf(totalDistance)));
+        mCurrentTimeTxw.setText(mSimpleDateFormat.format(new Date()));
+    }
+
+    private void resetTotalDistance()
+    {
+        mLastLocation = null;
+        mStartLocation = null;
+        mTotalDistance = 0;
+    }
+
+    public void btnStopTrackingOnClick(View button){
+        resetTotalDistance();
         finish();
     }
 
@@ -347,14 +457,14 @@ public class TrackingActivity extends WearableActivity
         @Override
         public void handleMessage(Message message)
         {
-            TrackingActivity mainActivity = mTrackingActivityWeakReference.get();
+            TrackingActivity trackingActivity = mTrackingActivityWeakReference.get();
 
-            if (mainActivity != null)
+            if (trackingActivity != null)
             {
                 switch (message.what)
                 {
                     case MSG_UPDATE_SCREEN:
-                        mainActivity.refreshDisplayAndSetNextUpdate();
+                        trackingActivity.refreshDisplayAndSetNextUpdate();
                         break;
                 }
             }

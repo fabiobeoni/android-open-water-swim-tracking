@@ -2,7 +2,7 @@ package com.beoni.openwaterswimtracking.bll;
 
 import android.content.Context;
 
-import com.beoni.openwaterswimtracking.data.LocalFileStorage;
+import com.beoni.openwaterswimtracking.PrivateFileStorage;
 import com.beoni.openwaterswimtracking.model.SwimTrack;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -11,7 +11,6 @@ import org.androidannotations.annotations.EBean;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Class performing CRUD operations over swimming tracks.
@@ -27,7 +26,7 @@ public class SwimTrackManager
 
     //instance of class performing file reading/writing
     //on device hard-drive
-    private LocalFileStorage mStorage;
+    private PrivateFileStorage mStorage;
 
     //in memory list of swim tracks to provide
     //to the client
@@ -39,7 +38,7 @@ public class SwimTrackManager
     public SwimTrackManager(Context ctx)
     {
         mContext = ctx;
-        mStorage = LocalFileStorage.get();
+        mStorage = PrivateFileStorage.get();
     }
 
 

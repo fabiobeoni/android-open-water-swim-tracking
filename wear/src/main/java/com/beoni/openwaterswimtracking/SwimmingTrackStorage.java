@@ -1,72 +1,76 @@
 package com.beoni.openwaterswimtracking;
 
-
-import android.content.SharedPreferences;
+import android.content.Context;
 import android.location.Location;
-import android.util.Log;
 
+import com.beoninet.openwaterswimtracking.shared.ICallback;
 import com.beoninet.openwaterswimtracking.shared.LocationSerializer;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+
+import needle.Needle;
 
 public class SwimmingTrackStorage
 {
-    private static SwimmingTrackStorage mInstance;
-    private static SharedPreferences mPreferences;
+    private static final String TAG = SwimmingTrackStorage.class.getSimpleName();
+
+    private static final String TRACK_FILE_NAME = "tracks.trk";
+    private static final String EMPTY = "";
+
     private LocationSerializer mLocationSerializer;
+    private PrivateFileStorage mPrivateFileStorage;
+    private List<Location> mLocations;
+    private Context mContext;
 
-    private SwimmingTrackStorage(SharedPreferences preferences){
-        mPreferences = preferences;
+    public SwimmingTrackStorage(Context ctx){
+        mContext = ctx;
         mLocationSerializer = new LocationSerializer();
+        mPrivateFileStorage = PrivateFileStorage.get();
+        mLocations = null;
     }
 
-    public static SwimmingTrackStorage get(SharedPreferences preferences){
-        if(mInstance==null)
-            mInstance = new SwimmingTrackStorage(preferences);
+    public void addAsync(final Location location, final ICallback<Boolean> cb){
+        Needle.onBackgroundThread().execute(new Runnable() {
+            @Override
+            public void run() {
+                mLocations.add(location);
 
-        return mInstance;
+                String locationsStr = mLocationSerializer.serializeMany(mLocations);
+                boolean completed = mPrivateFileStorage.writeTextFile(mContext, TRACK_FILE_NAME, locationsStr);
+
+                if(cb!=null) cb.completed(completed);
+            }
+        });
     }
 
-    public SwimmingTrackStorage newTracking(){
-        deleteAll();
-        return mInstance;
+    public void getAllLocationsAsync(final boolean refresh, final ICallback<List<Location>> cb){
+        Needle.onBackgroundThread().execute(new Runnable() {
+            @Override
+            public void run() {
+                loadLocations(refresh);
+
+                if(cb!=null) cb.completed(mLocations);
+            }
+        });
     }
 
-    public void add(Location location){
-        mPreferences.edit().putString(
-                String.valueOf(location.getTime()),
-                mLocationSerializer.serialize(location)
-        ).apply();
+    public void deleteAllAsync(final ICallback<Boolean> cb){
+        Needle.onBackgroundThread().execute(new Runnable() {
+            @Override
+            public void run() {
+                boolean completed = mPrivateFileStorage.writeTextFile(mContext, TRACK_FILE_NAME, EMPTY);
+
+                if(cb!=null) cb.completed(completed);
+            }
+        });
     }
 
-    public List<Location> getAllLocations(){
-        return mLocationSerializer.parseMany(getAllLocationsAsString());
+    private void loadLocations(boolean refresh){
+        if(mLocations==null || refresh)
+            mLocations = mLocationSerializer.parseMany(loadLocationsAsString());
     }
 
-    public String getAllLocationsAsString(){
-        String locations = "";
-
-        //TreeMap automatically sorts by key :)... time.
-        TreeMap<Long,String> locationTreeMap = new TreeMap<>();
-
-        Map<String,?> all = mPreferences.getAll();
-        for (Map.Entry<String,?> entry:all.entrySet())
-            locationTreeMap.put(
-                    Long.parseLong(entry.getKey()),
-                    entry.getValue().toString()
-            );
-
-        //now loops bu in the right order, by time
-        for (TreeMap.Entry<Long,String> entry:locationTreeMap.entrySet())
-            locations += System.lineSeparator() + entry.getValue();
-
-        return locations;
-    }
-
-    private void deleteAll(){
-        mPreferences.edit().clear().apply();
+    public String loadLocationsAsString(){
+        return mPrivateFileStorage.readTextFile(mContext, TRACK_FILE_NAME);
     }
 }

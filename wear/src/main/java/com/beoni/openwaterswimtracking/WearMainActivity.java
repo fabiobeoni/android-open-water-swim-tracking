@@ -2,15 +2,11 @@ package com.beoni.openwaterswimtracking;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
-import android.text.format.DateUtils;
-import android.text.style.TtsSpan;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -20,11 +16,13 @@ import android.widget.Toast;
 import com.beoninet.android.easymessage.EasyMessageManager;
 import com.beoninet.android.easymessage.INodeConnection;
 import com.beoninet.openwaterswimtracking.shared.Constants;
+import com.beoninet.openwaterswimtracking.shared.ICallback;
+import com.beoninet.openwaterswimtracking.shared.SwimTrackCalculator;
 import com.google.android.gms.wearable.MessageEvent;
 
 import java.text.DecimalFormat;
 import java.util.List;
-import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
 
 
 public class WearMainActivity extends WearableActivity
@@ -33,14 +31,11 @@ public class WearMainActivity extends WearableActivity
 
     private TextView mHoursTxw;
     private TextView mDistanceTxw;
-    private ImageView mSyncImg;
     private ImageButton mStartSwimTrackBtn;
     private ImageButton mSendDataToDeviceBtn;
 
     private EasyMessageManager easyMessageManager;
     private SwimmingTrackStorage mSwimmingTrackStorage;
-
-    private List<Location> mLocations;
 
 
     @Override
@@ -49,13 +44,10 @@ public class WearMainActivity extends WearableActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wear_main);
 
-        SharedPreferences mSharedPref = getSharedPreferences(getString(R.string.locations_list_pref), Context.MODE_PRIVATE);
-
-        mSwimmingTrackStorage = SwimmingTrackStorage.get(mSharedPref);
+        mSwimmingTrackStorage = new SwimmingTrackStorage(this);
 
         mHoursTxw = findViewById(R.id.hoursTxw);
         mDistanceTxw = findViewById(R.id.distanceTxw);
-        mSyncImg = findViewById(R.id.syncStatusImg);
         mStartSwimTrackBtn = findViewById(R.id.startTrackingBtn);
         mSendDataToDeviceBtn = findViewById(R.id.sendDataToDeviceBtn);
 
@@ -93,7 +85,14 @@ public class WearMainActivity extends WearableActivity
     protected void onResume()
     {
         super.onResume();
-        bindData();
+
+        mSwimmingTrackStorage.getAllLocationsAsync(true, new ICallback<List<Location>>(){
+            @Override
+            public void completed(List<Location> locations)
+            {
+                displayTrackData(locations);
+            }
+        });
     }
 
     @Override
@@ -103,64 +102,75 @@ public class WearMainActivity extends WearableActivity
         easyMessageManager.disconnect();
     }
 
-    private void bindData()
+    private void displayTrackData(final List<Location> locations)
     {
-        hasData(); //populates mLocations list used below
-
-        int totalDistance = calculateTotalDistance(mLocations);
-        mDistanceTxw.setText(getString(R.string.last_track_distance, String.valueOf(totalDistance)));
-
-        String duration = calculateDuration(mLocations);
-        mHoursTxw.setText(getString(R.string.last_track_time_length, String.valueOf(duration)));
-    }
-
-    private String calculateDuration(List<Location> locations)
-    {
-        String result = "0.00";
-        if(hasData())
+        runOnUiThread(new Runnable()
         {
-            long startTime = locations.get(0).getTime();
-            long endTime = locations.get(locations.size() - 1).getTime();
-            double duration = (double)((endTime - startTime) / 1000 / 60); //in hours
-            DecimalFormat df = new DecimalFormat("#.##");
-            result = df.format(duration);
-        }
-
-        return result;
-    }
-
-    private int calculateTotalDistance(List<Location> locations)
-    {
-        int totalDistance = 0;
-
-        if(hasData()){
-            Location lastLocation = null;
-            for (Location location:locations)
+            @Override
+            public void run()
             {
-                if(lastLocation==null)
-                    lastLocation = location;
+                float totalDistance = SwimTrackCalculator.calculateDistance(locations,true);
+                mDistanceTxw.setText(getString(R.string.last_track_distance, String.valueOf(totalDistance)));
 
-                totalDistance += location.distanceTo(lastLocation);
+                long duration = 0;
+                if(locations!=null && locations.size()>0)
+                    duration = SwimTrackCalculator.calculateDuration(locations.get(0),locations.get(locations.size()-1));
+
+                mHoursTxw.setText(getString(R.string.last_track_time_length,
+                        String.valueOf(TimeUnit.MILLISECONDS.toHours(duration)),
+                        String.valueOf(TimeUnit.MILLISECONDS.toMinutes(duration)),
+                        String.valueOf(TimeUnit.MILLISECONDS.toSeconds(duration))
+                ));
             }
-        }
-
-        return totalDistance;
+        });
     }
 
-    private boolean hasData(){
-        mLocations = mSwimmingTrackStorage.getAllLocations();
-        return mLocations.size()>0;
-    }
-
-    private void navigateToSwimTrack()
+    private void resetTrackAndStartNewOne()
     {
-        Intent intent = new Intent(WearMainActivity.this, TrackingActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP); //to update the activity intent and related data
-        startActivity(intent);
+        mSwimmingTrackStorage.deleteAllAsync(new ICallback<Boolean>()
+        {
+            @Override
+            public void completed(Boolean isCompleted)
+            {
+                Intent intent = new Intent(WearMainActivity.this, TrackingActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP); //to update the activity intent and related data
+                startActivity(intent);
+            }
+        });
+    }
+
+    public void btnStartTrackingOnClick(View view)
+    {
+        mSwimmingTrackStorage.getAllLocationsAsync(false, new ICallback<List<Location>>()
+        {
+            @Override
+            public void completed(final List<Location> locations)
+            {
+                runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        if(locations!=null && locations.size()>0)
+                            new AlertDialog.Builder(WearMainActivity.this)
+                                    .setMessage(R.string.override_track_question)
+                                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener()
+                                    {
+                                        public void onClick(DialogInterface dialog, int whichButton)
+                                        {
+                                            resetTrackAndStartNewOne();
+                                        }
+                                    })
+                                    .setNegativeButton(android.R.string.no, null).show();
+                        else
+                            resetTrackAndStartNewOne();
+                    }
+                });
+            }
+        });
     }
 
     public void btnSendDataToDeviceOnClick(final View view){ //button click on view
-
         easyMessageManager.checkNodes(new INodeConnection()
         {
             @Override
@@ -169,15 +179,11 @@ public class WearMainActivity extends WearableActivity
                 //message delivered only when there are actually nodes
                 //connected
                 if(easyMessageManager.hasNodes())
-                {
-                    SharedPreferences mSharedPref = getSharedPreferences(getString(R.string.locations_list_pref), Context.MODE_PRIVATE);
-                    mSwimmingTrackStorage = SwimmingTrackStorage.get(mSharedPref);
-
+                    //no need to use async task since here your are already in other context
                     easyMessageManager.sendMessage(
                             Constants.MSG_SWIM_DATA_AVAILABLE,
-                            mSwimmingTrackStorage.getAllLocationsAsString()
+                            mSwimmingTrackStorage.loadLocationsAsString()
                     );
-                }
                 else
                     ((Activity)view.getContext()).runOnUiThread(new Runnable()
                     {
@@ -190,22 +196,5 @@ public class WearMainActivity extends WearableActivity
 
             }
         });
-    }
-
-    public void btnStartTrackingOnClick(View view)
-    {
-        if(hasData())
-            new AlertDialog.Builder(this)
-                .setMessage(R.string.override_track_question)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int whichButton)
-                    {
-                        navigateToSwimTrack();
-                    }
-                })
-                .setNegativeButton(android.R.string.no, null).show();
-        else
-            navigateToSwimTrack();
     }
 }
