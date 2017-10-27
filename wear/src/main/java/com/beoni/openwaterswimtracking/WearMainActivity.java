@@ -29,6 +29,8 @@ public class WearMainActivity extends WearableActivity
 {
     private static final String TAG = WearMainActivity.class.getSimpleName();
 
+    private static final int STATE_DEFAULT = 0;
+
     private TextView mHoursTxw;
     private TextView mDistanceTxw;
     private ImageButton mStartSwimTrackBtn;
