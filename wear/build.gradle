@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 //AndroidAnnotations
-apply plugin: 'android-apt'
-def AAVersion = '3.2'
+//apply plugin: 'android-apt'
+//def AAVersion = '3.2'
 
 buildscript {
     repositories {
@@ -13,12 +13,14 @@ buildscript {
     }
 }
 
+/*
 apt {
     arguments {
         androidManifestFile variant.outputs[0].processResources.manifestFile
         resourcePackageName 'com.beoni.openwaterswimtracking'
     }
 }
+*/
 
 android {
     compileSdkVersion 26
@@ -43,8 +45,8 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     //AndroidAnnotations
-    apt "org.androidannotations:androidannotations:$AAVersion"
-    compile "org.androidannotations:androidannotations-api:$AAVersion"
+    //apt "org.androidannotations:androidannotations:$AAVersion"
+    //compile "org.androidannotations:androidannotations-api:$AAVersion"
 
     //permission management library
     compile 'com.thanosfisherman.mayi:mayi:1.4'
