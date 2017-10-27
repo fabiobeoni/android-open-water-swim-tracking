@@ -4,9 +4,7 @@ import android.util.Log;
 
 import java.util.Arrays;
 
-/**
- * Utility to easily print errors.
- */
+//TODO: remove this class
 public class LLog
 {
     private static final String ERROR_TAG = "OWST.error";
