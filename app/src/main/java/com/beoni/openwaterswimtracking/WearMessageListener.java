@@ -36,8 +36,6 @@ public class WearMessageListener extends WearableListenerService
             }
             else
                 message = getString(R.string.no_data_received);
-
-            Toast.makeText(this,message,Toast.LENGTH_LONG).show();
         }
     }
 }
