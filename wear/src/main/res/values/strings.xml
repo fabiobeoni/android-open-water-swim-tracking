@@ -25,4 +25,8 @@
     <string name="locations_list_pref" translatable="false">LOCATIONS_LIST</string>
     <string name="last_track" translatable="false">LAST TRACK</string>
     <string name="no_track" translatable="false">NO TRACK YET</string>
+    <string name="to_be_sync">LAST TRACK</string>
+    <string name="sync_in_progress">SYNC IN PROGRESS</string>
+    <string name="sync_completed">SYNC COMPLETED</string>
+    <string name="error_on_data_sync">Data sync error</string>
 </resources>

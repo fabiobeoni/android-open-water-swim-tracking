@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="image_button_light">@android:color/holo_blue_light</color>
+    <color name="image_button_dark">@color/dark_blue</color>
+    <color name="image_button_disabled">@color/light_grey</color>
+</resources>

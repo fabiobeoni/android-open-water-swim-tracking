@@ -10,7 +10,7 @@
     tools:deviceIds="wear">
 
     <TextView
-        android:id="@+id/hoursTxw"
+        android:id="@+id/swimDurationTxw"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|center_horizontal"
@@ -23,7 +23,7 @@
         app:layout_box="all"/>
 
     <TextView
-        android:id="@+id/distanceTxw"
+        android:id="@+id/swimDistanceTxw"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|center_horizontal"
@@ -36,7 +36,7 @@
         app:layout_box="all"/>
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/statusMessageTxw"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|center_horizontal"
@@ -55,23 +55,23 @@
         android:layout_width="match_parent"
         android:layout_height="42dp"
         android:layout_gravity="bottom|clip_horizontal"
-        android:background="@android:color/holo_blue_light"
+        android:background="@color/image_button_light"
+        android:contentDescription="@string/send_data_to_device"
         android:onClick="btnSendDataToDeviceOnClick"
         android:padding="4dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_upload_white_48dp"
-        android:contentDescription="@string/send_data_to_device"/>
+        android:src="@drawable/ic_upload_white_48dp"/>
 
     <ImageButton
         android:id="@+id/startTrackingBtn"
         android:layout_width="match_parent"
         android:layout_height="42dp"
         android:layout_gravity="top|clip_horizontal"
-        android:background="@color/dark_blue"
+        android:background="@color/image_button_dark"
+        android:contentDescription="@string/start_tracking"
         android:onClick="btnStartTrackingOnClick"
         android:padding="4dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_swim_white_48dp"
-        android:contentDescription="@string/start_tracking"/>
+        android:src="@drawable/ic_swim_white_48dp"/>
 
 </android.support.wearable.view.BoxInsetLayout>

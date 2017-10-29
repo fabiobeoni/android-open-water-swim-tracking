@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,7 +19,6 @@ import com.beoninet.openwaterswimtracking.shared.ICallback;
 import com.beoninet.openwaterswimtracking.shared.SwimTrackCalculator;
 import com.google.android.gms.wearable.MessageEvent;
 
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -29,8 +27,14 @@ public class WearMainActivity extends WearableActivity
 {
     private static final String TAG = WearMainActivity.class.getSimpleName();
 
-    private TextView mHoursTxw;
-    private TextView mDistanceTxw;
+    private static final int UI_STATE_NO_SWIM = 10;
+    private static final int UI_STATE_HAS_SWIM = 20;
+    private static final int UI_STATE_SYNC_PROGRESS = 30;
+    private static final int UI_STATE_SYNC_COMPLETED = 40;
+
+    private TextView mSwimDurationTxw;
+    private TextView mSwimDistanceTxw;
+    private TextView mStatusMessageTxw;
     private ImageButton mStartSwimTrackBtn;
     private ImageButton mSendDataToDeviceBtn;
 
@@ -46,8 +50,9 @@ public class WearMainActivity extends WearableActivity
 
         mSwimmingTrackStorage = new SwimmingTrackStorage(this);
 
-        mHoursTxw = findViewById(R.id.hoursTxw);
-        mDistanceTxw = findViewById(R.id.distanceTxw);
+        mSwimDurationTxw = findViewById(R.id.swimDurationTxw);
+        mSwimDistanceTxw = findViewById(R.id.swimDistanceTxw);
+        mStatusMessageTxw = findViewById(R.id.statusMessageTxw);
         mStartSwimTrackBtn = findViewById(R.id.startTrackingBtn);
         mSendDataToDeviceBtn = findViewById(R.id.sendDataToDeviceBtn);
 
@@ -60,14 +65,23 @@ public class WearMainActivity extends WearableActivity
             }
 
             @Override
-            public void onMessageDelivered(boolean result)
+            public void onMessageDelivered(final boolean result)
             {
                 ((Activity)getContext()).runOnUiThread(new Runnable()
                 {
                     @Override
                     public void run()
                     {
-                        Toast.makeText(getContext(),R.string.data_delivered,Toast.LENGTH_SHORT).show();
+                        if(result)
+                        {
+                            setUIState(UI_STATE_SYNC_COMPLETED);
+                            Toast.makeText(getContext(), R.string.data_delivered, Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        {
+                            setUIState(UI_STATE_HAS_SWIM);
+                            Toast.makeText(getContext(), R.string.error_on_data_sync, Toast.LENGTH_LONG).show();
+                        }
                     }
                 });
             }
@@ -88,9 +102,21 @@ public class WearMainActivity extends WearableActivity
 
         mSwimmingTrackStorage.getAllLocationsAsync(true, new ICallback<List<Location>>(){
             @Override
-            public void completed(List<Location> locations)
+            public void completed(final List<Location> locations)
             {
-                displayTrackData(locations);
+                runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        if(locations!=null && locations.size()>0)
+                            setUIState(UI_STATE_HAS_SWIM);
+                        else
+                            setUIState(UI_STATE_NO_SWIM);
+
+                        displayTrackData(locations);
+                    }
+                });
             }
         });
     }
@@ -102,27 +128,56 @@ public class WearMainActivity extends WearableActivity
         easyMessageManager.disconnect();
     }
 
+    private void setUIState(int state){
+        switch (state){
+            case UI_STATE_NO_SWIM:
+                mStartSwimTrackBtn.setEnabled(true);
+                mStartSwimTrackBtn.setBackgroundColor(getResources().getColor(R.color.image_button_dark));
+                mSendDataToDeviceBtn.setEnabled(false);
+                mSendDataToDeviceBtn.setBackgroundColor(getResources().getColor(R.color.image_button_disabled));
+                mStatusMessageTxw.setText(R.string.no_track);
+                break;
+
+            case UI_STATE_HAS_SWIM:
+                mStartSwimTrackBtn.setEnabled(true);
+                mStartSwimTrackBtn.setBackgroundColor(getResources().getColor(R.color.image_button_dark));
+                mSendDataToDeviceBtn.setEnabled(true);
+                mSendDataToDeviceBtn.setBackgroundColor(getResources().getColor(R.color.image_button_light));
+                mStatusMessageTxw.setText(R.string.to_be_sync);
+                break;
+
+            case UI_STATE_SYNC_PROGRESS:
+                mStartSwimTrackBtn.setEnabled(false);
+                mStartSwimTrackBtn.setBackgroundColor(getResources().getColor(R.color.image_button_disabled));
+                mSendDataToDeviceBtn.setEnabled(false);
+                mSendDataToDeviceBtn.setBackgroundColor(getResources().getColor(R.color.image_button_disabled));
+                mStatusMessageTxw.setText(R.string.sync_in_progress);
+                break;
+
+            case UI_STATE_SYNC_COMPLETED:
+                mStartSwimTrackBtn.setEnabled(true);
+                mStartSwimTrackBtn.setBackgroundColor(getResources().getColor(R.color.image_button_dark));
+                mSendDataToDeviceBtn.setEnabled(true);
+                mSendDataToDeviceBtn.setBackgroundColor(getResources().getColor(R.color.image_button_light));
+                mStatusMessageTxw.setText(R.string.sync_completed);
+                break;
+        }
+    }
+
     private void displayTrackData(final List<Location> locations)
     {
-        runOnUiThread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                float totalDistance = SwimTrackCalculator.calculateDistance(locations,true);
-                mDistanceTxw.setText(getString(R.string.last_track_distance, String.valueOf(totalDistance)));
+        float totalDistance = SwimTrackCalculator.calculateDistance(locations,true);
+        mSwimDistanceTxw.setText(getString(R.string.last_track_distance, String.valueOf(totalDistance)));
 
-                long duration = 0;
-                if(locations!=null && locations.size()>0)
-                    duration = SwimTrackCalculator.calculateDuration(locations.get(0),locations.get(locations.size()-1));
+        long duration = 0;
+        if(locations!=null && locations.size()>0)
+            duration = SwimTrackCalculator.calculateDuration(locations.get(0),locations.get(locations.size()-1));
 
-                mHoursTxw.setText(getString(R.string.last_track_time_length,
-                        String.valueOf(TimeUnit.MILLISECONDS.toHours(duration)),
-                        String.valueOf(TimeUnit.MILLISECONDS.toMinutes(duration)),
-                        String.valueOf(TimeUnit.MILLISECONDS.toSeconds(duration))
-                ));
-            }
-        });
+        mSwimDurationTxw.setText(getString(R.string.last_track_time_length,
+                String.valueOf(TimeUnit.MILLISECONDS.toHours(duration)),
+                String.valueOf(TimeUnit.MILLISECONDS.toMinutes(duration)),
+                String.valueOf(TimeUnit.MILLISECONDS.toSeconds(duration))
+        ));
     }
 
     private void resetTrackAndStartNewOne()
@@ -179,11 +234,22 @@ public class WearMainActivity extends WearableActivity
                 //message delivered only when there are actually nodes
                 //connected
                 if(easyMessageManager.hasNodes())
+                {
                     //no need to use async task since here your are already in other context
                     easyMessageManager.sendMessage(
                             Constants.MSG_SWIM_DATA_AVAILABLE,
                             mSwimmingTrackStorage.loadLocationsAsString()
                     );
+
+                    runOnUiThread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            setUIState(UI_STATE_SYNC_PROGRESS);
+                        }
+                    });
+                }
                 else
                     ((Activity)view.getContext()).runOnUiThread(new Runnable()
                     {
