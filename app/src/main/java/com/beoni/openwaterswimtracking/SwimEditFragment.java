@@ -21,6 +21,7 @@ import com.beoni.openwaterswimtracking.model.SwimTrack;
 import com.beoni.openwaterswimtracking.utils.DateUtils;
 import com.beoninet.openwaterswimtracking.shared.Constants;
 import com.beoninet.openwaterswimtracking.shared.LocationSerializer;
+import com.beoninet.openwaterswimtracking.shared.SwimTrackCalculator;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -38,6 +39,7 @@ import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.StringRes;
 import org.androidannotations.annotations.res.StringArrayRes;
 
+import java.sql.Date;
 import java.util.List;
 
 /**
@@ -78,9 +80,6 @@ public class SwimEditFragment extends Fragment
     @StringArrayRes
     String[] flowValues;
 
-    @StringRes(R.string.swim_title_validate)
-    String mTitleValidation;
-
     @StringRes(R.string.swim_date_validate)
     String mDateValidation;
 
@@ -89,17 +88,11 @@ public class SwimEditFragment extends Fragment
 
     //swim track duration input control
     @ViewById(R.id.swim_duration)
-    SeekBar mDurationSkb;
-
-    @ViewById(R.id.swim_duration_label)
-    TextView mDurationLabelTvw;
+    EditText mDurationTxt;
 
     //swim track length input control
     @ViewById(R.id.swim_length)
-    SeekBar mLengthSkb;
-
-    @ViewById(R.id.swim_length_label)
-    TextView mLengthLabelTvw;
+    EditText mLengthTxt;
 
     //swim track temperature input control
     @ViewById(R.id.swim_temperature)
@@ -121,10 +114,6 @@ public class SwimEditFragment extends Fragment
 
     @ViewById(R.id.swim_flow_label)
     TextView mFlowTvw;
-
-    //swim track title input control
-    @ViewById(R.id.swim_title)
-    EditText mTitleTxt;
 
     //swim track date input control
     @ViewById(R.id.swim_date)
@@ -216,8 +205,18 @@ public class SwimEditFragment extends Fragment
         //so any user interaction with this activity gets reset
         //to start a blank form and fill GPS data
         if(hasRequestFromWear()){
-            mSwimTrack = SwimTrack.createNewEmptySwim(getContext());
-            mSwimTrack.setGpsLocations(mLocationSerializer, getGPSLocationsFromIntent());
+            List<Location> locations = getGPSLocationsFromIntent();
+            if(locations!=null && locations.size()>0)
+            {
+                long duration = SwimTrackCalculator.calculateDuration(locations.get(0),locations.get(locations.size()-1));
+                long distance = SwimTrackCalculator.calculateDistance(locations,true);
+
+                mSwimTrack = SwimTrack.createNewEmptySwim(getContext());
+                mSwimTrack.setGpsLocations(mLocationSerializer, locations);
+                mSwimTrack.setDuration(duration);
+                mSwimTrack.setLength(distance);
+                mSwimTrack.setDate(new Date(locations.get(0).getTime()));
+            }
         }
         else{
             //only if no data from wear then look for data
@@ -266,13 +265,14 @@ public class SwimEditFragment extends Fragment
 
     private void bindData()
     {
+        float duration = mSwimTrack.getDuration()/1000/60; //sets the value in minutes
+
         //binds data to UI
-        mTitleTxt.setText(mSwimTrack.getTitle());
         mLocationTxt.setText(mSwimTrack.getLocation());
         mDateTxt.setText(DateUtils.dateToString(mSwimTrack.getDate(),DateUtils.SHORT_FORMAT));
         mNotesTxt.setText(mSwimTrack.getNotes());
-        mDurationSkb.setProgress(mSwimTrack.getDuration());
-        mLengthSkb.setProgress(mSwimTrack.getLength()/100);
+        mDurationTxt.setText(String.valueOf(duration));
+        mLengthTxt.setText(String.valueOf(mSwimTrack.getLength())); //sets the value in meters
         mTemperatureSkb.setProgress(mSwimTrack.getPerceivedTemperature());
         mTemperatureTvw.setText(temperatureValues[mSwimTrack.getPerceivedTemperature()]);
         mWavesSkb.setProgress(mSwimTrack.getWaves());
@@ -311,13 +311,6 @@ public class SwimEditFragment extends Fragment
 
     //======= DATA BINDING AND VALIDATION ==========/
 
-    @AfterTextChange(R.id.swim_title)
-    void onTitleChange(){
-        mSwimTrack.setTitle(mTitleTxt.getText().toString());
-        if(!mSwimTrack.isTitleValid())
-            mTitleTxt.setError(mTitleValidation);
-    }
-
     @AfterTextChange(R.id.swim_date)
     void onDateChange(){
         if(mDateTxt.getText()!=null){
@@ -341,19 +334,22 @@ public class SwimEditFragment extends Fragment
         mSwimTrack.setNotes(mNotesTxt.getText().toString());
     }
 
-    @SeekBarProgressChange(R.id.swim_duration)
-    void onDurationChange(SeekBar seekBar, int i, boolean b){
-        mDurationLabelTvw.setText(SwimTrack.formatDuration(getContext(),i));
-        mSwimTrack.setDuration(i);
+    @AfterTextChange(R.id.swim_duration)
+    void onDurationChange(){
+        long duration = 0;
+        if(mDurationTxt.getText()!=null && mDurationTxt.getText().toString().trim().length()>0)
+            duration =(long) (Float.parseFloat(mDurationTxt.getText().toString())*60)*1000; //in milliseconds
+
+        mSwimTrack.setDuration(duration);
     }
 
-    @SeekBarProgressChange(R.id.swim_length)
-    void onLengthChange(SeekBar seekBar, int i, boolean b){
-        //1 "i" = 100 meters
-        i=i*100;
+    @AfterTextChange(R.id.swim_length)
+    void onLengthChange(){
+        long distance = 0;
+        if(mLengthTxt.getText()!=null && mLengthTxt.getText().toString().trim().length()>0)
+            distance = Long.parseLong(mLengthTxt.getText().toString());
 
-        mLengthLabelTvw.setText(String.valueOf(i)+ mLengthLabel);
-        mSwimTrack.setLength(i);
+        mSwimTrack.setLength(distance);
     }
 
     @SeekBarProgressChange(R.id.swim_flow)

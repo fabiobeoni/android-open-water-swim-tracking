@@ -1,5 +1,7 @@
 package com.beoni.openwaterswimtracking.utils;
 
+import android.support.annotation.NonNull;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,17 +14,24 @@ import java.util.Date;
  */
 public class DateUtils
 {
-    public final static String FORMAT = "dd/mm/yyyy hh:mm:ss";
-    public final static String SHORT_FORMAT = "dd/mm/yyyy";
+    public final static String FORMAT = "dd/MM/yyyy hh:mm:ss";
+    public final static String SHORT_FORMAT = "dd/MM/yyyy";
+
+    @NonNull
+    private static DateFormat getDateFormat(String format)
+    {
+        DateFormat formatter =  new SimpleDateFormat(format);
+        formatter.setLenient(false);
+        return  formatter;
+    }
 
     public static String dateToString(Date date){
-        DateFormat df = new SimpleDateFormat(FORMAT);
-        return df.format(date);
+        return getDateFormat(FORMAT).format(date);
     }
 
     public static String dateToString(Date date, String format){
-        DateFormat formatter = new SimpleDateFormat(format);
-        return formatter.format(date).toString();
+        String t = getDateFormat(format).format(date);
+        return t;
     }
 
     /**
@@ -31,7 +40,7 @@ public class DateUtils
      * @return
      */
     public static Date stringToDate(String dateStr, String format){
-        DateFormat formatter = new SimpleDateFormat(format);
+        DateFormat formatter = getDateFormat(format);
         try
         {
             return formatter.parse(dateStr);
