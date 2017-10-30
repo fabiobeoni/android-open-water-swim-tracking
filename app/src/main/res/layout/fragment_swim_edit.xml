@@ -20,20 +20,6 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/swim_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/swim_title_hint"
-                    android:inputType="textCapSentences"
-                    android:maxLines="1"/>
-
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
                     android:id="@+id/swim_location"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -83,25 +69,12 @@
                 android:textSize="18sp"/>
 
 
-            <SeekBar
+            <EditText
                 android:id="@+id/swim_duration"
-                style="@style/Widget.AppCompat.SeekBar.Discrete"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:max="600"
-                android:progress="1"/>
-
-            <TextView
-                android:id="@+id/swim_duration_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:paddingEnd="8dp"
-                android:paddingStart="8dp"
-                android:text="[value]"
-                android:textColor="@color/colorDark"
-                android:textSize="18sp"/>
+                android:ems="10"
+                android:inputType="number"/>
 
 
             <TextView
@@ -115,26 +88,12 @@
                 android:textColor="?android:attr/textColorHint"
                 android:textSize="18sp"/>
 
-            <SeekBar
+            <EditText
                 android:id="@+id/swim_length"
-                style="@style/Widget.AppCompat.SeekBar.Discrete"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:max="600"
-                android:progress="1"/>
-
-            <TextView
-                android:id="@+id/swim_length_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:paddingEnd="8dp"
-                android:paddingLeft="8dp"
-                android:paddingStart="8dp"
-                android:text="[value]"
-                android:textColor="@color/colorDark"
-                android:textSize="18sp"/>
+                android:ems="10"
+                android:inputType="number"/>
 
 
             <TextView
@@ -237,11 +196,11 @@
                 xmlns:map="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/map_view"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
+                android:layout_height="300dp"
                 android:layout_weight="1"
                 android:paddingTop="12dp"
-                map:mapType="normal"
                 map:liteMode="true"
+                map:mapType="normal"
                 />
 
         </LinearLayout>

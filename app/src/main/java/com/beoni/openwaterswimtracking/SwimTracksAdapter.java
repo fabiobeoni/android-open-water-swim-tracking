@@ -74,7 +74,6 @@ public class SwimTracksAdapter extends ArrayAdapter
 
             itemView.wavesImgVw = (ImageView) view.findViewById(R.id.icon_swim_temperature);
             itemView.flowImgVw = (ImageView) view.findViewById(R.id.icon_swim_flow);
-            itemView.titleTvw = (TextView) view.findViewById(R.id.swim_title);
             itemView.locationTvw = (TextView) view.findViewById(R.id.swim_location);
             itemView.lengthTvw = (TextView) view.findViewById(R.id.swim_length);
             itemView.durationTvw = (TextView) view.findViewById(R.id.swim_duration);
@@ -88,7 +87,6 @@ public class SwimTracksAdapter extends ArrayAdapter
 
         final SwimTrack swimTrack = (SwimTrack) this.getItem(position);
 
-        itemView.titleTvw.setText(swimTrack.getTitle());
         itemView.locationTvw.setText(swimTrack.getLocation());
         itemView.durationTvw.setText(SwimTrack.formatDuration(getContext(),swimTrack.getDuration()));
         itemView.lengthTvw.setText(String.valueOf(swimTrack.getLength())+resources.getString(R.string.swim_length_label));
@@ -120,7 +118,6 @@ public class SwimTracksAdapter extends ArrayAdapter
     static class ItemView
     {
         TextView locationTvw;
-        TextView titleTvw;
         TextView lengthTvw;
         TextView durationTvw;
         TextView dateTvw;

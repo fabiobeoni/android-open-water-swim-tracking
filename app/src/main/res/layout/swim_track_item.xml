@@ -48,18 +48,6 @@
             android:layout_marginBottom="4dp">
 
             <TextView
-                android:id="@+id/swim_location"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:maxWidth="170dp"
-                android:text="Spot"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
-
-            <TextView
                 android:id="@+id/swim_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -72,12 +60,17 @@
         </RelativeLayout>
 
         <TextView
-            android:id="@+id/swim_title"
-            android:layout_width="wrap_content"
+            android:id="@+id/swim_location"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Title"
-            android:textColor="@color/colorPrimary"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:maxWidth="170dp"
+            android:text="Spot"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textColor="@color/colorPrimary"/>
 
         <RelativeLayout
             android:layout_width="match_parent"

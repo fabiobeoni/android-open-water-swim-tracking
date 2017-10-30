@@ -28,15 +28,14 @@ public class SwimTrack implements Serializable
      */
     public static SwimTrack createNewEmptySwim(Context ctx){
         return new SwimTrack(
-                ctx.getResources().getString(R.string.new_swim_title),
-                "",
                 ctx.getResources().getString(R.string.new_swim_location),
                 DateUtils.stringToDate("01/01/2017",DateUtils.SHORT_FORMAT)
-                ,60,3000,1,1,1
+                ,0,0,1,1,1,
+                ""
         );
     }
 
-    public static String formatDuration(Context ctx, int duration){
+    public static String formatDuration(Context ctx, float duration){
         //"i" are minutes
         double h = ((double)duration/60.00);
         DecimalFormatSymbols symbols = new DecimalFormatSymbols();
@@ -55,9 +54,8 @@ public class SwimTrack implements Serializable
         return (hours+ hoursLabel +minutes+ minutesLabel);
     }
 
-    private SwimTrack(String title, String notes, String location, Date date, int duration, int length, int perceivedTemperature, int waves, int flow)
+    private SwimTrack(String location, Date date, int duration, int length, int perceivedTemperature, int waves, int flow, String notes)
     {
-        this.title = title;
         this.notes = notes;
         this.location = location;
         this.date = date;
@@ -83,24 +81,12 @@ public class SwimTrack implements Serializable
     }
 
     public boolean isValid(){
-        return (isDateValid() && isLocationValid() && isTitleValid());
-    }
 
-    public String getTitle()
-    {
-        return title;
+        return (
+                isDateValid() && isLocationValid() &&
+                        isDurationValid() && isLengthValid()
+        );
     }
-
-    public void setTitle(String title)
-    {
-        this.title = title;
-    }
-
-    public boolean isTitleValid(){
-        return (this.title!=null && this.title.trim().length()>0);
-    }
-
-    private String title;
 
     public String getNotes()
     {
@@ -140,25 +126,31 @@ public class SwimTrack implements Serializable
         return (this.date!=null);
     }
 
-    public int getDuration()
+    public long getDuration()
     {
         return duration;
     }
 
-    public void setDuration(int duration)
+    public void setDuration(long duration)
     {
         this.duration = duration;
     }
 
-    public int getLength()
+    public boolean isDurationValid(){
+        return duration>0;
+    }
+
+    public long getLength()
     {
         return length;
     }
 
-    public void setLength(int length)
+    public void setLength(long length)
     {
         this.length = length;
     }
+
+    public boolean isLengthValid(){ return length>0;}
 
     public int getPerceivedTemperature()
     {
@@ -232,10 +224,10 @@ public class SwimTrack implements Serializable
     private String notes;
     private String location;
     private Date date;
-    //in minutes
-    private int duration = 0;
-    //measure type agnostic number
-    private int length = 0;
+    //in milliseconds
+    private long duration = 0;
+    //in meters
+    private long length = 0;
     private int perceivedTemperature = 0;
     private int waves = 0;
     private int flow = 0;

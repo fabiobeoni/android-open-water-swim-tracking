@@ -13,9 +13,9 @@ public class SwimTrackCalculator
         return (endLocation.getTime()-startLocation.getTime());
     }
 
-    public static float calculateDistance(List<Location> locations, boolean round)
+    public static long calculateDistance(List<Location> locations, boolean round)
     {
-        float totalDistance = 0;
+        long totalDistance = 0;
 
         if(locations.size()>0){
             Location lastLocation = null;

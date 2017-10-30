@@ -33,10 +33,10 @@
     <string name="swim_notes_hint">Notes</string>
     <string name="swim_date_hint">When (*)</string>
     <string name="swim_location_hint">Spot (*)</string>
-    <string name="swim_duration">Duration</string>
+    <string name="swim_duration">Duration (* minutes)</string>
     <string name="swim_duration_label_hours">&#160;h&#160;&#160;</string>
     <string name="swim_duration_label_minutes">&#160;m</string>
-    <string name="swim_length">Distance</string>
+    <string name="swim_length">Distance (* meters)</string>
     <string name="swim_length_label">&#160;meters</string>
     <string name="swim_temperature">Perceived Temperature</string>
     <string-array name="temperature_values">
