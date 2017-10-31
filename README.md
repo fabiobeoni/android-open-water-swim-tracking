@@ -9,7 +9,8 @@ The app also uses well known Android libraries like AndroidAnnotations, GSon, Pi
 <p>The app is a <strong>swim training utility to</strong> <strong>keep track of open water swimming</strong>. Common features are:</p>
 
 <ol>
-<li>Keep track of open water swimming sessions by recording data like spot name, notes, swim length, duration, marine weather conditions (like flow and waves), perceived temperature</li>
+<li>By the <strong>watch module</strong>: keep track of open water swimming sessions by recording swim length, duration, GPS coordinates of points</li>
+<li>By the <strong>phone module</strong>: manually record user feedback about marine weather conditions like flow, waves and perceived temperature</li>
 <li>List swim sessions</li>
 <li>Present swimming performance in a graph displayed by an Home Screen widget</li>
 <li>Backup and restore swim sessions on Google Firebase cloud service</li>
