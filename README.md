@@ -31,5 +31,8 @@ The app also uses well known Android libraries like AndroidAnnotations, GSon, Pi
 <img src="https://github.com/fabiobeoni/android-open-water-swim-tracking/blob/master/github_info_page/6.png?raw=true" alt="Login to backup" title="">
 <img src="https://github.com/fabiobeoni/android-open-water-swim-tracking/blob/master/github_info_page/7.png?raw=true" alt="Backup" title="">
 <img src="https://github.com/fabiobeoni/android-open-water-swim-tracking/blob/master/github_info_page/8.png?raw=true" alt="Restore" title="">
+  <img src="https://github.com/fabiobeoni/android-open-water-swim-tracking/blob/master/github_info_page/watch-main.png?raw=true" alt="Restore" title="" style="width:50%">
+  <img src="https://github.com/fabiobeoni/android-open-water-swim-tracking/blob/master/github_info_page/watch-track.png?raw=true" alt="Restore" title="">
+  <img src="https://github.com/fabiobeoni/android-open-water-swim-tracking/blob/master/github_info_page/watch-track-ambient.png?raw=true" alt="Restore" title="">
 <img src="https://github.com/fabiobeoni/android-open-water-swim-tracking/blob/master/github_info_page/widget.jpg?raw=true" alt="Home widget" title="">
 </
