@@ -69,8 +69,22 @@ public class RssListAdapter extends ArrayAdapter
         if(rssItemSimplified.getImageUrl()!=null)
             Picasso.with(getContext()).load(rssItemSimplified.getImageUrl())
                     .placeholder(R.drawable.placeholder)
-                    .error(R.drawable.placeholder)
-                    .into(holder.imageView);
+                    .into(holder.imageView, new com.squareup.picasso.Callback(){
+
+                        @Override
+                        public void onSuccess()
+                        {
+                            holder.imageView.setVisibility(View.VISIBLE);
+                        }
+
+                        @Override
+                        public void onError()
+                        {
+                            holder.imageView.setVisibility(View.GONE);
+                        }
+                    });
+        else
+            holder.imageView.setVisibility(View.GONE);
 
         holder.titleView.setText(rssItemSimplified.getTitle());
         holder.dateView.setText(DateUtils.dateToString(rssItemSimplified.getDate(),DateUtils.SHORT_FORMAT));
