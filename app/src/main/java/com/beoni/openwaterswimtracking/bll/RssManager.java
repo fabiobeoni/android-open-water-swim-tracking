@@ -153,7 +153,10 @@ public class RssManager
         //gets the last data restoreFromFireDatabase date
         if(!lastDownloadDateStr.equals("")){
             Date lastDownloadDate = DateUtils.stringToDate(lastDownloadDateStr,DateUtils.FORMAT);
-            diff = DateUtils.dateDiff(lastDownloadDate,today);
+            if(lastDownloadDate!=null)
+                diff = DateUtils.dateDiff(lastDownloadDate,today);
+            else
+                diff = 1;
         }
 
         return (diff>=1);
