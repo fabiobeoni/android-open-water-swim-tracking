@@ -73,7 +73,12 @@ public class RssManager
     {
         ArrayList<RssItemSimplified> rssItems = new ArrayList<>();
 
-        if(ConnectivityUtils.isDeviceConnected(mContext) && isDownloadedRssObsolete()){
+        boolean connected = ConnectivityUtils.isDeviceConnected(mContext);
+
+        //TODO: revisit this step since prevents loading in some cases
+        //boolean rssObs = isDownloadedRssObsolete();
+
+        if(connected){
             rssItems = downloadRss();
             writeRssFile(rssItems);
         }
@@ -153,7 +158,10 @@ public class RssManager
         //gets the last data restoreFromFireDatabase date
         if(!lastDownloadDateStr.equals("")){
             Date lastDownloadDate = DateUtils.stringToDate(lastDownloadDateStr,DateUtils.FORMAT);
-            diff = DateUtils.dateDiff(lastDownloadDate,today);
+            if(lastDownloadDate!=null)
+                diff = DateUtils.dateDiff(lastDownloadDate,today);
+            else
+                diff = 2;
         }
 
         return (diff>=1);

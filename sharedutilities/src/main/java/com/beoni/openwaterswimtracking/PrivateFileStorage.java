@@ -76,6 +76,7 @@ public class PrivateFileStorage
         boolean result = false;
         try
         {
+            ctx.deleteFile(fileName);
             outputStream = ctx.openFileOutput(fileName, Context.MODE_PRIVATE);
             outputStream.write(content.getBytes());
             result = true;
