@@ -22,23 +22,63 @@ import com.google.android.gms.wearable.MessageEvent;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-
+/**
+ * Starting activity, shows UI controls to:
+ * 1. start a new recording session of GPS locations,
+ * 2. display last swimming track duration and distance,
+ * 3. start sending track data to handled device
+ */
 public class WearMainActivity extends WearableActivity
 {
     private static final String TAG = WearMainActivity.class.getSimpleName();
 
+    /**
+     * No swimming track data available yet to display, first time access only.
+     * User can start a new tracking, sync button is disabled instead.
+     */
     private static final int UI_STATE_NO_SWIM = 10;
+
+    /**
+     * Last track about swimming are stored on wear
+     * and can be displayed to the user.
+     * User can start a new tracking, sync feature is also on.
+     */
     private static final int UI_STATE_HAS_SWIM = 20;
+
+    /**
+     * Sending swimming track data to the handled
+     * device, that's a really short time and you
+     * may not notice it while running the app.
+     * User can not start a new tracking, sync button
+     * is disabled instead during data transfer.
+     */
     private static final int UI_STATE_SYNC_PROGRESS = 30;
+
+    /**
+     * Data have been sent to the handled device,
+     * User can start a new tracking, sync feature is also on.
+     */
     private static final int UI_STATE_SYNC_COMPLETED = 40;
 
+    //All UI controls
     private TextView mSwimDurationTxw;
     private TextView mSwimDistanceTxw;
     private TextView mStatusMessageTxw;
     private ImageButton mStartSwimTrackBtn;
     private ImageButton mSendDataToDeviceBtn;
 
+    /**
+     * Instance of the library utility class
+     * to quickly send and receive messages
+     * by the Message API channel from/to
+     * wear/phone
+     */
     private EasyMessageManager easyMessageManager;
+
+    /**
+     * Instance of class storing GPS locations
+     * recorded from the wear into h memory.
+     */
     private SwimmingTrackStorage mSwimmingTrackStorage;
 
 
@@ -56,6 +96,10 @@ public class WearMainActivity extends WearableActivity
         mStartSwimTrackBtn = findViewById(R.id.startTrackingBtn);
         mSendDataToDeviceBtn = findViewById(R.id.sendDataToDeviceBtn);
 
+        //Registers message listeners to communicate
+        //with the handled device.
+        //MessageManager is connected on Start and disconnected
+        //on Stop
         easyMessageManager = new EasyMessageManager(this){
             @Override
             public void onMessageReceived(MessageEvent messageEvent)
@@ -100,6 +144,8 @@ public class WearMainActivity extends WearableActivity
     {
         super.onResume();
 
+        //gets all available GPS locations and
+        // updates the UI according to available data
         mSwimmingTrackStorage.getAllLocationsAsync(true, new ICallback<List<Location>>(){
             @Override
             public void completed(final List<Location> locations)
@@ -128,6 +174,11 @@ public class WearMainActivity extends WearableActivity
         easyMessageManager.disconnect();
     }
 
+    /**
+     * Set all UI controls status
+     * according to data availability.
+     * @param state
+     */
     private void setUIState(int state){
         switch (state){
             case UI_STATE_NO_SWIM:
@@ -164,6 +215,11 @@ public class WearMainActivity extends WearableActivity
         }
     }
 
+    /**
+     * Shows swimming track distance and duration
+     * on UI with needed formatting.
+     * @param locations
+     */
     private void displayTrackData(final List<Location> locations)
     {
         float totalDistance = SwimTrackCalculator.calculateDistance(locations,true);
@@ -180,10 +236,16 @@ public class WearMainActivity extends WearableActivity
         ));
     }
 
+    /**
+     * Deletes current existing swimming
+     * track data and redirect user to
+     * tracking activity when done.
+     */
     private void resetTrackAndStartNewOne()
     {
         mSwimmingTrackStorage.deleteAllAsync(new ICallback<Boolean>()
         {
+            //TODO: add check about deleting result.
             @Override
             public void completed(Boolean isCompleted)
             {
@@ -194,6 +256,12 @@ public class WearMainActivity extends WearableActivity
         });
     }
 
+    /**
+     * When user wants to start a new tracking
+     * checks if a track is store and ask to
+     * confirm before proceeding to override.
+     * @param view
+     */
     public void btnStartTrackingOnClick(View view)
     {
         mSwimmingTrackStorage.getAllLocationsAsync(false, new ICallback<List<Location>>()
@@ -225,6 +293,13 @@ public class WearMainActivity extends WearableActivity
         });
     }
 
+    /**
+     * Starts sending data to the handled device.
+     * Connected device is needed, data are sent
+     * using the Message API channel and serialized
+     * as text.
+     * @param view
+     */
     public void btnSendDataToDeviceOnClick(final View view){ //button click on view
         easyMessageManager.checkNodes(new INodeConnection()
         {
