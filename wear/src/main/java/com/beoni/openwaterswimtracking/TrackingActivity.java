@@ -56,7 +56,7 @@ public class TrackingActivity extends WearableActivity
     //TODO:consider moving app settings to let the user decide...
     private static final long AMBIENT_MODE_UPDATE_INTERVAL_MS = (2 * 60 * 1000); //2 minutes
     private static final long TRACK_MIN_TIME_DIFF_MINUTES = (0); //0 milli-seconds
-    private static final long TRACK_MIN_DISTANCE_METERS = 0; //100; //100 meters
+    private static final long TRACK_MIN_DISTANCE_METERS = 50; //100 meters
     private static final int AMBIENT_INT_REQ_CODE = 0;
 
     public static final SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("HH:mm:ss");
@@ -79,9 +79,32 @@ public class TrackingActivity extends WearableActivity
 
     private LocationManager mLocationManager;
     private LocationListener mLocationListener;
-    private Location mLastLocation;
-    private Location mStartLocation;
+
+    /**
+     * Instance of class that keep stores all
+     * the GPS locations recorded by this activity.
+     */
     private SwimmingTrackStorage mSwimmingTrackStorage;
+
+    /**
+     * Last location recorded before the current one.
+     * Needed to calculate distance between track
+     * points.
+     */
+    private Location mLastLocation;
+
+    /**
+     * First GPS location recorded.
+     * Needed to calculate the total
+     * time from begin to end of the track.
+     */
+    private Location mStartLocation;
+
+    /**
+     * Total swim distance, sum
+     * of multiple segments defined
+     * by GPS points.
+     */
     private float mTotalDistance;
 
     private TextView mTotalDistanceTxw;
@@ -89,6 +112,14 @@ public class TrackingActivity extends WearableActivity
     private TextView mCurrentTimeTxw;
     private View mContainerView;
     private ImageButton mStopBtn;
+
+    private SwimmingTrackStorage getSwimmingTrackStorage()
+    {
+        if(mSwimmingTrackStorage==null)
+            mSwimmingTrackStorage = new SwimmingTrackStorage(this);
+
+        return mSwimmingTrackStorage;
+    }
 
 
     @Override
@@ -106,6 +137,9 @@ public class TrackingActivity extends WearableActivity
 
         setAmbientEnabled();
 
+        //set the alarm needed to call display updates when
+        //ambient state is enabled on watch.
+        //The listener of this trigger also reads GPS coordinates.
         mAmbientStateAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
         Intent ambientStateIntent = new Intent(getApplicationContext(), TrackingActivity.class);
@@ -117,7 +151,11 @@ public class TrackingActivity extends WearableActivity
                 PendingIntent.FLAG_UPDATE_CURRENT
         );
 
+        //sets default values
         resetTotalDistance();
+
+        //gets GPS location, updates the UI
+        //and updates teh alarm for next update
         refreshDisplayAndSetNextUpdate();
     }
 
@@ -243,6 +281,10 @@ public class TrackingActivity extends WearableActivity
     public void onUpdateAmbient()
     {
         super.onUpdateAmbient();
+
+        //this event is critical because
+        //it open the window to get data
+        //and update UI based on them
         refreshDisplayAndSetNextUpdate();
     }
 
@@ -272,14 +314,6 @@ public class TrackingActivity extends WearableActivity
         mStopBtn.setBackgroundColor((int)mStopBtn.getTag());
 
         refreshDisplayAndSetNextUpdate();
-    }
-
-    private SwimmingTrackStorage getSwimmingTrackStorage()
-    {
-        if(mSwimmingTrackStorage==null)
-            mSwimmingTrackStorage = new SwimmingTrackStorage(this);
-
-        return mSwimmingTrackStorage;
     }
 
     /**
@@ -382,6 +416,11 @@ public class TrackingActivity extends WearableActivity
         }
     }
 
+    /**
+     * Add the new GPS location to the
+     * track on local storage.
+     * @param location
+     */
     private void storeNewLocation(final Location location)
     {
         //reloading from data source is for some reasons
@@ -411,6 +450,11 @@ public class TrackingActivity extends WearableActivity
         });
     }
 
+    /**
+     * Calculate distance and time from last
+     * tracked location and updates teh screen.
+     * @param location
+     */
     private void calculateTrackData(Location location)
     {
         long duration = SwimTrackCalculator.calculateDuration(mStartLocation,location);
@@ -419,6 +463,11 @@ public class TrackingActivity extends WearableActivity
         displayTrackData(duration,mTotalDistance);
     }
 
+    /**
+     * Updates the UI to display swim duration and total distance.
+     * @param duration
+     * @param totalDistance
+     */
     private void displayTrackData(long duration, float totalDistance){
         mHoursTxw.setText(getString(R.string.last_track_time_length,
                 String.valueOf(TimeUnit.MILLISECONDS.toHours(duration)),
@@ -429,6 +478,12 @@ public class TrackingActivity extends WearableActivity
         mCurrentTimeTxw.setText(mSimpleDateFormat.format(new Date()));
     }
 
+    /**
+     * Clears the swim track values
+     * to display on UI when the user
+     * stops tracking, or new intent
+     * comes.
+     */
     private void resetTotalDistance()
     {
         mLastLocation = null;
